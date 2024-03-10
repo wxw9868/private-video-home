@@ -1,4 +1,4 @@
-module video
+module github.com/wxw9868/video
 
 go 1.21
 

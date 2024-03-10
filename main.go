@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+
+	"github.com/wxw9868/video/api"
 )
 
 func main() {
-	router := Engine()
+	router := api.Engine()
 
-	ip, err := getLocalIP()
+	ip, err := api.GetLocalIP()
 	if err != nil {
 		log.Fatal(err)
 	}
