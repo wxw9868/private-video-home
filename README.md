@@ -1,3 +1,5 @@
+# video
+
 + [ckplayer.com](https://www.ckplayer.com/)
 + [Bootstrap V5](https://v5.bootcss.com/)
 + [ffmpeg-go](https://github.com/u2takey/ffmpeg-go)
@@ -6,7 +8,6 @@
 - [一个工具箱 - 好用的在线工具都在这里！](http://www.atoolbox.net/)
 
 ```
-echo "# video" >> README.md
 git init
 git add README.md
 git commit -m "first commit"
