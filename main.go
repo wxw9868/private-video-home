@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/wxw9868/video/api"
+	"github.com/wxw9868/video/router"
+	"github.com/wxw9868/video/utils"
 )
 
 func main() {
-	router := api.Engine()
+	router := router.Engine()
 
-	ip, err := api.GetLocalIP()
+	ip, err := utils.GetLocalIP()
 	if err != nil {
 		log.Fatal(err)
 	}

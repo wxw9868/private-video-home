@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -9,10 +10,43 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/wxw9868/video/utils"
 )
 
-func videoList(c *gin.Context) {
+func LoginApi(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.html", gin.H{
+		"title": "登录",
+	})
+}
+
+func DoLoginApi(c *gin.Context) {
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+
+	fmt.Println("s: ", email, password)
+
+	if email != "" && password != "" {
+		session := sessions.Default(c)
+		session.Set("email", email)
+		session.Set("password", password)
+		session.Save()
+
+		c.Redirect(http.StatusMovedPermanently, "/")
+		return
+	}
+}
+
+func LogoutApi(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+
+	c.JSON(http.StatusOK, nil)
+}
+
+func VideoList(c *gin.Context) {
 	if c.Query("actress_id") != "" {
 		indexInt, _ := strconv.Atoi(c.Query("actress_id"))
 		actress := actressListSort[indexInt]
@@ -60,12 +94,12 @@ func videoList(c *gin.Context) {
 
 				filePath := videoDir + "/" + filename
 				fil, _ := os.Open(filePath)
-				duration, _ := GetMP4Duration(fil)
+				duration, _ := utils.GetMP4Duration(fil)
 
 				posterPath := posterDir + "/" + title + ".jpg"
 				_, err = os.Stat(posterPath)
 				if os.IsNotExist(err) {
-					_ = ReadFrameAsJpeg(filePath, posterPath, "00:00:56")
+					_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:00:56")
 				}
 
 				//snapshotPath := snapshotDir + "/" + title + ".gif"
@@ -77,7 +111,7 @@ func videoList(c *gin.Context) {
 					Title:    title,
 					Actress:  actress,
 					Size:     size / 1024 / 1024,
-					Duration: ResolveTime(duration),
+					Duration: utils.ResolveTime(duration),
 					ModTime:  fi.ModTime().Format("2006-01-02 15:04:05"),
 					Poster:   posterPath,
 				}
@@ -94,7 +128,7 @@ func videoList(c *gin.Context) {
 		"actressID":   -1,
 	})
 }
-func videoPlay(c *gin.Context) {
+func VideoPlay(c *gin.Context) {
 	id := c.Query("id")
 	intId, _ := strconv.Atoi(id)
 	name := list[intId]
@@ -110,7 +144,7 @@ var replaceName = map[string]struct{}{
 	"无码频道_每天更新_":            {},
 }
 
-func videoRename(c *gin.Context) {
+func VideoRename(c *gin.Context) {
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
 		log.Fatal(err)
