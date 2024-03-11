@@ -8,8 +8,8 @@
 	<!-- 引入 Bootstrap CSS -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 	<!-- 引入 CKPlayer CSS（如果需要样式定制的话） -->
-	<link type="text/css" rel="stylesheet" href="assets/ckplayer/ckplayer/css/ckplayer.css" />
-	<link type="text/css" rel="stylesheet" href="assets/css/play.css" />
+	<link type="text/css" rel="stylesheet" href="assets/ckplayer/css/ckplayer.css" />
+	<link type="text/css" rel="stylesheet" href="assets/app/css/play.css" />
 </head>
 <body>
 
@@ -33,13 +33,13 @@
 <!--
 	如果需要使用其它语言，请在此处引入相应的js,比如:<script type="text/javascript" src="ckplayer/language/en.js" charset="UTF-8"></script>
 -->
-<script type="text/javascript" src="assets/ckplayer/ckplayer/js/ckplayer.min.js" charset="UTF-8"></script>
+<script type="text/javascript" src="assets/ckplayer/js/ckplayer.min.js" charset="UTF-8"></script>
 <script>
 	//调用开始
 	var videoObject = {
 		container: '#videoPlayer', //视频容器
 		volume: 0.8,//默认音量，范围0-1
-		poster: 'assets/ckplayer/video/poster.png',//封面图片
+		// poster: 'assets/ckplayer/video/poster.png',//封面图片
 		autoplay: true,//是否自动播放
 		loop: true,//是否需要循环播放
 		seek: 'cookie',//指定跳转到cookie记录的时间，使用该属性必需配置属性cookie

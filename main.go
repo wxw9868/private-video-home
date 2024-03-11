@@ -4,19 +4,20 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/wxw9868/video/api"
+	"github.com/wxw9868/video/router"
+	"github.com/wxw9868/video/utils"
 )
 
 func main() {
-	router := api.Engine()
+	router := router.Engine()
 
-	ip, err := api.GetLocalIP()
+	ip, err := utils.GetLocalIP()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Server Running")
-	if err := router.Run(fmt.Sprintf("%s:%d", ip, 80)); err != nil {
+	if err := router.Run(fmt.Sprintf("%s:%d", ip, 9090)); err != nil {
 		panic(err)
 	}
 }
