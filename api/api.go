@@ -139,6 +139,14 @@ func VideoPlay(c *gin.Context) {
 	})
 }
 
+func VideoActress(c *gin.Context) {
+	actressList := actressListSort
+	c.HTML(http.StatusOK, "actress.html", gin.H{
+		"title":       "演员列表",
+		"actressList": actressList,
+	})
+}
+
 var replaceName = map[string]struct{}{
 	"_tg关注_@AVWUMAYUANPIAN": {},
 	"无码频道_每天更新_":            {},
