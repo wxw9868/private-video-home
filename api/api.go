@@ -141,9 +141,25 @@ func VideoPlay(c *gin.Context) {
 
 func VideoActress(c *gin.Context) {
 	actressList := actressListSort
+	actressSlice := make([]actress, len(actressList))
+
+	for index, name := range actressListSort {
+		nameSlice := []rune(name)
+		avatar := avatarDir + "/" + name + ".png"
+		utils.GenerateAvatar(string(nameSlice[0]), avatar)
+
+		actressSlice[index] = actress{
+			ID:      index + 1,
+			Actress: name,
+			Avatar:  avatar,
+		}
+	}
+
+	actressBytes, _ := json.Marshal(actressSlice)
+
 	c.HTML(http.StatusOK, "actress.html", gin.H{
 		"title":       "演员列表",
-		"actressList": actressList,
+		"actressList": string(actressBytes),
 	})
 }
 

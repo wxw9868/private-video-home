@@ -4,15 +4,50 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"image/color"
+	"image/color/palette"
 	"io"
 	"log"
+	"math/rand"
 	"net"
 	"os"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/disintegration/imaging"
+	"github.com/shiningrush/avatarbuilder"
+	"github.com/shiningrush/avatarbuilder/calc"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
+
+func GenerateAvatar(name, path string) error {
+	palette := palette.Plan9
+	var bgColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
+	var frontColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
+	bgColor = palette[randint(len(palette))]
+	frontColor = palette[randint(len(palette))]
+	ab := avatarbuilder.NewAvatarBuilder("assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
+	ab.SetBackgroundColor(bgColor)
+	ab.SetFrontgroundColor(frontColor)
+	ab.SetFontSize(300)
+	ab.SetAvatarSize(460, 460)
+	if err := ab.GenerateImageAndSave(name, path); err != nil {
+		return err
+	}
+	return nil
+}
+
+var (
+	rng   = rand.New(rand.NewSource(time.Now().UnixNano()))
+	rngMu = new(sync.Mutex)
+)
+
+func randint(n int) int {
+	rngMu.Lock()
+	defer rngMu.Unlock()
+	return rng.Intn(n)
+}
 
 func GetLocalIP() (string, error) {
 	interfaces, err := net.Interfaces()
