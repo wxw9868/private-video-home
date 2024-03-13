@@ -4,12 +4,10 @@ go 1.21
 
 require (
 	github.com/disintegration/imaging v1.6.2
-	github.com/disintegration/letteravatar v0.0.0-20160912210445-1a457b860450
 	github.com/gin-gonic/gin v1.9.1
-	github.com/issue9/identicon/v2 v2.1.2
-	github.com/o1egl/govatar v0.4.1
 	github.com/shiningrush/avatarbuilder v0.0.0-20220126032521-dd13fcf4210d
 	github.com/u2takey/ffmpeg-go v0.5.0
+	gorm.io/gorm v1.20.12
 )
 
 require (
@@ -17,6 +15,8 @@ require (
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.1 // indirect
 )
 
 require (

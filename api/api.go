@@ -146,9 +146,12 @@ func VideoPlay(c *gin.Context) {
 	intId, _ := strconv.Atoi(id)
 	name := list[intId]
 
+	videoUrl := videoDir + "/" + name
+
 	c.HTML(http.StatusOK, "play.html", gin.H{
 		"title":     "视频播放",
-		"video_url": name,
+		"videoUrl":  videoUrl,
+		"videoName": name,
 	})
 }
 
