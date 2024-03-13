@@ -46,6 +46,19 @@ func LogoutApi(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+func VideoIndex(c *gin.Context) {
+	cards := make([]string, 6)
+	for i := 0; i < 6; i++ {
+		cardPath := "./assets/image/bizhi/card" + strconv.Itoa(i+1) + ".jpeg"
+		cards[i] = cardPath
+	}
+
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"title": "首页",
+		"data":  cards,
+	})
+}
+
 func VideoList(c *gin.Context) {
 	if c.Query("actress_id") != "" {
 		indexInt, _ := strconv.Atoi(c.Query("actress_id"))
@@ -143,15 +156,21 @@ func VideoActress(c *gin.Context) {
 	actressList := actressListSort
 	actressSlice := make([]actress, len(actressList))
 
-	for index, name := range actressListSort {
-		nameSlice := []rune(name)
-		avatar := avatarDir + "/" + name + ".png"
-		utils.GenerateAvatar(string(nameSlice[0]), avatar)
+	if len(actressList) > 0 {
+		for index, name := range actressListSort {
+			nameSlice := []rune(name)
+			avatarPath := avatarDir + "/" + name + ".png"
 
-		actressSlice[index] = actress{
-			ID:      index + 1,
-			Actress: name,
-			Avatar:  avatar,
+			_, err := os.Stat(avatarPath)
+			if os.IsNotExist(err) {
+				utils.GenerateAvatar(string(nameSlice[0]), avatarPath)
+			}
+
+			actressSlice[index] = actress{
+				ID:      index + 1,
+				Actress: name,
+				Avatar:  avatarPath,
+			}
 		}
 	}
 
@@ -161,11 +180,6 @@ func VideoActress(c *gin.Context) {
 		"title":       "演员列表",
 		"actressList": string(actressBytes),
 	})
-}
-
-var replaceName = map[string]struct{}{
-	"_tg关注_@AVWUMAYUANPIAN": {},
-	"无码频道_每天更新_":            {},
 }
 
 func VideoRename(c *gin.Context) {

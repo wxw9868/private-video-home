@@ -4,6 +4,8 @@
 + [Bootstrap V5](https://v5.bootcss.com/)
 + [ffmpeg-go](https://github.com/u2takey/ffmpeg-go)
 
++ [jQuery API 3.5.1 速查表](https://jquery.cuishifeng.cn/index.html)
+
 - [免费Favicon.ico图标在线生成器](https://www.logosc.cn/logo/favicon)
 - [一个工具箱 - 好用的在线工具都在这里！](http://www.atoolbox.net/)
 

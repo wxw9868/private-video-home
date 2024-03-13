@@ -35,12 +35,10 @@ func Engine() *gin.Engine {
 	auth := router.Group("")
 	auth.Use(AuthSession())
 	auth.GET("/logout", api.LogoutApi)
-	auth.GET("/", api.VideoList)
+	auth.GET("/", api.VideoIndex)
+	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
-	auth.GET("/home", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "home.html", nil)
-	})
 	auth.GET("/rename", api.VideoRename)
 
 	return router
