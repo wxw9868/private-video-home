@@ -112,7 +112,7 @@ func VideoList(c *gin.Context) {
 				posterPath := posterDir + "/" + title + ".jpg"
 				_, err = os.Stat(posterPath)
 				if os.IsNotExist(err) {
-					_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:00:56")
+					_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:00:10")
 				}
 
 				//snapshotPath := snapshotDir + "/" + title + ".gif"
