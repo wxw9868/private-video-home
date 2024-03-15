@@ -4,56 +4,74 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{.title}}</title>
-	<link href="assets/image/favicon/favicon.ico" rel="shortcut icon">
-	<!-- 引入 Bootstrap CSS -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-	<!-- 引入 CKPlayer CSS（如果需要样式定制的话） -->
-	<link type="text/css" rel="stylesheet" href="assets/ckplayer/css/ckplayer.css" />
-	<link type="text/css" rel="stylesheet" href="assets/app/css/play.css" />
+	<link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
+	<link rel="stylesheet" href="assets/bootstrap-5.3.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://unpkg.byted-static.com/xgplayer/3.0.10/dist/index.min.css">
 </head>
 <body>
-
-<div class="container">
-	<div class="row">
-		<div class="col-12">
-			<!-- CKPlayer 容器 -->
-			<div id="videoContainer">
-				<div id="videoPlayer"></div>
-			</div>
-		</div>
-	</div>
+	
+<style>
+	.container-fluid {
+		display: flex;
+    	place-content: center;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		overflow: hidden;
+	}
+	#videoPlayer {
+		position: relative;
+		padding-bottom: 56.25%; 
+		overflow: hidden;
+	}
+</style>
+<div class="container-fluid">
+	<div id="videoPlayer"></div>
 </div>
 
-<!-- 引入 Bootstrap JavaScript (可选，如果你需要 JavaScript 插件) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="assets/bootstrap-5.3.0/js/bootstrap.bundle.min.js" charset="utf-8"></script>
+<script src="https://unpkg.byted-static.com/xgplayer/3.0.10/dist/index.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+	let storage = Object
+	let videoUrl = '{{ .videoUrl }}'
+	if(!window.localStorage){
+		alert('浏览器不支持localStorage')
+	}else{
+		storage = window.localStorage;
+	}
 
-<!-- 引入 CKPlayer JavaScript -->
-<!--
-	如果需要使用其它语言，请在此处引入相应的js,比如:<script type="text/javascript" src="ckplayer/language/en.js" charset="UTF-8"></script>
--->
-<script type="text/javascript" src="assets/ckplayer/js/ckplayer.min.js" charset="UTF-8"></script>
-<script>
-	//调用开始
-	var videoObject = {
-		container: '#videoPlayer', //视频容器
-		volume: 0.8,//默认音量，范围0-1
-		// poster: 'assets/ckplayer/video/poster.png',//封面图片
-		autoplay: true,//是否自动播放
-		loop: true,//是否需要循环播放
-		seek: 'cookie',//指定跳转到cookie记录的时间，使用该属性必需配置属性cookie
-		video: '{{ .video_url }}',//视频地址
-		webFull: true,//是否启用页面全屏按钮，默认不启用
-		screenshot: true,//截图功能是否开启
-		logo: 'assets/image/favicon/favicon-32x32.png',
-		title: '{{ .video_url }}',//视频标题
-		playbackrateOpen: true,//是否开启控制栏倍速选项
-		playbackrateList: [0.75,1,1.25,1.5,2,4],//倍速配置值
-		cookie: 'video',//cookie名称,请在同一域中保持唯一
-		domain: window.location.host,//cookie保存域
-	};
-	new ckplayer(videoObject);//初始化播放器
+	let player = new Player({
+		id: 'videoPlayer',
+		autoplay: true,
+		volume: 0.6,
+		loop: true,
+		url: videoUrl,
+		// poster: "https://lf3-static.bytednsdoc.com/obj/eden-cn/nupenuvpxnuvo/xgplayer_doc/poster.jpg",
+		playsinline: true,
+		lang: 'zh-cn',
+		startTime: storage.getItem(videoUrl),
+		// fluid: true,
+		// fitVideoSize: 'auto',
+		// seekedStatus: 'auto',
+		miniprogress: true,
+		screenShot: true, //显示截图按钮
+  		videoAttributes: {
+    		crossOrigin: 'anonymous'
+  		},
+		rotate: true,//是否使用旋转插件
+		pip: true, //显示切换按钮
+		mini: true, //开启小窗插件
+		playbackRate: [0.5, 0.75, 1, 1.5, 2, 3, 4],
+		defaultPlaybackRate: 1.0,
+		// height: window.innerHeight,
+        // width: window.innerWidth,
+	});
+	const Events = window.Player.Events
+	player.on(Events.TIME_UPDATE, (data) => {
+		storage.setItem(videoUrl,data.currentTime)
+	})
 </script>
+
 </body>
 </html>

@@ -9,7 +9,7 @@
     <title>{{.title}}</title>
 
     <link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
-    <link href="assets/bootstrap-5.3.0/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/bootstrap-5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
       /* 悬停效果 */
       .col-auto:hover {
@@ -145,7 +145,7 @@
   </footer>
 </main>
 
-<script src="assets/bootstrap-5.3.0/assets/dist/js/bootstrap.bundle.min.js"></script>\
+<script src="assets/bootstrap-5.3.0/js/bootstrap.bundle.min.js"></script>\
 <script>
   let jsonStr = '{{ .actressList }}';
     function parseJSON(str) {
@@ -159,16 +159,18 @@
     }
   // 假设这是从服务器或其他地方获取的视频列表数据
   let actressList = parseJSON(jsonStr);
-  const videosPerPage = 12;
+  const videosPerPage = 50;
   let currentPage = 1;
   let totalPages;
 
   // 渲染视频列表
   function renderVideoList(start, end) {
     $('.row').empty();
+
     let row = '';
     try {
-      actressList.forEach(item => {
+      let subArray = actressList.slice(start, end);
+      subArray.forEach(item => {
         row += `
         <div class="col-auto">
           <a href="/list?actress_id=`+ (item.id - 1) +`" target="_blank" rel="noopener noreferrer">
@@ -186,26 +188,26 @@
 
     // 更新分页控件
   function updatePagination() {
-        const pageNumbers = document.querySelector('#page-numbers');
-        pageNumbers.innerHTML = '';
+    const pageNumbers = document.querySelector('#page-numbers');
+    pageNumbers.innerHTML = '';
 
-        const startPage = Math.max(currentPage - 5, 1);
-        const endPage = Math.min(currentPage + 5, totalPages);
+    const startPage = Math.max(currentPage - 5, 1);
+    const endPage = Math.min(currentPage + 5, totalPages);
 
-        for (let i = startPage; i <= endPage; i++) {
-            const btn = document.createElement('button');
-            btn.textContent = i;
-            btn.addEventListener('click', () => {
-                currentPage = i;
-                renderVideoList((i - 1) * videosPerPage, i * videosPerPage);
-            });
+    for (let i = startPage; i <= endPage; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.addEventListener('click', () => {
+          currentPage = i;
+          renderVideoList((i - 1) * videosPerPage, i * videosPerPage);
+      });
 
-            if (i === currentPage) {
-                btn.classList.add('active');
-            }
+      if (i === currentPage) {
+          btn.classList.add('active');
+      }
 
-            pageNumbers.appendChild(btn);
-        }
+      pageNumbers.appendChild(btn);
+    }
 
         // 启用/禁用“首页”和“尾页”按钮
         const firstPageBtn = document.querySelector('#first-page');
