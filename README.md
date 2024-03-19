@@ -2,7 +2,8 @@
 
 ## 先决条件
 ### 安装ffmpeg
-根据自己的系统选择下载并安装：[ffmpeg二进制文件下载地址](https://ffbinaries.com/downloads)
+根据自己的系统选择下载并安装：
+> [ffmpeg，ffprobe二进制文件](https://ffbinaries.com/downloads)
 ```shell
 go get github.com/u2takey/ffmpeg-go
 ```

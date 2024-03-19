@@ -6,6 +6,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.9.1
 	github.com/shiningrush/avatarbuilder v0.0.0-20220126032521-dd13fcf4210d
+	github.com/tidwall/gjson v1.17.1
 	github.com/u2takey/ffmpeg-go v0.5.0
 	gorm.io/gorm v1.20.12
 )
@@ -17,10 +18,8 @@ require (
 	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.1 // indirect
-	golang.org/x/mobile v0.0.0-20240318141834-19e4cdff4698 // indirect
-	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/tools v0.18.0 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 )
 
 require (

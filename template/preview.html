@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Video Preview</title>
+</head>
+<body>
+ 
+<video width="320" height="240" controls>
+  <source src="assets/video/072822_001_朝比奈菜々子とアナル初体験_朝比奈菜々子.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+<!-- <canvas id="videoCanvas" width="320" height="240"></canvas>
+<video id="videoElement" src="assets/video/072822_001_朝比奈菜々子とアナル初体験_朝比奈菜々子.mp4" width="320" height="240"></video> -->
+
+<script>
+    var video = document.getElementById('videoElement');
+    var canvas = document.getElementById('videoCanvas');
+    var ctx = canvas.getContext('2d');
+    
+    video.addEventListener('loadeddata', function() {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    }, false);
+</script>
+
+</body>
+</html>
