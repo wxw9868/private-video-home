@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.108.0">
+    <title>{{.title}}</title>
+
+    <link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
+    <link href="assets/bootstrap-5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 悬停效果 */
+        .col:hover {
+            transform: scale(1.05); /* 放大效果 */
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+
+<main>
+    <div class="container">
+        <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
+            </a>
+    
+            <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="/" class="nav-link px-2 active">Home</a></li>
+                <li><a href="/list" class="nav-link px-2">List</a></li>
+                <li><a href="/actress" class="nav-link px-2">Actress</a></li>
+                <li><a href="#" class="nav-link px-2">About</a></li>
+            </ul>
+
+            <div id="login" class="col-md-3 text-end">
+                <button type="button" class="btn btn-outline-primary me-2" onclick="login()">Login</button>
+                <button type="button" class="btn btn-primary">Sign-up</button>
+            </div>
+
+            <div id="settings" class="col-md-3 dropdown text-end">
+                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="assets/image/bizhi/avatar.jpeg" alt="mdo" width="32" height="32" class="rounded-circle">
+                </a>
+                <ul class="dropdown-menu text-small">
+                    <li><a class="dropdown-item" href="#">New project...</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
+                </ul>
+            </div>
+            <script>
+                function login() {
+                    window.location.href = "/login";
+                }
+                function logout() {
+                    $.get("/logout",function(data,status){
+                        // console.log("数据：" + data + "\n状态：" + status);
+                        if (status = "success") {
+                            window.location.reload();
+                        } 
+                    });
+                }
+                var cookieString = document.cookie;
+                console.log(cookieString)
+                if (cookieString != "") {
+                    document.getElementById("login").style.display = "none";
+                } else {
+                    document.getElementById("settings").style.display = "none";
+                }      
+            </script>
+        </header>
+    </div>
+
+    <section class="py-5 text-center container">
+        <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+              </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active" data-bs-interval="10000">
+                    <img src="assets/image/bizhi/bizhi1.jpeg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item" data-bs-interval="2000">
+                    <img src="assets/image/bizhi/bizhi2.jpeg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="assets/image/bizhi/bizhi3.jpeg" class="d-block w-100" alt="...">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </section>
+    
+    <div class="album py-5 bg-light">
+        <div class="container">
+            <div id="videoContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {{range $i,$v := .data}}
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <title>Placeholder {{$i}}</title>
+                        <img src="{{$v}}" alt="..." width="100%" height="225">
+                        <div class="card-body">
+                            <p class="card-text" style="height: 80px;">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" style="--bs-btn-padding-x: 2.5rem">View</button>
+                                </div>
+                                <small class="text-muted">9 mins</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</main>
+  
+<footer class="text-muted py-5">
+    <div class="container">
+        <p class="float-end mb-1">
+            <a href="#">Back to top</a>
+        </p>
+        <p class="mb-1">视频网站</p>
+    </div>
+</footer>
+
+<script src="assets/bootstrap-5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+$(function($) {
+    let jsonStr = '{{ .data }}';
+    function parseJSON(str) {
+        try {
+            return eval(jsonStr);
+        } catch (e) {
+            console.log(e);
+            //返回默认对象，或根据用例返回。
+            return str
+        }
+    }
+    // 假设这是从服务器或其他地方获取的视频列表数据
+    let videoList = parseJSON(jsonStr);
+
+    // $('#videoContainer').empty();
+
+    let videoItem = ''
+    try {
+        let subArray = videoList.slice(start, end);
+        subArray.forEach(item => {
+            videoItem += `
+        <div class="col">
+            <div class="card shadow-sm">
+                <svg class="bd-placeholder-img card-img-top" width="100%" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <title>`+ item.title + `</title>
+                    <img src="`+ item.poster + `" alt="">
+                </svg>
+                <div class="card-body">
+                    <p class="card-text" style="height: 80px;">`+ item.title + `</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="/play?id=`+ (item.id - 1) + `" target="_blank">
+                                <button type="button" class="btn btn-sm btn-outline-primary" style="--bs-btn-padding-x: 2.5rem">View</button>
+                            </a>
+                        </div>
+                        <br>
+                        <small class="text-muted">`+ item.duration + `</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+        });
+    } catch (error) { }
+    // $('#videoContainer').append(videoItem);
+});
+</script>
+
+</body>
+</html>

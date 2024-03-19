@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.108.0">
+    <title>{{.title}}</title>
+
+    <link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
+    <link href="assets/bootstrap-5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      /* 悬停效果 */
+      .col-auto:hover {
+        transform: scale(1.05); /* 放大效果 */
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+
+<main>
+
+  <div class="container">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+      <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+        <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
+      </a>
+
+      <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="/" class="nav-link px-2">Home</a></li>
+          <li><a href="/list" class="nav-link px-2">List</a></li>
+          <li><a href="/actress" class="nav-link px-2 active">Actress</a></li>
+          <li><a href="#" class="nav-link px-2">About</a></li>
+      </ul>
+      <!-- <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0" id="act_cat">
+          <script>
+              let actCat = `<li class="nav-item"><a href="/" class="nav-link {{if eq -1 .actressID}} active {{end}}" aria-current="page">Home</a></li>`
+              let actressID = ' {{.actressID}}';
+              let actressList = '{{.actressList}}'
+              actressList = actressList.replace('[','').replace(']','').split(' ');
+              for (let i = 0; i < actressList.length; i++) {
+                  actCat += `<li class="nav-item"><a href="/?actress_id=`+i+`" class="nav-link`;
+                  if(actressID == i) {
+                      actCat += ` active`;
+                  }
+                  actCat += `" aria-current="page">`+actressList[i]+`</a></li>`;
+              }
+              $('#act_cat').append(actCat)
+          </script>
+      </ul> -->
+
+      <div id="login" class="col-md-3 text-end">
+        <button type="button" class="btn btn-outline-primary me-2" onclick="login()">Login</button>
+        <button type="button" class="btn btn-primary">Sign-up</button>
+      </div>
+
+      <div id="settings" class="col-md-3 dropdown text-end">
+        <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="assets/image/bizhi/avatar.jpeg" alt="mdo" width="32" height="32" class="rounded-circle">
+        </a>
+        <ul class="dropdown-menu text-small">
+          <li><a class="dropdown-item" href="#">New project...</a></li>
+          <li><a class="dropdown-item" href="#">Settings</a></li>
+          <li><a class="dropdown-item" href="#">Profile</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
+        </ul>
+      </div>
+      <script>
+        function login() {
+          window.location.href = "/login";
+        }
+        function logout() {
+          $.get("/logout",function(data,status){
+            // console.log("数据：" + data + "\n状态：" + status);
+            if (status = "success") {
+              window.location.reload();
+            } 
+          });
+        }
+        var cookieString = document.cookie;
+        console.log(cookieString)
+        if (cookieString != "") {
+          document.getElementById("login").style.display = "none";
+        } else {
+          document.getElementById("settings").style.display = "none";
+        }      
+      </script>
+    </header>
+  </div>
+
+  <div class="container marketing">
+    <div class="row">
+      <div class="col-auto">
+        <a href="/" target="_blank" rel="noopener noreferrer">
+          <img src="assets/image/bizhi/avatar.jpeg" width="100" height="100" class="rounded-circle" alt="...">
+        </a>
+        <p class="text-center">name</p>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* 分页样式 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 0px;
+        margin-top: 20px;
+        border-top-width: 0px;
+        border-bottom-width: 0px;
+        margin-bottom: 20px;
+        padding-bottom: 0px;
+
+    }
+
+    .pagination button {
+        margin: 0 5px;
+        padding: 5px 10px;
+        border: none;
+        background-color: #f5f5f5;
+        cursor: pointer;
+    }
+
+    .pagination button.active {
+        background-color: #007bff;
+        color: white;
+    }
+  </style>
+  <div class="pagination">
+    <button id="first-page" disabled>首页</button>
+    <button id="prev-page" disabled>上一页</button>
+    <span id="page-numbers"></span>
+    <button id="next-page">下一页</button>
+    <button id="last-page">尾页</button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="container">
+    <p class="float-end"><a href="#">Back to top</a></p>
+    <p>&copy; 2017–2022 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+  </footer>
+</main>
+
+<script src="assets/bootstrap-5.3.0/js/bootstrap.bundle.min.js"></script>\
+<script>
+  let jsonStr = '{{ .actressList }}';
+    function parseJSON(str) {
+        try {
+            return eval(jsonStr);
+        } catch (e) {
+            console.log(e);
+            //返回默认对象，或根据用例返回。
+            return str
+        }
+    }
+  // 假设这是从服务器或其他地方获取的视频列表数据
+  let actressList = parseJSON(jsonStr);
+  const videosPerPage = 50;
+  let currentPage = 1;
+  let totalPages;
+
+  // 渲染视频列表
+  function renderVideoList(start, end) {
+    $('.row').empty();
+
+    let row = '';
+    try {
+      let subArray = actressList.slice(start, end);
+      subArray.forEach(item => {
+        row += `
+        <div class="col-auto">
+          <a href="/list?actress_id=`+ (item.id - 1) +`" target="_blank" rel="noopener noreferrer">
+            <img src="`+ item.avatar +`" width="100" height="100" class="rounded-circle" alt="...">
+          </a>
+          <p class="text-center">`+ item.actress +`</p>
+        </div>`;
+      });
+    } catch (error) { }
+    $('.row').append(row);
+
+    // 更新分页控件
+    updatePagination();
+  }
+
+    // 更新分页控件
+  function updatePagination() {
+    const pageNumbers = document.querySelector('#page-numbers');
+    pageNumbers.innerHTML = '';
+
+    const startPage = Math.max(currentPage - 5, 1);
+    const endPage = Math.min(currentPage + 5, totalPages);
+
+    for (let i = startPage; i <= endPage; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.addEventListener('click', () => {
+          currentPage = i;
+          renderVideoList((i - 1) * videosPerPage, i * videosPerPage);
+      });
+
+      if (i === currentPage) {
+          btn.classList.add('active');
+      }
+
+      pageNumbers.appendChild(btn);
+    }
+
+        // 启用/禁用“首页”和“尾页”按钮
+        const firstPageBtn = document.querySelector('#first-page');
+        firstPageBtn.disabled = currentPage === 1;
+        const lastPageBtn = document.querySelector('#last-page');
+        lastPageBtn.disabled = currentPage === totalPages;
+
+        // 启用/禁用“上一页”和“下一页”按钮
+        const prevPageBtn = document.querySelector('#prev-page');
+        prevPageBtn.disabled = currentPage === 1;
+        const nextPageBtn = document.querySelector('#next-page');
+        nextPageBtn.disabled = currentPage === totalPages;
+    }
+
+  // 计算总页数并初始化
+  totalPages = Math.ceil(actressList.length / videosPerPage);
+  renderVideoList(0, videosPerPage);
+
+  // 事件监听器
+  document.querySelector('#prev-page').addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+    }
+  });
+
+  document.querySelector('#next-page').addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+    }
+  });
+
+  document.querySelector('#first-page').addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage = 1;
+      renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+    }
+  });
+
+  document.querySelector('#last-page').addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage = totalPages;
+      renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+    }
+  });
+</script>
+
+</body>
+</html>
