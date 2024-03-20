@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/wxw9868/video/initialize/db"
 	"github.com/wxw9868/video/router"
 	"github.com/wxw9868/video/utils"
 )
 
 func main() {
-	// db.RegisterTables()
+	db.RegisterTables()
 
 	router := router.Engine()
 

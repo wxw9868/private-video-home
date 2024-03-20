@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/wxw9868/video/service"
 	"github.com/wxw9868/video/utils"
 )
 
@@ -81,58 +82,7 @@ func VideoList(c *gin.Context) {
 	}
 
 	if videos == nil && list == nil {
-		files, err := os.ReadDir(videoDir)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		list = make([]string, len(files))
-		videos = make([]video, len(files))
-		// modelVideos = make([]model.Video, len(files))
-
-		for k, file := range files {
-			filename := file.Name()
-			ext := filepath.Ext(filename)
-			if ext == ".mp4" {
-				strs := strings.Split(filename, ".")
-				title := strs[0]
-				arrs := strings.Split(strs[0], "_")
-				actress := arrs[len(arrs)-1]
-				if _, ok := actressList[actress]; !ok {
-					actressListSort = append(actressListSort, actress)
-				}
-				actressList[actress] = append(actressList[actress], k)
-
-				fi, _ := file.Info()
-				size, _ := strconv.ParseFloat(strconv.FormatInt(fi.Size(), 10), 64)
-
-				filePath := videoDir + "/" + filename
-				fil, _ := os.Open(filePath)
-				duration, _ := utils.GetMP4Duration(fil)
-
-				posterPath := posterDir + "/" + title + ".jpg"
-				_, err = os.Stat(posterPath)
-				if os.IsNotExist(err) {
-					_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:01:45")
-				}
-
-				//snapshotPath := snapshotDir + "/" + title + ".gif"
-				//_ = CutVideoForGif(filePath, posterPath)
-
-				// modelVideos[k] = model.Video{}
-
-				list[k] = filename
-				videos[k] = video{
-					ID:       k + 1,
-					Title:    title,
-					Actress:  actress,
-					Size:     size / 1024 / 1024,
-					Duration: utils.ResolveTime(duration),
-					ModTime:  fi.ModTime().Format("2006-01-02 15:04:05"),
-					Poster:   posterPath,
-				}
-			}
-		}
+		writeToCache()
 	}
 
 	videosBytes, _ := json.Marshal(videos)
@@ -144,6 +94,7 @@ func VideoList(c *gin.Context) {
 		"actressID":   -1,
 	})
 }
+
 func VideoPlay(c *gin.Context) {
 	id := c.Query("id")
 	intId, _ := strconv.Atoi(id)
@@ -159,6 +110,10 @@ func VideoPlay(c *gin.Context) {
 }
 
 func VideoActress(c *gin.Context) {
+	// actresss, _ := as.Find()
+	// fmt.Printf("%+v\n", actresss)
+	// return
+
 	actressList := actressListSort
 	actressSlice := make([]actress, len(actressList))
 
@@ -188,6 +143,11 @@ func VideoActress(c *gin.Context) {
 	})
 }
 
+func VideoImport(c *gin.Context) {
+	service.VideoImport()
+	c.JSON(http.StatusOK, "SUCCESS")
+}
+
 func VideoRename(c *gin.Context) {
 	var videoDir = "C:/Users/wxw9868/Downloads/Telegram Desktop"
 	files, err := os.ReadDir(videoDir)
@@ -201,4 +161,63 @@ func VideoRename(c *gin.Context) {
 		newpath := videoDir + "/" + filename
 		os.Rename(oldpath, newpath)
 	}
+}
+
+func writeToCache() error {
+	files, err := os.ReadDir(videoDir)
+	if err != nil {
+		return err
+	}
+
+	list = make([]string, len(files))
+	videos = make([]video, len(files))
+
+	for k, file := range files {
+		filename := file.Name()
+		ext := filepath.Ext(filename)
+		if ext == ".mp4" {
+			strs := strings.Split(filename, ".")
+			title := strs[0]
+			arrs := strings.Split(strs[0], "_")
+			actress := arrs[len(arrs)-1]
+			if _, ok := actressList[actress]; !ok {
+				actressListSort = append(actressListSort, actress)
+			}
+			actressList[actress] = append(actressList[actress], k)
+
+			fi, _ := file.Info()
+			size, _ := strconv.ParseFloat(strconv.FormatInt(fi.Size(), 10), 64)
+
+			filePath := videoDir + "/" + filename
+			fil, _ := os.Open(filePath)
+			duration, _ := utils.GetMP4Duration(fil)
+
+			videoInfo, _ := utils.VideoInfo(filePath)
+
+			posterPath := posterDir + "/" + title + ".jpg"
+			_, err = os.Stat(posterPath)
+			if os.IsNotExist(err) {
+				_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:02:30")
+			}
+
+			//snapshotPath := snapshotDir + "/" + title + ".gif"
+			//_ = CutVideoForGif(filePath, posterPath)
+
+			list[k] = filename
+			videos[k] = video{
+				ID:            k + 1,
+				Title:         title,
+				Actress:       actress,
+				Size:          size / 1024 / 1024,
+				Duration:      utils.ResolveTime(duration),
+				ModTime:       fi.ModTime().Format("2006-01-02 15:04:05"),
+				Poster:        posterPath,
+				Width:         int(videoInfo["width"].(int64)),
+				Height:        int(videoInfo["height"].(int64)),
+				CodecName:     fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string)),
+				ChannelLayout: videoInfo["channel_layout"].(string),
+			}
+		}
+	}
+	return nil
 }

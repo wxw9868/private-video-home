@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -39,6 +38,7 @@ func Engine() *gin.Engine {
 	auth.Use(AuthSession())
 	auth.GET("/logout", api.LogoutApi)
 	auth.GET("/", api.VideoIndex)
+	auth.GET("/import", api.VideoImport)
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
@@ -70,8 +70,6 @@ func AuthSession() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-
-		fmt.Println("ssid: ", session.Get("email").(string), session.Get("password").(string))
 
 		session.Set("email", email)
 		session.Set("password", password)
