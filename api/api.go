@@ -185,6 +185,10 @@ func VideoActress(c *gin.Context) {
 	})
 }
 
+func VideoImport(c *gin.Context) {
+
+}
+
 func VideoRename(c *gin.Context) {
 	files, err := os.ReadDir(videoDir)
 	if err != nil {

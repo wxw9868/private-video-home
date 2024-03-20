@@ -8,7 +8,7 @@ require (
 	github.com/shiningrush/avatarbuilder v0.0.0-20220126032521-dd13fcf4210d
 	github.com/tidwall/gjson v1.17.1
 	github.com/u2takey/ffmpeg-go v0.5.0
-	gorm.io/gorm v1.20.12
+	gorm.io/gorm v1.25.8
 )
 
 require (
@@ -17,9 +17,11 @@ require (
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.1 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
+	gorm.io/driver/sqlite v1.5.5 // indirect
 )
 
 require (

@@ -23,6 +23,10 @@ import (
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
+func Format() {
+	// "2006-01-02 15:04:05"
+}
+
 func GenerateAvatar(name, path string) error {
 	palette := palette.Plan9
 	var bgColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
@@ -195,12 +199,12 @@ func ReadFrameAsJpeg(inFileName, outFileName, ss string) error {
 	return nil
 }
 
-func VideoInfo(inFileName string) error {
+func VideoInfo(inFileName string) (map[string]interface{}, error) {
 	a, err := ffmpeg.Probe(inFileName)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
+	fmt.Println(a)
 	duration := gjson.Get(a, "format.duration").Float()
 	size := gjson.Get(a, "format.size").Int()
 	creationTime := gjson.Get(a, "format.tags.creation_time").Time().Add(0)
@@ -216,5 +220,17 @@ func VideoInfo(inFileName string) error {
 	fmt.Printf("时长：%f\n", duration)
 	fmt.Printf("音频声道：%s\n", channelLayout)
 	fmt.Printf("创建时间：%s\n", creationTime.Format("2006:01:02 15:04:06"))
-	return nil
+
+	data := map[string]interface{}{
+		"duration":       duration,
+		"size":           size,
+		"creation_time":  creationTime,
+		"width":          width,
+		"height":         height,
+		"codec_name0":    codecName0,
+		"codec_name1":    codecName1,
+		"channel_layout": channelLayout,
+	}
+
+	return data, nil
 }
