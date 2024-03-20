@@ -12,12 +12,14 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/disintegration/imaging"
 	"github.com/shiningrush/avatarbuilder"
 	"github.com/shiningrush/avatarbuilder/calc"
+	"github.com/tidwall/gjson"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
@@ -190,5 +192,29 @@ func ReadFrameAsJpeg(inFileName, outFileName, ss string) error {
 		return err
 	}
 
+	return nil
+}
+
+func VideoInfo(inFileName string) error {
+	a, err := ffmpeg.Probe(inFileName)
+	if err != nil {
+		return err
+	}
+
+	duration := gjson.Get(a, "format.duration").Float()
+	size := gjson.Get(a, "format.size").Int()
+	creationTime := gjson.Get(a, "format.tags.creation_time").Time().Add(0)
+	width := gjson.Get(a, "streams.0.width").Int()
+	height := gjson.Get(a, "streams.0.height").Int()
+	codecName0 := gjson.Get(a, "streams.0.codec_name").String()
+	codecName1 := gjson.Get(a, "streams.1.codec_name").String()
+	channelLayout := gjson.Get(a, "streams.1.channel_layout").String()
+
+	fmt.Printf("大小：%d\n", size)
+	fmt.Printf("尺寸：%d x %d\n", width, height)
+	fmt.Printf("编解码器：%s %s\n", strings.ToUpper(codecName1), strings.ToUpper(codecName0))
+	fmt.Printf("时长：%f\n", duration)
+	fmt.Printf("音频声道：%s\n", channelLayout)
+	fmt.Printf("创建时间：%s\n", creationTime.Format("2006:01:02 15:04:06"))
 	return nil
 }

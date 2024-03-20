@@ -88,6 +88,7 @@ func VideoList(c *gin.Context) {
 
 		list = make([]string, len(files))
 		videos = make([]video, len(files))
+		// modelVideos = make([]model.Video, len(files))
 
 		for k, file := range files {
 			filename := file.Name()
@@ -112,11 +113,13 @@ func VideoList(c *gin.Context) {
 				posterPath := posterDir + "/" + title + ".jpg"
 				_, err = os.Stat(posterPath)
 				if os.IsNotExist(err) {
-					_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:00:10")
+					_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:01:45")
 				}
 
 				//snapshotPath := snapshotDir + "/" + title + ".gif"
 				//_ = CutVideoForGif(filePath, posterPath)
+
+				// modelVideos[k] = model.Video{}
 
 				list[k] = filename
 				videos[k] = video{
@@ -186,6 +189,7 @@ func VideoActress(c *gin.Context) {
 }
 
 func VideoRename(c *gin.Context) {
+	var videoDir = "C:/Users/wxw9868/Downloads/Telegram Desktop"
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
 		log.Fatal(err)

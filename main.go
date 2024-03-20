@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	// db.RegisterTables()
+
 	router := router.Engine()
 
 	ip, err := utils.GetLocalIP()
@@ -16,7 +18,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := router.Run(fmt.Sprintf("%s:%d", ip, 8081)); err != nil {
+	if err := router.Run(fmt.Sprintf("%s:%d", ip, 80)); err != nil {
 		panic(err)
 	}
 }
