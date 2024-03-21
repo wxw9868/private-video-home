@@ -17,7 +17,7 @@ type Video struct {
 	Height        int       `gorm:"column:height;type:int;default:0;comment:高"`
 	CodecName     string    `gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
 	ChannelLayout string    `gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
-	CreationTime  time.Time `gorm:"column:creation_time;type:time;comment:时间"`
+	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
 }
 
 type Actress struct {

@@ -6,13 +6,13 @@ type ActressService struct{}
 
 type Actress struct {
 	ID      uint   `json:"id"`
-	Actress string `json:"actress"`
-	Avatar  string `json:"avatar"`
+	Actress string `gorm:"column:actress" json:"actress"`
+	Avatar  string `gorm:"column:avatar" json:"avatar"`
 }
 
 func (as *ActressService) Find() ([]Actress, error) {
 	var actresss []Actress
-	if err := db.Model(&model.Actress{}).Unscoped().Find(&actresss).Error; err != nil {
+	if err := db.Model(&model.Actress{}).Find(&actresss).Error; err != nil {
 		return nil, err
 	}
 	return actresss, nil

@@ -34,6 +34,7 @@ var avatarDir = "./assets/image/avatar"
 // var snapshotDir = "./assets/image/snapshot"
 var list []string
 var videos []video
+var actresss []actress
 var actressList = make(map[string][]int)
 var actressListSort []string
 

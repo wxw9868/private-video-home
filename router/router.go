@@ -34,15 +34,25 @@ func Engine() *gin.Engine {
 		c.HTML(http.StatusOK, "preview.html", nil)
 	})
 
-	auth := router.Group("")
-	auth.Use(AuthSession())
+	auth := router.Group("", AuthSession())
 	auth.GET("/logout", api.LogoutApi)
 	auth.GET("/", api.VideoIndex)
-	auth.GET("/import", api.VideoImport)
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
 	auth.GET("/rename", api.VideoRename)
+	auth.GET("/import", api.VideoImport)
+
+	// 简单的路由组: v1
+	v1 := router.Group("/v1")
+	{
+		auth := v1.Group("")
+		auth.Use(AuthSession())
+		auth.GET("/cache/list", api.CacheVideoList)
+		auth.GET("/cache/actress", api.CacheVideoActress)
+		auth.GET("/cache/play", api.CacheVideoPlay)
+		auth.GET("/cache/rename", api.VideoRename)
+	}
 
 	return router
 }
