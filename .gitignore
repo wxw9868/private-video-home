@@ -1,3 +1,4 @@
 *.exe
 assets/video
 *.DS_Store
+tmp
