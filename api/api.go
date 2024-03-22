@@ -50,7 +50,7 @@ func VideoPlay(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "play.html", gin.H{
 		"title":     "视频播放",
-		"videoUrl":  videoDir + "/" + vs.Actress + ".mp4",
+		"videoUrl":  videoDir + "/" + vs.Title + ".mp4",
 		"videoName": vs.Actress,
 	})
 }
