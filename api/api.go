@@ -43,12 +43,21 @@ func VideoList(c *gin.Context) {
 
 func VideoPlay(c *gin.Context) {
 	id := c.Query("id")
+	player := c.Query("player")
+
+	var name string
+	if player == "ckplayer" {
+		name = "ckplayer.html"
+	} else {
+		name = "xgplayer.html"
+	}
+
 	vs, err := vs.First(id)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c.HTML(http.StatusOK, "play.html", gin.H{
+	c.HTML(http.StatusOK, name, gin.H{
 		"title":     "视频播放",
 		"videoUrl":  videoDir + "/" + vs.Title + ".mp4",
 		"videoName": vs.Actress,

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{.title}}</title>
+	<link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
+	<link rel="stylesheet" href="assets/bootstrap-5.3.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/xgplayer-3.0.10/index.min.css">
+	<style>
+		html,
+		body {
+			height: 100%;
+		}
+	
+		body {
+			display: flex;
+			align-items: center;
+			background-image: url('assets/image/bizhi/bg-bs.jpeg');
+			background-size: 100% 100%;
+			background-position: center;
+		}
+		.container-fluid {
+			display: flex; 
+			justify-content: center; 
+		}
+	</style>
+</head>
+<body>
+	
+<div class="container-fluid">
+	<div id="videoPlayer"></div>
+</div>
+
+<script src="assets/bootstrap-5.3.0/js/bootstrap.bundle.min.js" charset="utf-8"></script>
+<script src="assets/xgplayer-3.0.10/index.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+	let storage = Object
+	let videoUrl = '{{ .videoUrl }}'
+	if(!window.localStorage){
+		alert('浏览器不支持localStorage')
+	}else{
+		storage = window.localStorage;
+	}
+
+	let player = new Player({
+		id: 'videoPlayer',
+		autoplay: true, // 是否自动播放
+		volume: 0.6, // 默认音量, 取值范围0 ~ 1
+		loop: true, // 是否循环播放
+		url: videoUrl,
+		// poster: "https://lf3-static.bytednsdoc.com/obj/eden-cn/nupenuvpxnuvo/xgplayer_doc/poster.jpg",
+		lang: 'zh-cn', // 播放器初始显示语言
+		startTime: storage.getItem(videoUrl), // 初始起播时间，仅点播
+		fitVideoSize: 'auto', // 初始起播时间，仅点播
+		seekedStatus: 'auto', // seek操作结束之后播放器的状态，如果取值为auto，则维持原播放状态, 默认是seek之后直接播放
+		pip: true, // 是否使用画中画插件
+		rotate: true,// 是否使用旋转插件
+		// screenShot: true, //显示截图按钮
+  		// videoAttributes: {
+    	// 	crossOrigin: 'anonymous'
+  		// },
+		// playbackRate: [0.5, 0.75, 1, 1.5, 2, 3, 4],
+		// defaultPlaybackRate: 1.0,
+	});
+	const Events = window.Player.Events
+	player.on(Events.TIME_UPDATE, (data) => {
+		storage.setItem(videoUrl,data.currentTime)
+	})
+</script>
+
+</body>
+</html>
