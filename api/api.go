@@ -92,7 +92,7 @@ func VideoRename(c *gin.Context) {
 	for _, file := range files {
 		filename := file.Name()
 		oldpath := videoDir + "/" + filename
-		filename = strings.Replace(filename, "无码频道_每天更新_", "", -1)
+		filename = strings.Replace(filename, "无码频道-tg关注 @AVWUMAYUANPIAN  每天更新", "", -1)
 		newpath := videoDir + "/" + filename
 		os.Rename(oldpath, newpath)
 	}
