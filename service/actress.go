@@ -8,12 +8,29 @@ type Actress struct {
 	ID      uint   `json:"id"`
 	Actress string `gorm:"column:actress" json:"actress"`
 	Avatar  string `gorm:"column:avatar" json:"avatar"`
+	Count   uint32 `json:"count"`
 }
 
 func (as *ActressService) Find() ([]Actress, error) {
 	var actresss []Actress
-	if err := db.Model(&model.Actress{}).Find(&actresss).Error; err != nil {
+	rows, err := db.Model(&model.Actress{}).Rows()
+	if err != nil {
 		return nil, err
+	}
+	defer rows.Close()
+
+	var count int64
+	for rows.Next() {
+		var modelActress model.Actress
+		db.ScanRows(rows, &modelActress)
+		db.Model(&model.Video{}).Where("actress = ?", modelActress.Actress).Count(&count)
+
+		actresss = append(actresss, Actress{
+			ID:      modelActress.ID,
+			Actress: modelActress.Actress,
+			Avatar:  modelActress.Avatar,
+			Count:   uint32(count),
+		})
 	}
 	return actresss, nil
 }

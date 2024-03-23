@@ -29,7 +29,7 @@ func VideoList(c *gin.Context) {
 	actressID := c.Query("actress_id")
 	videos, err := vs.Find(actressID)
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 	videosBytes, _ := json.Marshal(videos)
 

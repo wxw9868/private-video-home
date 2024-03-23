@@ -30,7 +30,7 @@ func Engine() *gin.Engine {
 	router.Use(InitSession())
 	router.GET("/login", api.LoginApi)
 	router.POST("/doLogin", api.DoLoginApi)
-	router.GET("/preview", func(c *gin.Context) {
+	router.GET("/preivew", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "preview.html", nil)
 	})
 
