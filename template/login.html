@@ -18,21 +18,21 @@
 
   <main class="form-signin w-100 m-auto">
     <form action="/doLogin" name="login" method="POST">
-      <img class="mb-4" src="assets/bootstrap-5.3.0/brand/bootstrap-logo.svg" alt="" width="72" height="57">
-      <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+      <img class="mb-4" src="assets/image/favicon/video/logo.png" alt="" width="72" height="57">
+      <h1 class="h3 mb-3 fw-normal">登录</h1>
 
       <div class="form-floating">
-        <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-        <label for="floatingInput">Email address</label>
+        <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
+        <label for="floatingInput">邮箱</label>
       </div>
       <div class="form-floating">
-        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
-        <label for="floatingPassword">Password</label>
+        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+        <label for="floatingPassword">密码</label>
       </div>
 
       <div class="checkbox mb-3">
         <label>
-          <input type="checkbox" value="remember-me"> Remember me
+          <input type="checkbox" value="remember-me"> 记住我
         </label>
       </div>
       <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
@@ -41,5 +41,4 @@
   </main>
 
 </body>
-
 </html>
