@@ -24,13 +24,29 @@
 			display: flex; 
 			justify-content: center; 
 		}
+        
+		.card {
+            border: none;
+			/* 这里的0.5 是透明度值，可以根据需要调整 */
+			background-color: rgba(255, 255, 255, 0.1); 
+        }
 	</style>
 </head>
 <body>
-	
+
 <div class="container-fluid">
-	<div id="videoPlayer"></div>
+	<div class="card mb-3 justify-content-center">
+		<div id="videoPlayer"></div>
+		<div class="card-body">
+		 	<h5 class="card-title">{{ .videoTitle }}</h5>
+		  	<p class="card-text">{{ .videoActress }}</p>
+		  	<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+		</div>
+	</div>
 </div>
+<!-- <div class="container-fluid">
+	<div id="videoPlayer1"></div>
+</div> -->
 
 <script src="assets/player/xgplayer-3.0.10/index.min.js" charset="utf-8"></script>
 <script type="text/javascript">
@@ -61,6 +77,9 @@
   		// },
 		// playbackRate: [0.5, 0.75, 1, 1.5, 2, 3, 4],
 		// defaultPlaybackRate: 1.0,
+		width: 'auto',
+		hight: 'auto',
+	
 	});
 	const Events = window.Player.Events
 	player.on(Events.TIME_UPDATE, (data) => {

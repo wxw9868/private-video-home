@@ -24,15 +24,30 @@
 			display: flex; 
 			justify-content: center; 
 		}
+		.card {
+            border: none;
+			/* 这里的0.5 是透明度值，可以根据需要调整 */
+			background-color: rgba(255, 255, 255, 0.1); 
+        }
 	</style>
 </head>
 <body>
-	
-<div class="container-fluid">
-	<div class="video" style="width: 100%; height: 500px;max-width: 800px;">播放容器</div>
-</div>
 
-<script type="text/javascript" src="assets/ckplayer-x3/js/ckplayer.min.js" charset="UTF-8"></script>
+	<div class="container-fluid">
+		<div class="card mb-3 justify-content-center">
+			<div class="video" style="width: 100%; height: 450px;width: 800px;max-width: 800px;"></div>
+			<div class="card-body">
+				 <h5 class="card-title">{{ .videoTitle }}</h5>
+				  <p class="card-text">{{ .videoActress }}</p>
+				  <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+			</div>
+		</div>
+	</div>
+	<!-- <div class="container-fluid">
+		<div class="video" style="width: 100%; height: 450px;max-width: 800px;">播放容器</div>
+	</div> -->
+
+<script type="text/javascript" src="assets/player/ckplayer-x3/js/ckplayer.min.js" charset="UTF-8"></script>
 <script>
 	//调用开始
 	var videoObject = {
@@ -46,7 +61,7 @@
 		webFull: true,//是否启用页面全屏按钮，默认不启用
 		screenshot: true,//截图功能是否开启
 		// logo: 'assets/image/favicon/av/favicon-32x32.png',
-		title: '{{ .videoName }}',//视频标题
+		title: '{{ .videoActress }}',//视频标题
 		playbackrateOpen: true,//是否开启控制栏倍速选项
 		playbackrateList: [0.75,1,1.25,1.5,2,4],//倍速配置值
 		cookie: 'video',//cookie名称,请在同一域中保持唯一
