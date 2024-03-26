@@ -33,11 +33,14 @@
 <body>
 	<div class="container-fluid">
 		<div class="card">
-			<div class="video ratio ratio-16x9"></div>
+			<div id="videoPlayer" class="ratio ratio-16x9"></div>
 			<div class="card-body">
-				 <h5 class="card-title">{{ .videoTitle }}</h5>
-				  <p class="card-text">{{ .videoActress }}</p>
-				  <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+				<h5 class="card-title">{{ .videoTitle }}</h5>
+				<p class="card-text">{{ .videoActress }}</p>
+				<p class="card-text">
+					<a href="#"><img src="assets/image/logo/xgplayer.jpg" alt="xgplayer" width="50" height="50" class="rounded-circle"></a>
+					<a href="#"><img src="assets/image/logo/ckplayer.png" alt="ckplayer" width="50" height="50" class="rounded-circle"></a>
+				</p>
 			</div>
 		</div>
 	</div>
@@ -49,7 +52,7 @@
 <script>
 	//调用开始
 	var videoObject = {
-		container: '.video', //视频容器
+		container: '#videoPlayer', //视频容器
 		volume: 0.6,//默认音量，范围0-1
 		// poster: 'assets/ckplayer-x3/video/poster.png',//封面图片
 		autoplay: true,//是否自动播放
