@@ -11,6 +11,7 @@
 
   <link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
   <link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+  <link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
   <style>
     /* 悬停效果 */
     .col:hover {
@@ -92,7 +93,7 @@
             <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
           </ul>
           <a href="#" class="link-dark text-decoration-none" id="setbg">
-            <img src="assets/image/icon/sun-fill..svg" alt="mdo" width="32" height="32">
+            <img src="assets/image/icon/sun-fill.svg" alt="mdo" width="32" height="32">
           </a>
         </div>
         <script>
@@ -115,7 +116,7 @@
           }
           $("#setbg").click(function () {
             var src = $("#setbg > img").attr("src")
-            if (src == "assets/image/icon/sun.svg") {
+            if (src == "assets/image/icon/sun-fill.svg") {
               $("#setbg > img").attr("src", "assets/image/icon/moon-stars-fill.svg");
               $("body").removeClass("bg-light").addClass("bg-dark text-secondary");
               $(".card").removeClass("text-light").addClass("text-secondary");
