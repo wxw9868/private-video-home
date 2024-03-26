@@ -14,33 +14,46 @@
   <style>
     /* 悬停效果 */
     .col:hover {
-      transform: scale(1.05);
+      transform: scale(1.03);
       /* 放大效果 */
+      color: #d2578d;
+      font-weight: bold;
+      cursor: pointer;
+      /* 设定鼠标样式 */
     }
 
     h5:hover {
       color: #090909;
       font-weight: bold;
-      cursor: pointer; /* 设定鼠标样式 */
+      cursor: pointer;
+      /* 设定鼠标样式 */
+    }
+
+    a {
+      color: unset;
+      /* 设置为浏览器默认的颜色 */
+      text-decoration: none;
+      /* 移除超链接下划线 */
     }
   </style>
   <script src="assets/app/js/jquery-3.5.1.min.js"></script>
 </head>
 
-<body class="bg-dark">
+<body class="bg-light">
 
   <main>
     <div class="container">
-      <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+      <header
+        class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <a href="/" class="d-flex align-items-center col-md-auto mb-2 mb-md-0 text-dark text-decoration-none">
           <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
         </a>
 
         <ul class="nav nav-pills col-md-auto col-md-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="/" class="nav-link px-2">Home</a></li>
-          <li><a href="/list" class="nav-link px-2">List</a></li>
-          <li><a href="/actress" class="nav-link px-2 active">Actress</a></li>
-          <li><a href="#" class="nav-link px-2">About</a></li>
+          <li><a class="nav-link px-2" href="/">Home</a></li>
+          <li><a class="nav-link px-2" href="/list">List</a></li>
+          <li><a class="nav-link px-2 active" href="/actress">Actress</a></li>
+          <li><a class="nav-link px-2" href="#">About</a></li>
         </ul>
         <!-- <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0" id="act_cat">
           <script>
@@ -65,7 +78,8 @@
         </div>
 
         <div id="settings" class="col-md-auto dropdown text-end">
-          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <a href="#" class="link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"
+            aria-expanded="false">
             <img src="assets/image/bizhi/avatar.jpeg" alt="mdo" width="32" height="32" class="rounded-circle">
           </a>
           <ul class="dropdown-menu text-small">
@@ -77,6 +91,9 @@
             </li>
             <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
           </ul>
+          <a href="#" class="link-dark text-decoration-none" id="setbg">
+            <img src="assets/image/icon/sun-fill..svg" alt="mdo" width="32" height="32">
+          </a>
         </div>
         <script>
           function login() {
@@ -95,7 +112,21 @@
             document.getElementById("login").style.display = "none";
           } else {
             document.getElementById("settings").style.display = "none";
-          }      
+          }
+          $("#setbg").click(function () {
+            var src = $("#setbg > img").attr("src")
+            if (src == "assets/image/icon/sun.svg") {
+              $("#setbg > img").attr("src", "assets/image/icon/moon-stars-fill.svg");
+              $("body").removeClass("bg-light").addClass("bg-dark text-secondary");
+              $(".card").removeClass("text-light").addClass("text-secondary");
+              $("footer").removeClass("bg-light").addClass("text-secondary");
+            } else {
+              $("#setbg > img").attr("src", "assets/image/icon/sun-fill.svg");
+              $("body").removeClass("bg-dark text-secondary").addClass("bg-light");
+              $(".card").removeClass("text-secondary").addClass("bg-light");
+              $("footer").removeClass("text-secondary").addClass("bg-light");
+            }
+          });   
         </script>
       </header>
     </div>
@@ -103,11 +134,11 @@
     <div class="py-5">
       <div class="container">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-  
+
         </div>
       </div>
     </div>
-    
+
   </main>
 
   <style>
@@ -146,7 +177,7 @@
     <button id="last-page">尾页</button>
   </div>
 
-  <footer class="text-muted py-5">
+  <footer class="py-5">
     <div class="container">
       <p class="float-end mb-1">
         <a href="#">Back to top</a>
@@ -172,15 +203,15 @@
     queue.on("progress", function (e) {
       var proNum = Math.ceil(e.progress * 100);
       var progress = `
-      <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="`+proNum+`" aria-valuemin="0" aria-valuemax="100" style="width:100%;height: 20px">
-        <div class="progress-bar progress-bar-striped bg-success" style="width: `+proNum+`%">`+proNum+`%</div>
+      <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="`+ proNum + `" aria-valuemin="0" aria-valuemax="100" style="width:100%;height: 20px">
+        <div class="progress-bar progress-bar-striped bg-success" style="width: `+ proNum + `%">` + proNum + `%</div>
       </div>`;
       $(".row").html(progress);
     });
     let imgSrcs = [];
     actressList.forEach((item, index) => {
       imgSrcs.push({ id: 'img' + index, src: item.avatar });
-    }); 
+    });
     // 加载多个文件     
     queue.loadManifest(imgSrcs);
 
@@ -197,17 +228,17 @@
               <a href="/list?actress_id=`+ (item.id) + `" target="_blank" rel="noopener noreferrer"></a>
               <div>
                 <h5 class="mt-4 lh-1 fs-6">`+ item.actress + `</h5>
-                <p class="lh-1 w-light text-secondary">`+ item.count +` 部影片</p>
+                <p class="lh-1 w-light text-secondary">`+ item.count + ` 部影片</p>
               </div>
             </div>
           </div>`;
         });
       } catch (error) { }
-      
+
       $('.row').append(row);
 
       for (let index = 0; index < videosPerPage; index++) {
-        var id = 'img' + (start+index);
+        var id = 'img' + (start + index);
         var img = queue.getResult(id);
         $('.col:eq(' + index + ') > div > a').append(img);
         $('.col:eq(' + index + ') > div > a > img').attr({ width: "100", height: "100", class: "flex-shrink-0 me-3 img-fluid rounded-circle" });
@@ -292,4 +323,5 @@
   </script>
 
 </body>
+
 </html>
