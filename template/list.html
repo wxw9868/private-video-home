@@ -10,7 +10,7 @@
     <title>{{.title}}</title>
 
     <link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
-    <link href="assets/bootstrap-5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
     <style>
         /* 悬停效果 */
         .col:hover {
@@ -187,8 +187,8 @@
         </div>
     </footer>
 
-    <script src="assets/bootstrap-5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/preloadjs-1.0.1/preloadjs.min.js"></script>
+    <script src="assets/app/js/bootstrap-5.3.0.bundle.min.js"></script>
+    <script src="assets/app/js/preloadjs-1.0.1.min.js"></script>
     <script>
         // 假设这是从服务器或其他地方获取的视频列表数据
         let jsonStr = '{{ .data }}';
@@ -225,23 +225,53 @@
                 subArray.forEach((item, index) => {
                     videoItem += `
                         <div class="col">
-                            <div class="card shadow-sm">
-                                <div class="bd-placeholder-img card-img-top" width="100%" height="225">
-                                    <title>`+ item.title + `</title>  
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text">`+ item.title + `</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="/play?player=xgplayer&id=`+ (item.id) + `" target="_blank" class="btn btn-outline-primary">xgplayer</a>
-                                            <a href="/play?player=ckplayer&id=`+ (item.id) + `" target="_blank" class="btn btn-outline-primary">ckplayer</a>
+                            <a href="/" target="_blank">
+                            <div class="card rounded-4">
+                                <ul class="card-img-overlay d-flex mt-auto justify-content-end">
+                                    <li class="d-flex align-items-end">
+                                        <div class="transparent-bg text-light">
+                                            <i class="me-1"></i>
+                                            <i class="bi bi-heart"></i>
+                                            <small class="me-1">1000</small>
+                                        </div> 
+                                    </li>
+                                    <li class="d-flex align-items-end">
+                                        <div class="transparent-bg text-light">
+                                            <i class="me-1"></i>
+                                            <i class="bi bi-eye"></i>
+                                            <small class="me-1">1000</small>
                                         </div>
-                                        <small class="text-muted">`+ item.duration + `</small>
-                                    </div>
-                                </div>
+                                    </li>
+                                    <li class="d-flex align-items-end">
+                                        <div class="transparent-bg text-light">
+                                            <i class="me-1"></i>
+                                            <i class="bi bi-clock"></i>
+                                            <small class="me-1">`+ item.duration + `</small>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
-                        </div>
-                    `;
+                            </a>
+                            <div class="card-body mt-2">
+                                <p class="card-title text-truncate">`+ item.title + `</p>
+                            </div>
+                        </div>`;
+                    // videoItem += `
+                    //     <div class="col">
+                    //         <div class="card shadow-sm">
+                    //             <div class="bd-placeholder-img card-img-top" width="100%" height="225"></div>
+                    //             <div class="card-body">
+                    //                 <p class="card-text text-truncate">`+ item.title + `</p>
+                    //                 <div class="d-flex justify-content-between align-items-center">
+                    //                     <div class="btn-group btn-group-sm">
+                    //                         <a href="/play?player=xgplayer&id=`+ (item.id) + `" target="_blank" class="btn btn-outline-primary">xgplayer</a>
+                    //                         <a href="/play?player=ckplayer&id=`+ (item.id) + `" target="_blank" class="btn btn-outline-primary">ckplayer</a>
+                    //                     </div>
+                    //                     <small class="text-muted">`+ item.duration + `</small>
+                    //                 </div>
+                    //             </div>
+                    //         </div>
+                    //     </div>`;
                 });
             } catch (error) { }
 
@@ -250,8 +280,11 @@
             for (let index = 0; index < videosPerPage; index++) {
                 var id = 'img' + (start+index);
                 var img = queue.getResult(id);
-                $('.bd-placeholder-img:eq(' + index + ')').append(img);
-                $('.bd-placeholder-img:eq(' + index + ') > img').attr({ width: "100%", height: "100%", class: "img-fluid" });
+                // $('.bd-placeholder-img:eq(' + index + ')').append(img);
+                // $('.bd-placeholder-img:eq(' + index + ') > img').attr({ width: "100%", height: "100%", class: "img-fluid" });
+
+                $('.card:eq(' + index + ')').append(img);
+                $('.card:eq(' + index + ') > img').attr({ width: "100%", height: "225", class: "card-img rounded-4" });
             }
 
             // 更新分页控件
