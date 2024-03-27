@@ -22,10 +22,10 @@ type actress struct {
 	Avatar  string `json:"avatar"`
 }
 
-type card struct {
-	ID   int    `json:"id"`
-	Card string `json:"card"`
-}
+// type card struct {
+// 	ID   int    `json:"id"`
+// 	Card string `json:"card"`
+// }
 
 var videoDir = "./assets/video"
 var posterDir = "./assets/image/poster"
