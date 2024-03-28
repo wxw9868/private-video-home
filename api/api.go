@@ -54,11 +54,6 @@ func VideoPlay(c *gin.Context) {
 		name = "player.html"
 	}
 
-	c.HTML(http.StatusOK, name, gin.H{
-		"title": "视频播放",
-	})
-	return
-
 	vs, err := vs.First(id)
 	if err != nil {
 		log.Fatal(err)
