@@ -228,7 +228,7 @@
             <div class="d-flex position-relative">
               <a href="/list?actress_id=`+ (item.id) + `" target="_blank" rel="noopener noreferrer"></a>
               <div>
-                <p class="mt-3 lh-1">`+ item.actress + `</p>
+                <p class="mt-2 lh-1">`+ item.actress + `</p>
                 <p class="lh-1 text-secondary">`+ item.count + ` 部影片</p>
               </div>
             </div>
@@ -242,7 +242,7 @@
         var id = 'img' + (start + index);
         var img = queue.getResult(id);
         $('.col:eq(' + index + ') > div > a').append(img);
-        $('.col:eq(' + index + ') > div > a > img').attr({ width: "80", height: "80", class: "flex-shrink-0 me-3 img-fluid rounded-circle" });
+        $('.col:eq(' + index + ') > div > a > img').attr({ width: "70", height: "70", class: "img-fluid rounded-circle me-2" });
       }
 
       // 更新分页控件
