@@ -25,17 +25,22 @@
 
 		<div class="container">
             <header
-                class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+                class="navbar navbar-expand-lg d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
                 <a href="/" class="d-flex align-items-center col-md-auto mb-2 mb-md-0 text-dark text-decoration-none">
                     <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
                 </a>
 
-                <ul class="nav nav-pills col-md-auto mb-2 justify-content-center mb-md-0">
-                    <li><a class="nav-link px-2" href="/">Home</a></li>
-                    <li><a class="nav-link px-2" href="/list">List</a></li>
-                    <li><a class="nav-link px-2" href="/actress">Actress</a></li>
-                    <li><a class="nav-link px-2 active" href="#">Player</a></li>
-                </ul>
+				<button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav col-md-auto mb-2 align-items-center mb-md-0">
+                        <li class="nav-item"><a class="nav-link px-2 active" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link px-2" href="/list">List</a></li>
+                        <li class="nav-item"><a class="nav-link px-2" href="/actress">Actress</a></li>
+                        <li class="nav-item"><a class="nav-link px-2 active" href="#">Player</a></li>
+                    </ul>
+                </div>
 
                 <div id="login" class="col-md-auto text-end">
                     <button type="button" class="btn btn-outline-primary me-2" onclick="login()">Login</button>
@@ -286,6 +291,7 @@
 				crossOrigin:'Anonymous',//发送跨域字符
 				title: '{{ .videoActress }}',// 视频标题
 				playbackrateOpen: true, // 是否开启控制栏倍速选项
+				playbackrate: 1, // 默认倍速
 				playbackrateList: [0.75, 1, 1.25, 1.5, 2, 4], // 倍速配置值 
 				controls: true,//是否显示自带控制栏
 				rightBar: true,//是否开启右边控制栏

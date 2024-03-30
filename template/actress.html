@@ -44,17 +44,22 @@
   <main>
     <div class="container">
       <header
-        class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        class="navbar navbar-expand-lg d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <a href="/" class="d-flex align-items-center col-md-auto mb-2 mb-md-0 text-dark text-decoration-none">
           <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
         </a>
 
-        <ul class="nav nav-pills col-md-auto col-md-auto mb-2 justify-content-center mb-md-0">
-          <li><a class="nav-link px-2" href="/">Home</a></li>
-          <li><a class="nav-link px-2" href="/list">List</a></li>
-          <li><a class="nav-link px-2 active" href="/actress">Actress</a></li>
-          <li><a class="nav-link px-2" href="/play">Player</a></li>
-        </ul>
+        <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav col-md-auto mb-2 align-items-center mb-md-0">
+                <li class="nav-item"><a class="nav-link px-2" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link px-2" href="/list">List</a></li>
+                <li class="nav-item"><a class="nav-link px-2 active" href="/actress">Actress</a></li>
+                <li class="nav-item"><a class="nav-link px-2 disabled" href="/play">Player</a></li>
+            </ul>
+        </div>
     
         <div id="login" class="col-md-auto text-end">
           <button type="button" class="btn btn-outline-primary me-2" onclick="login()">Login</button>
