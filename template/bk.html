@@ -11,64 +11,61 @@
 
   <link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
   <link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
-  <link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
   <style>
     /* 悬停效果 */
     .col:hover {
-      transform: scale(1.03);
+      transform: scale(1.05);
       /* 放大效果 */
-      color: #d2578d;
-      font-weight: bold;
-      cursor: pointer;
-      /* 设定鼠标样式 */
     }
 
-    h5:hover {
-      color: #090909;
-      font-weight: bold;
-      cursor: pointer;
-      /* 设定鼠标样式 */
-    }
-
-    a {
-      color: unset;
-      /* 设置为浏览器默认的颜色 */
-      text-decoration: none;
-      /* 移除超链接下划线 */
+    .ellipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   </style>
+  <script src="assets/app/js/jquery-3.5.1.min.js"></script>
 </head>
 
-<body class="bg-light">
+<body>
 
   <main>
     <div class="container">
-      <header
-        class="navbar navbar-expand-lg d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+      <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <a href="/" class="d-flex align-items-center col-md-auto mb-2 mb-md-0 text-dark text-decoration-none">
           <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
         </a>
 
-        <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav col-md-auto mb-2 align-items-center mb-md-0">
-                <li class="nav-item"><a class="nav-link px-2" href="/">Home</a></li>
-                <li class="nav-item"><a class="nav-link px-2" href="/list">List</a></li>
-                <li class="nav-item"><a class="nav-link px-2 active" href="/actress">Actress</a></li>
-                <li class="nav-item"><a class="nav-link px-2 disabled" href="/play">Player</a></li>
-            </ul>
-        </div>
-    
+        <ul class="nav nav-pills col-md-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="/" class="nav-link px-2">Home</a></li>
+          <li><a href="/list" class="nav-link px-2">List</a></li>
+          <li><a href="/actress" class="nav-link px-2 active">Actress</a></li>
+          <li><a href="#" class="nav-link px-2">About</a></li>
+        </ul>
+        <!-- <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0" id="act_cat">
+          <script>
+              let actCat = `<li class="nav-item"><a href="/" class="nav-link {{if eq -1 .actressID}} active {{end}}" aria-current="page">Home</a></li>`
+              let actressID = ' {{.actressID}}';
+              let actressList = '{{.actressList}}'
+              actressList = actressList.replace('[','').replace(']','').split(' ');
+              for (let i = 0; i < actressList.length; i++) {
+                  actCat += `<li class="nav-item"><a href="/?actress_id=`+i+`" class="nav-link`;
+                  if(actressID == i) {
+                      actCat += ` active`;
+                  }
+                  actCat += `" aria-current="page">`+actressList[i]+`</a></li>`;
+              }
+              $('#act_cat').append(actCat)
+          </script>
+        </ul> -->
+
         <div id="login" class="col-md-auto text-end">
           <button type="button" class="btn btn-outline-primary me-2" onclick="login()">Login</button>
           <button type="button" class="btn btn-primary">Sign-up</button>
         </div>
 
         <div id="settings" class="col-md-auto dropdown text-end">
-          <a href="#" class="link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"
-            aria-expanded="false">
+          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="assets/image/bizhi/avatar.jpeg" alt="mdo" width="32" height="32" class="rounded-circle">
           </a>
           <ul class="dropdown-menu text-small">
@@ -80,21 +77,80 @@
             </li>
             <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
           </ul>
-          <a href="#" class="link-dark text-decoration-none" id="setbg">
-            <img src="assets/image/icon/sun-fill.svg" alt="mdo" width="32" height="32">
-          </a>
         </div>
+        <script>
+          function login() {
+            window.location.href = "/login";
+          }
+          function logout() {
+            $.get("/logout", function (data, status) {
+              if (status = "success") {
+                window.location.reload();
+              }
+            });
+          }
+          var cookieString = document.cookie;
+          console.log(cookieString)
+          if (cookieString != "") {
+            document.getElementById("login").style.display = "none";
+          } else {
+            document.getElementById("settings").style.display = "none";
+          }      
+        </script>
       </header>
     </div>
 
-    <div class="py-5">
+    <div class="py-5 bg-light">
       <div class="container">
-        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
+   
+        <div class="card mb-3">
+          <img src="..." class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+          </div>
+        </div>
 
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3"> 
+
+          <div class="btn-group" role="group" aria-label="Basic outlined example">
+            <button type="button" class="btn btn-outline-primary">Left</button>
+            <button type="button" class="btn btn-outline-primary">Right</button>
+          </div>
+
+          <div class="ellipsis">这是一段很长的文字，超出容器宽度会显示为省略号</div>
+
+          <div class="col">
+            <div class="d-flex position-relative">
+              <a href="#" target="_blank" rel="noopener noreferrer">
+                <img src="assets/image/avatar/波多野結衣.png" width="100" height="100" class="flex-shrink-0 me-3 img-fluid rounded-circle" alt="...">
+              </a>
+              <div>
+                <h5 class="mt-4 lh-1 fs-6 fw-medium">波多野結衣</h5>
+                <p class="lh-1 w-light text-secondary">20部影片</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>   
+    </div>
+    
+    <hr>
+
+    <div class="py-5 bg-light">
+      <div class="container text-center">
+        <div class="row row-cols-1 row-cols-sm-3 row-cols-md-6 g-3"> 
+          <div class="col">
+            <a href="#" target="_blank" rel="noopener noreferrer">
+              <img src="assets/image/avatar/波多野結衣.png" width="100" height="100" class="img-fluid rounded-circle" alt="...">
+            </a>
+            <p>波多野結衣</p>
+          </div>
         </div>
       </div>
     </div>
-
+    
   </main>
 
   <style>
@@ -133,7 +189,7 @@
     <button id="last-page">尾页</button>
   </div>
 
-  <footer class="py-5">
+  <footer class="text-muted py-5">
     <div class="container">
       <p class="float-end mb-1">
         <a href="#">Back to top</a>
@@ -142,69 +198,7 @@
     </div>
   </footer>
 
-  <script src="assets/app/js/jquery-3.5.1.min.js"></script>
-  <script>
-		let storage = Object;
-		if (!window.localStorage) {
-			alert('浏览器不支持localStorage')
-		} else {
-			storage = window.localStorage;
-		}
-
-		var bg = storage.getItem("bg");
-		if (bg == "dark") {
-			setBgDark()
-		} else if (bg == "light") {
-			setBgLight()
-		} else {
-			setBgLight()
-		}
-
-    var cookieString = document.cookie;
-    if (cookieString != "") {
-        document.getElementById("login").style.display = "none";
-    } else {
-        document.getElementById("settings").style.display = "none";
-    }
-
-    function login() {
-        window.location.href = "/login";
-    }
-    function logout() {
-        $.get("/logout", function (data, status) {
-            if (status = "success") {
-                window.location.reload();
-            }
-        });
-    }
-    
-    $('#setbg').click(function(){
-      var src = $("#setbg > img").attr("src")
-      if (src == "assets/image/icon/sun-fill.svg") {
-        setBgDark();
-      } else {
-        setBgLight();
-      }
-    });
-
-    function setBgDark() {
-			$("#setbg > img").attr("src", "assets/image/icon/moon-stars-fill.svg");
-			$("body").removeClass("bg-light").addClass("bg-dark text-secondary");
-			$(".card").removeClass("text-light").addClass("text-secondary");
-			$("footer").removeClass("bg-light").addClass("text-secondary");
-			
-			storage.setItem("bg", "dark");
-		}
-
-		function setBgLight() {
-			$("#setbg > img").attr("src", "assets/image/icon/sun-fill.svg");
-			$("body").removeClass("bg-dark text-secondary").addClass("bg-light");
-			$(".card").removeClass("text-secondary").addClass("bg-light");
-			$("footer").removeClass("text-secondary").addClass("bg-light");
-
-			storage.setItem("bg", "light");
-		}
-	</script>
+  <script src="assets/app/js/bootstrap-5.3.0.bundle.min.js"></script>
   <script src="assets/app/js/preloadjs-1.0.1.min.js"></script>
   <script>
     // 假设这是从服务器或其他地方获取的视频列表数据
@@ -221,15 +215,15 @@
     queue.on("progress", function (e) {
       var proNum = Math.ceil(e.progress * 100);
       var progress = `
-      <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="`+ proNum + `" aria-valuemin="0" aria-valuemax="100" style="width:100%;height: 20px">
-        <div class="progress-bar progress-bar-striped bg-success" style="width: `+ proNum + `%">` + proNum + `%</div>
+      <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="`+proNum+`" aria-valuemin="0" aria-valuemax="100" style="width:100%;height: 20px">
+        <div class="progress-bar progress-bar-striped bg-success" style="width: `+proNum+`%">`+proNum+`%</div>
       </div>`;
       $(".row").html(progress);
     });
     let imgSrcs = [];
     actressList.forEach((item, index) => {
       imgSrcs.push({ id: 'img' + index, src: item.avatar });
-    });
+    }); 
     // 加载多个文件     
     queue.loadManifest(imgSrcs);
 
@@ -242,24 +236,22 @@
         subArray.forEach(item => {
           row += `
           <div class="col">
-            <div class="d-flex position-relative">
-              <a href="/list?actress_id=`+ (item.id) + `" target="_blank" rel="noopener noreferrer"></a>
-              <div>
-                <p class="mt-2 lh-1">`+ item.actress + `</p>
-                <p class="lh-1 text-secondary">`+ item.count + ` 部影片</p>
-              </div>
-            </div>
+            <a href="/list?actress_id=`+ (item.id) + `" target="_blank" rel="noopener noreferrer"></a>
+            <p class="text-center">`+ item.actress + `</p>
           </div>`;
         });
       } catch (error) { }
-
+      
       $('.row').append(row);
 
       for (let index = 0; index < videosPerPage; index++) {
-        var id = 'img' + (start + index);
+        var id = 'img' + (start+index);
         var img = queue.getResult(id);
+        // $('.col:eq(' + index + ') > a').append(img);
+        // $('.col:eq(' + index + ') > a > img').attr({ width: "100", height: "100", class: "img-fluid rounded-circle" });
+
         $('.col:eq(' + index + ') > div > a').append(img);
-        $('.col:eq(' + index + ') > div > a > img').attr({ width: "70", height: "70", class: "img-fluid rounded-circle me-2" });
+        $('.col:eq(' + index + ') > div > a > img').attr({ width: "100", height: "100", class: "flex-shrink-0 me-3 img-fluid rounded-circle" });
       }
 
       // 更新分页控件
@@ -339,8 +331,6 @@
       }
     });
   </script>
-  <script src="assets/app/js/bootstrap-5.3.0.bundle.min.js"></script>
 
 </body>
-
 </html>

@@ -5,8 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{.title}}</title>
 	<link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
-	<link rel="stylesheet" href="assets/bootstrap-5.3.0/css/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/xgplayer-3.0.10/index.min.css">
+	<link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+	<link href="assets/player/xgplayer-3.0.10/index.min.css" rel="stylesheet">
 	<style>
 		html,
 		body {
@@ -24,15 +24,34 @@
 			display: flex; 
 			justify-content: center; 
 		}
+        
+		.card {
+            border: none;
+			/* 这里的0.5 是透明度值，可以根据需要调整 */
+			background-color: rgba(255, 255, 255, 0.1); 
+        }
 	</style>
 </head>
 <body>
-	
-<div class="container-fluid">
-	<div id="videoPlayer"></div>
-</div>
 
-<script src="assets/xgplayer-3.0.10/index.min.js" charset="utf-8"></script>
+<div class="container-fluid">
+	<div class="card">
+		<div id="videoPlayer"></div>
+		<div class="card-body">
+		 	<h5 class="card-title">{{ .videoTitle }}</h5>
+		  	<p class="card-text">{{ .videoActress }}</p>
+		  	<p class="card-text">
+				<a href="#"><img src="assets/image/logo/xgplayer.jpg" alt="xgplayer" width="50" height="50" class="rounded-circle"></a>
+				<a href="#"><img src="assets/image/logo/ckplayer.png" alt="ckplayer" width="50" height="50" class="rounded-circle"></a>
+			</p>
+		</div>
+	</div>
+</div>
+<!-- <div class="container-fluid">
+	<div id="videoPlayer1"></div>
+</div> -->
+
+<script src="assets/player/xgplayer-3.0.10/index.min.js" charset="utf-8"></script>
 <script type="text/javascript">
 	let storage = Object
 	let videoUrl = '{{ .videoUrl }}'
@@ -61,6 +80,9 @@
   		// },
 		// playbackRate: [0.5, 0.75, 1, 1.5, 2, 3, 4],
 		// defaultPlaybackRate: 1.0,
+		width: 'auto',
+		hight: 'auto',
+	
 	});
 	const Events = window.Player.Events
 	player.on(Events.TIME_UPDATE, (data) => {

@@ -48,8 +48,10 @@ func VideoPlay(c *gin.Context) {
 	var name string
 	if player == "ckplayer" {
 		name = "ckplayer.html"
-	} else {
+	} else if player == "xgplayer" {
 		name = "xgplayer.html"
+	} else {
+		name = "player.html"
 	}
 
 	vs, err := vs.First(id)
@@ -58,9 +60,10 @@ func VideoPlay(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, name, gin.H{
-		"title":     "视频播放",
-		"videoUrl":  videoDir + "/" + vs.Title + ".mp4",
-		"videoName": vs.Actress,
+		"title":        "视频播放",
+		"videoTitle":   vs.Title,
+		"videoActress": vs.Actress,
+		"videoUrl":     videoDir + "/" + vs.Title + ".mp4",
 	})
 }
 

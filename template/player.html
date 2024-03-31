@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.108.0">
+	<title>{{.title}}</title>
+	<link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
+	<link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+	<link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+	<style>
+		.card {
+			border: none;
+			/* 这里的0.5 是透明度值，可以根据需要调整 */
+			background-color: rgba(255, 255, 255, 0.1);
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+
+		<div class="container">
+            <header
+                class="navbar navbar-expand-lg d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+                <a href="/" class="d-flex align-items-center col-md-auto mb-2 mb-md-0 text-dark text-decoration-none">
+                    <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
+                </a>
+
+				<button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav col-md-auto mb-2 align-items-center mb-md-0">
+                        <li class="nav-item"><a class="nav-link px-2 active" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link px-2" href="/list">List</a></li>
+                        <li class="nav-item"><a class="nav-link px-2" href="/actress">Actress</a></li>
+                        <li class="nav-item"><a class="nav-link px-2 active" href="#">Player</a></li>
+                    </ul>
+                </div>
+
+                <div id="login" class="col-md-auto text-end">
+                    <button type="button" class="btn btn-outline-primary me-2" onclick="login()">Login</button>
+                    <button type="button" class="btn btn-primary">Sign-up</button>
+                </div>
+
+                <div id="settings" class="col-md-auto dropdown text-end">
+                    <a href="#" class="link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <img src="assets/image/bizhi/avatar.jpeg" alt="mdo" width="32" height="32"
+                            class="rounded-circle">
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                        <li><a class="dropdown-item" href="#">New project...</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
+                    </ul>
+                    <a href="#" class="link-dark text-decoration-none" id="setbg">
+                        <img src="assets/image/icon/sun-fill.svg" alt="mdo" width="32" height="32" style="color: cornflowerblue;">
+                    </a>
+                </div>
+            </header>
+        </div>
+
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-9">
+					<div class="card">
+						<div id="videoContainer" class="card-img-top"></div>
+						<div class="card-body">
+							<h5 class="card-title">{{ .videoTitle }}</h5>
+							<p class="card-text">{{ .videoActress }}</p>
+							<p class="card-text d-flex justify-content-start">
+								<span class="fs-3"><small class="text-muted">播放器：</small></span>
+								<img onclick="loadPlayer('xgplayer')" src="assets/image/logo/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('ckplayer')" src="assets/image/logo/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</main>
+
+	<script src="assets/app/js/jquery-3.5.1.min.js"></script>
+	<script>
+		let storage = Object;
+		if (!window.localStorage) {
+			alert('浏览器不支持localStorage')
+		} else {
+			storage = window.localStorage;
+		}
+
+		var bg = storage.getItem("bg");
+		if (bg == "dark") {
+			setBgDark()
+		} else if (bg == "light") {
+			setBgLight()
+		} else {
+			setBgLight()
+		}
+
+		var cookieString = document.cookie;
+		if (cookieString != "") {
+			document.getElementById("login").style.display = "none";
+		} else {
+			document.getElementById("settings").style.display = "none";
+		}
+
+		function login() {
+			window.location.href = "/login";
+		}
+		function logout() {
+			$.get("/logout", function (data, status) {
+				if (status = "success") {
+					window.location.reload();
+				}
+			});
+		}
+
+		$('#setbg').click(function(){
+			var src = $("#setbg > img").attr("src")
+			if (src == "assets/image/icon/sun-fill.svg") {
+				setBgDark();
+			} else {
+				setBgLight();
+			}
+		});
+
+		function setBgDark() {
+			console.log("setBgDark");
+			$("#setbg > img").attr("src", "assets/image/icon/moon-stars-fill.svg");
+			$("body").removeClass("bg-light").addClass("bg-dark text-secondary");
+			$(".card").removeClass("text-light").addClass("text-secondary");
+			$("footer").removeClass("bg-light").addClass("text-secondary");
+			
+			storage.setItem("bg", "dark");
+		}
+
+		function setBgLight() {
+			$("#setbg > img").attr("src", "assets/image/icon/sun-fill.svg");
+			$("body").removeClass("bg-dark text-secondary").addClass("bg-light");
+			$(".card").removeClass("text-secondary").addClass("bg-light");
+			$("footer").removeClass("text-secondary").addClass("bg-light");
+
+			storage.setItem("bg", "light");
+		}
+	</script>
+	<script>
+		let videoUrl = '{{ .videoUrl }}';
+		// videoUrl = 'assets/video/lc.mp4';
+
+		loadPlayer('');
+
+		function loadPlayer(playerType) {
+			remove();
+
+			var player = storage.getItem("player");
+			if (playerType == '' && player == '') {
+				playerType = 'xgplayer';
+			} else if (playerType == '' && player != '') {
+				playerType = player;
+			}
+			
+			var div = document.createElement("div");
+			div.setAttribute("id", "videoPlayer");
+			var classList = ["img-fluid"];
+			if (playerType == "ckplayer") {
+				classList.push("ratio", "ratio-16x9");
+			}
+			div.classList.add(...classList);
+			document.getElementById("videoContainer").appendChild(div);
+
+			if (playerType == "ckplayer") {
+				loadCSS("assets/player/ckplayer-x3/css/ckplayer.css");
+				loadJavaScript("assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
+			} else {
+				loadCSS("assets/player/xgplayer-3.0.10/index.min.css");
+				loadJavaScript("assets/player/xgplayer-3.0.10/index.min.js", loadXgplayer);
+			}
+			storage.setItem("player", playerType);
+		}
+
+		function remove() {
+			var videoPlayer = document.getElementById("videoPlayer");
+			if (videoPlayer) {
+				document.getElementById("videoContainer").removeChild(videoPlayer);
+			}
+			var ckplayerMenus = document.getElementsByClassName("ckplayer-ckplayer-menu");
+			if (ckplayerMenus.length > 0) {
+				for (let index = 0; index < ckplayerMenus.length; index++) {
+					const element = ckplayerMenus[index];
+					element.remove();
+				}
+			}
+
+			var links = document.getElementsByTagName("link");
+			if (links.length > 0) {
+				for (let index = 0; index < links.length; index++) {
+					const element = links[index];
+					var video = element.getAttribute("video");
+					if (video == "css") {
+						element.remove();
+					}
+				}
+			}
+			var scripts = document.getElementsByTagName("script");
+			if (scripts.length > 0) {
+				for (let index = 0; index < scripts.length; index++) {
+					const element = scripts[index];
+					var video = element.getAttribute("video");
+					if (video == "js") {
+						element.remove();
+					}
+				}
+			}
+		}
+
+		// 动态加载CSS文件
+		function loadCSS(href) {
+			var link = document.createElement("link");
+			link.rel = "stylesheet";
+			link.type = "text/css";
+			link.href = href;
+			link.setAttribute("video", "css");
+			document.getElementsByTagName("head")[0].appendChild(link);
+		}
+
+		// 动态加载JavaScript文件
+		function loadJavaScript(url, callback) {
+			var script = document.createElement("script");
+			script.type = "text/javascript";
+			script.src = url;
+			script.setAttribute("video", "js");
+			document.getElementsByTagName("head")[0].appendChild(script);
+			script.onload = function () {
+				callback();
+			};
+		}
+
+		function loadXgplayer() {
+			if (typeof Player !== "undefined") {
+				let player = new Player({
+					id: 'videoPlayer',
+					autoplay: true, // 是否自动播放
+					volume: 0.6, // 默认音量, 取值范围0 ~ 1
+					loop: true, // 是否循环播放
+					url: videoUrl,
+					lang: 'zh-cn', // 播放器初始显示语言
+					startTime: storage.getItem(videoUrl), // 初始起播时间，仅点播
+					fitVideoSize: 'auto', // 初始起播时间，仅点播
+					seekedStatus: 'auto', // seek操作结束之后播放器的状态，如果取值为auto，则维持原播放状态, 默认是seek之后直接播放
+					pip: true, // 是否使用画中画插件
+					rotate: true,// 是否使用旋转插件
+					screenShot: true, //显示截图按钮
+					videoAttributes: {
+						crossOrigin: 'anonymous'
+					},
+					playbackRate: [0.5, 0.75, 1, 1.5, 2, 3, 4],
+					defaultPlaybackRate: 1.0,
+					width: 'auto',
+					hight: 'auto',
+					// poster: '',
+				});
+				const Events = window.Player.Events;
+				player.on(Events.TIME_UPDATE, (data) => {
+					storage.setItem(videoUrl, data.currentTime);
+				});
+			}
+		}
+
+		function loadCkplayer() {
+			var videoObject = {
+				container: '#videoPlayer', // 视频容器
+				volume: 0.6, // 默认音量，范围0-1
+				autoplay: true, // 是否自动播放
+				loop: true, // 是否需要循环播放
+				seek: 'cookie', // 指定跳转到cookie记录的时间，使用该属性必需配置属性cookie
+				cookie: 'video', // cookie名称,请在同一域中保持唯一
+				video: videoUrl, // 视频地址
+				webFull: true, // 是否启用页面全屏按钮，默认不启用
+				screenshot: true, // 截图功能是否开启
+				crossOrigin:'Anonymous',//发送跨域字符
+				title: '{{ .videoActress }}',// 视频标题
+				playbackrateOpen: true, // 是否开启控制栏倍速选项
+				playbackrate: 1, // 默认倍速
+				playbackrateList: [0.75, 1, 1.25, 1.5, 2, 4], // 倍速配置值 
+				controls: true,//是否显示自带控制栏
+				rightBar: true,//是否开启右边控制栏
+				menu: [], // 右键菜单
+				// poster: 'assets/ckplayer-x3/video/poster.png',// 封面图片
+				// logo: 'assets/image/favicon/video/favicon-32x32.png',
+			};
+			var player = new ckplayer(videoObject)//调用播放器并赋值给变量player
+			player.screenshot()//截图并返回图片地址
+		}
+	</script>
+</body>
+
+</html>
