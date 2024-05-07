@@ -52,51 +52,9 @@
 </head>
 
 <body>
-
     <main>
         <div class="container">
-            <header class="navbar navbar-expand-lg d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-                <a href="/" class="d-flex align-items-center col-md-auto mb-2 mb-md-0 text-dark text-decoration-none">
-                    <img src="assets/image/favicon/video/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
-                </a>
-
-                <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav col-md-auto mb-2 align-items-center mb-md-0">
-                        <li class="nav-item"><a class="nav-link px-2 active" href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link px-2" href="/list">List</a></li>
-                        <li class="nav-item"><a class="nav-link px-2" href="/actress">Actress</a></li>
-                        <li class="nav-item"><a class="nav-link px-2 disabled" href="/play">Player</a></li>
-                    </ul>
-                </div>
-
-                <div id="login" class="col-md-auto text-end">
-                    <button type="button" class="btn btn-outline-primary me-2" onclick="login()">Login</button>
-                    <button type="button" class="btn btn-primary">Sign-up</button>
-                </div>
-
-                <div id="settings" class="col-md-auto dropdown text-end">
-                    <a href="#" class="link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <img src="assets/image/bizhi/avatar.jpeg" alt="mdo" width="32" height="32"
-                            class="rounded-circle">
-                    </a>
-                    <ul class="dropdown-menu text-small">
-                        <li><a class="dropdown-item" href="#">New project...</a></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
-                    </ul>
-                    <a href="#" class="link-dark text-decoration-none" id="setbg">
-                        <img src="assets/image/icon/sun-fill.svg" alt="mdo" width="32" height="32" style="color: cornflowerblue;">
-                    </a>
-                </div>
-            </header>
+            {{ template "header" }}
         </div>
 
         <section class="py-5 text-center container">
@@ -111,13 +69,13 @@
                 </div>
                 <div class="carousel-inner">
                     <div class="carousel-item active" data-bs-interval="10000">
-                        <img src="assets/image/bizhi/bizhi1.jpeg" class="d-block w-100" alt="...">
+                        <img src="assets/image/banner/banner1.jpg" class="d-block w-100" alt="...">
                     </div>
                     <div class="carousel-item" data-bs-interval="2000">
-                        <img src="assets/image/bizhi/bizhi2.jpeg" class="d-block w-100" alt="...">
+                        <img src="assets/image/banner/banner2.jpg" class="d-block w-100" alt="...">
                     </div>
                     <div class="carousel-item">
-                        <img src="assets/image/bizhi/bizhi3.jpeg" class="d-block w-100" alt="...">
+                        <img src="assets/image/banner/banner3.jpg" class="d-block w-100" alt="...">
                     </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval"
@@ -138,7 +96,7 @@
                 <div id="videoContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                     {{range $i,$v := .data}}
                     <div class="col">
-                        <a href="#" target="_blank">
+                        <a href="javascript:void(0)">
                             <div class="card rounded-4">
                                 <img src="{{$v}}" class="img-fluid card-img rounded-4" width="100%" height="225" alt="...">
                                 <ul class="card-img-overlay d-flex mt-auto justify-content-end">
@@ -166,16 +124,15 @@
                                 </ul>
                             </div>
                             <div class="card-body mt-2">
-                                <p class="card-title text-truncate">This is a wider card with supporting text below as a
-                                    natural lead-in to additional content. This content is a little bit longer.</p>
+                                <p class="card-title text-truncate">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
                             </div>
                         </a>
                     </div>
                     {{end}}
 
-                    {{range $i,$v := .data}}
+                    <!-- {{range $i,$v := .data}}
                     <div class="col">
-                        <a href="#" target="_blank">
+                        <a href="javascript:void(0)">
                             <div class="card rounded-4">
                                 <img src="{{$v}}" class="img-fluid card-img rounded-4" alt="..." width="100%" height="225">
                                 <div class="card-img-overlay">
@@ -205,8 +162,7 @@
                                 </div>
                             </div>
                             <div class="card-body mt-2">
-                                <p class="card-title text-truncate">This is a wider card with supporting text below as a
-                                    natural lead-in to additional content. This content is a little bit longer.</p>
+                                <p class="card-title text-truncate">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
                             </div>
                         </a>
                     </div>
@@ -224,27 +180,20 @@
                                     natural lead-in to additional content. This content is a little bit longer.</p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="btn-group">
-                                        <a href="#" target="_blank" class="btn btn-outline-primary">View</a>
+                                        <a href="javascript:void(0)" class="btn btn-outline-primary">View</a>
                                     </div>
                                     <small class="text-muted">9 mins</small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {{end}}
+                    {{end}} -->
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="py-5">
-        <div class="container">
-            <p class="float-end mb-1">
-                <a href="#">Back to top</a>
-            </p>
-            <p class="mb-1">视频网站</p>
-        </div>
-    </footer>
+    {{ template "footer" }}
 
     <script src="assets/app/js/jquery-3.5.1.min.js"></script>
     <script>

@@ -13,9 +13,9 @@ import (
 )
 
 func VideoIndex(c *gin.Context) {
-	cards := make([]string, 6)
-	for i := 0; i < 6; i++ {
-		cardPath := "./assets/image/bizhi/card" + strconv.Itoa(i+1) + ".jpeg"
+	cards := make([]string, 14)
+	for i := 0; i < 14; i++ {
+		cardPath := "./assets/image/card/card" + strconv.Itoa(i+1) + ".jpeg"
 		cards[i] = cardPath
 	}
 

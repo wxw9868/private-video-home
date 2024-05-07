@@ -18,8 +18,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	ip = "127.0.0.1"
 
-	if err := router.Run(fmt.Sprintf("%s:%d", ip, 80)); err != nil {
+	if err := router.Run(fmt.Sprintf("%s:%d", ip, 8081)); err != nil {
 		panic(err)
 	}
 }
