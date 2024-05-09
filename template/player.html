@@ -35,7 +35,20 @@
 							<h5 class="card-title">{{ .videoTitle }}</h5>
 							<p class="card-text">{{ .videoActress }}</p>
 							<p class="card-text d-flex justify-content-start">
-								<span class="fs-3"><small class="text-muted">播放器：</small></span>
+								<span class="d-flex align-items-end statistics_collect" data="{{ .videoID }}">
+									<i class="bi bi-heart" style="font-size: 1.5rem;">100</i>
+									<i class="me-3"></i>
+								</span>
+								<span class="d-flex align-items-end statistics_browse">
+									<i class="bi bi-eye" style="font-size: 1.5rem;">100</i>
+									<i class="me-3"></i>
+								</span>
+								<span class="d-flex align-items-end">
+									<i class="bi bi-clock" style="font-size: 1.5rem;">1:02:56</i>
+								</span>
+							</p>
+							<p class="card-text d-flex justify-content-start">
+								<span class="fs-3"><small class="text-muted">切换播放器：</small></span>
 								<img onclick="loadPlayer('xgplayer')" src="assets/image/logo/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
 								<img onclick="loadPlayer('ckplayer')" src="assets/image/logo/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
 							</p>
@@ -261,6 +274,78 @@
 			player.screenshot()//截图并返回图片地址
 		}
 	</script>
+	<script src="assets/app/js/axios.min.js"></script>
+    <script>
+        // 统计收藏量
+        $('.statistics_collect').click(function(){
+            var children = $(this).children()  
+            var collect = children[0].classList   
+            var count = children[0].textContent  
+			var setCollect = 0
+            if (collect[1] == 'bi-heart') {
+                collect.remove('bi-heart')
+                collect.add('bi-heart-fill')
+                count++
+                children[0].textContent = count
+				setCollect = 1
+            } else {
+                collect.add('bi-heart')
+                collect.remove('bi-heart-fill')
+                count--
+                children[0].textContent = count
+				setCollect = -1
+            } 
+
+            const formData = {};
+    		formData['video_id'] = $(this).attr('data')
+			formData['collect'] = setCollect
+            
+            axios.post('/collect',formData,{headers: {'content-type': 'application/json'}})
+            .then(function (response) {
+                console.log(response);
+                if (response) {
+                    
+                }
+            })
+            .catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+            });   
+        })
+
+        // 统计浏览量
+        $('.statistics_browse').click(function(){
+            var children = $(this).children()  
+            var collect = children[0].classList   
+            var count = children[0].textContent   
+            if (collect[0] == 'bi-eye') {
+                collect.remove('bi-eye')
+                collect.add('bi-eye-fill')
+                count++
+                children[0].textContent = count
+            } else {
+                collect.add('bi-eye')
+                collect.remove('bi-eye-fill')
+                count--
+                children[0].textContent = count
+            }   
+        })
+    </script>
 </body>
 
 </html>

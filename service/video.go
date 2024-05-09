@@ -1,10 +1,12 @@
 package service
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
+	"gorm.io/gorm"
 )
 
 type VideoService struct{}
@@ -70,6 +72,25 @@ func (vs *VideoService) First(id string) (model.Video, error) {
 	return video, nil
 }
 
+type VideoLog struct {
+	gorm.Model
+	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
+	Collect uint `gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
+	Browse  uint `gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
+	Zan     uint `gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
+	Cai     uint `gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
+	Watch   uint `gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
+	Video   Video
+}
+
+func (vs *VideoService) Info(id string) (model.Video, error) {
+	var video model.Video
+	if err := db.Where("id = ?", id).First(&video).Error; err != nil {
+		return video, err
+	}
+	return video, nil
+}
+
 func (vs *VideoService) List() ([]model.Video, error) {
 	var videos []model.Video
 	if err := db.Find(&videos).Error; err != nil {
@@ -81,6 +102,28 @@ func (vs *VideoService) List() ([]model.Video, error) {
 func (vs *VideoService) Create(videos []model.Video) error {
 	if err := db.Create(&videos).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (vs *VideoService) Collect(videoID uint, collect int) error {
+	var video model.Video
+	result := db.First(&video, videoID)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return errors.New("视频不存在！")
+	}
+
+	var expr string
+	if collect == 1 {
+		// 增加1
+		expr = "collect + 1"
+	} else {
+		// 减少1
+		expr = "collect - 1"
+	}
+	result = db.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("collect", gorm.Expr(expr))
+	if result.Error != nil {
+		return errors.New("更新失败！")
 	}
 	return nil
 }

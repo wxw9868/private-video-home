@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/wxw9868/util"
 	"github.com/wxw9868/video/service"
 )
 
@@ -56,11 +57,12 @@ func VideoPlay(c *gin.Context) {
 
 	vs, err := vs.First(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%s\n", err)
 	}
 
 	c.HTML(http.StatusOK, name, gin.H{
 		"title":        "视频播放",
+		"videoID":      vs.ID,
 		"videoTitle":   vs.Title,
 		"videoActress": vs.Actress,
 		"videoUrl":     videoDir + "/" + vs.Title + ".mp4",
@@ -79,6 +81,30 @@ func VideoActress(c *gin.Context) {
 		"title":       "演员列表",
 		"actressList": string(actressBytes),
 	})
+}
+
+type VideoCollect struct {
+	VideoID uint `form:"video_id" json:"video_id" binding:"required"`
+	Collect int  `form:"collect" json:"collect" binding:"required,oneof=1 -1"`
+}
+
+// 收藏
+func VideoCollectApi(c *gin.Context) {
+	var bind VideoCollect
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	if err := vs.Collect(bind.VideoID, bind.Collect); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+	}
+
+	msg := "收藏成功"
+	if bind.Collect == -1 {
+		msg = "取消收藏"
+	}
+	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
 func VideoImport(c *gin.Context) {

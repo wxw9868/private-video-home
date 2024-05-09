@@ -40,6 +40,8 @@ func Engine() *gin.Engine {
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
+	auth.POST("/collect", api.VideoCollectApi)
+
 	auth.GET("/rename", api.VideoRename)
 	auth.GET("/import", api.VideoImport)
 
