@@ -72,7 +72,7 @@ func (vs *VideoService) First(id string) (model.Video, error) {
 	return video, nil
 }
 
-type VideoLog struct {
+type VideoInfo struct {
 	gorm.Model
 	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
 	Collect uint `gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
