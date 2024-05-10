@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/video/service"
 )
@@ -55,17 +56,17 @@ func VideoPlay(c *gin.Context) {
 		name = "player.html"
 	}
 
-	vs, err := vs.First(id)
+	vi, err := vs.Info(cast.ToUint(id))
 	if err != nil {
 		log.Printf("%s\n", err)
 	}
 
 	c.HTML(http.StatusOK, name, gin.H{
 		"title":        "视频播放",
-		"videoID":      vs.ID,
-		"videoTitle":   vs.Title,
-		"videoActress": vs.Actress,
-		"videoUrl":     videoDir + "/" + vs.Title + ".mp4",
+		"videoID":      vi.ID,
+		"videoTitle":   vi.Title,
+		"videoActress": vi.Actress,
+		"videoUrl":     videoDir + "/" + vi.Title + ".mp4",
 	})
 }
 

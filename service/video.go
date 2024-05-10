@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"strconv"
+	"time"
 
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
@@ -73,19 +74,27 @@ func (vs *VideoService) First(id string) (model.Video, error) {
 }
 
 type VideoInfo struct {
-	gorm.Model
-	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
-	Collect uint `gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
-	Browse  uint `gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
-	Zan     uint `gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
-	Cai     uint `gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
-	Watch   uint `gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
-	Video   Video
+	ID            uint      `json:"id"`
+	Title         string    `json:"title" gorm:"column:title;type:varchar(255);comment:标题"`
+	Actress       string    `json:"actress" gorm:"column:actress;type:varchar(100);comment:演员"`
+	Size          int64     `json:"size" gorm:"column:size;type:bigint;comment:大小"`
+	Duration      float64   `json:"duration" gorm:"column:duration;type:float;default:0;comment:时长"`
+	Poster        string    `json:"poster" gorm:"column:poster;type:varchar(255);comment:封面"`
+	Width         int       `json:"width" gorm:"column:width;type:int;default:0;comment:宽"`
+	Height        int       `json:"height" gorm:"column:height;type:int;default:0;comment:高"`
+	CodecName     string    `json:"codec_name" gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
+	ChannelLayout string    `json:"channel_layout" gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
+	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
+	Collect       uint      `json:"browse" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
+	Browse        uint      `json:"collect" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
+	Zan           uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
+	Cai           uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
+	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
 }
 
-func (vs *VideoService) Info(id string) (model.Video, error) {
-	var video model.Video
-	if err := db.Where("id = ?", id).First(&video).Error; err != nil {
+func (vs *VideoService) Info(id uint) (VideoInfo, error) {
+	var video VideoInfo
+	if err := db.Model(&model.Video{}).Joins("left join video_VideoLog on video_VideoLog.video_id = video_Video.id").Where("video_Video.id = ?", id).Scan(&video).Error; err != nil {
 		return video, err
 	}
 	return video, nil

@@ -6,6 +6,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.9.1
 	github.com/shiningrush/avatarbuilder v0.0.0-20220126032521-dd13fcf4210d
+	github.com/spf13/cast v1.6.0
 	github.com/tidwall/gjson v1.17.1
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/wxw9868/util v0.0.0-20240409125452-e5fe9a10b52f
