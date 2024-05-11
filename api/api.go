@@ -132,6 +132,28 @@ func VideoCollectApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
+type VideoBrowse struct {
+	VideoID uint `form:"video_id" json:"video_id" binding:"required"`
+}
+
+// 浏览
+func VideoBrowseApi(c *gin.Context) {
+	var bind VideoCollect
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	if err := vs.Browse(bind.VideoID, userID); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+	}
+
+	msg := "浏览记录成功"
+	c.JSON(http.StatusOK, util.Success(msg, nil))
+}
+
 func VideoImport(c *gin.Context) {
 	service.VideoImport()
 	c.JSON(http.StatusOK, gin.H{

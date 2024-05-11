@@ -152,3 +152,27 @@ func (vs *VideoService) Collect(videoID uint, collect int, userID uint) error {
 
 	return nil
 }
+
+func (vs *VideoService) Browse(videoID uint, userID uint) error {
+	var video model.Video
+	result := db.First(&video, videoID)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return errors.New("视频不存在！")
+	}
+
+	tx := db.Begin()
+
+	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).Assign("browse = ?", gorm.Expr("browse + 1")).FirstOrCreate(&model.UserBrowseLog{}).Error; err != nil {
+		tx.Rollback()
+		return errors.New("创建失败！")
+	}
+	result = tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("browse", gorm.Expr("browse + 1"))
+	if result.Error != nil {
+		tx.Rollback()
+		return errors.New("更新失败！")
+	}
+
+	tx.Commit()
+
+	return nil
+}
