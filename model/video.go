@@ -25,3 +25,13 @@ type Actress struct {
 	Actress string `gorm:"column:actress;type:varchar(100);comment:演员"`
 	Avatar  string `gorm:"column:avatar;type:varchar(255);comment:头像"`
 }
+
+type VideoLog struct {
+	gorm.Model
+	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
+	Collect uint `gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
+	Browse  uint `gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
+	Zan     uint `gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
+	Cai     uint `gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
+	Watch   uint `gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
+}
