@@ -85,19 +85,19 @@ type VideoInfo struct {
 	CodecName     string    `json:"codec_name" gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
 	ChannelLayout string    `json:"channel_layout" gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
 	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
-	Collect       uint      `json:"browse" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
-	Browse        uint      `json:"collect" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
+	Collect       uint      `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
+	Browse        uint      `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
 	Zan           uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
 	Cai           uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
 	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
 }
 
 func (vs *VideoService) Info(id uint) (VideoInfo, error) {
-	var video VideoInfo
-	if err := db.Model(&model.Video{}).Joins("left join video_VideoLog on video_VideoLog.video_id = video_Video.id").Where("video_Video.id = ?", id).Scan(&video).Error; err != nil {
-		return video, err
+	var videoInfo VideoInfo
+	if err := db.Table("video_Video as v").Select("*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog l on l.video_id = v.id").Where("v.id = ?", id).Scan(&videoInfo).Error; err != nil {
+		return VideoInfo{}, err
 	}
-	return video, nil
+	return videoInfo, nil
 }
 
 func (vs *VideoService) List() ([]model.Video, error) {
@@ -115,24 +115,40 @@ func (vs *VideoService) Create(videos []model.Video) error {
 	return nil
 }
 
-func (vs *VideoService) Collect(videoID uint, collect int) error {
+func (vs *VideoService) Collect(videoID uint, collect int, userID uint) error {
 	var video model.Video
 	result := db.First(&video, videoID)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return errors.New("视频不存在！")
 	}
 
+	tx := db.Begin()
+
 	var expr string
 	if collect == 1 {
 		// 增加1
 		expr = "collect + 1"
+
+		if err := tx.Create(&model.UserCollectLog{UserID: userID, VideoID: videoID}).Error; err != nil {
+			tx.Rollback()
+			return errors.New("创建失败！")
+		}
 	} else {
 		// 减少1
 		expr = "collect - 1"
+
+		if err := tx.Where("user_id = ? and video_id = ?", userID, videoID).Delete(&model.UserCollectLog{}).Error; err != nil {
+			tx.Rollback()
+			return errors.New("删除失败！")
+		}
 	}
-	result = db.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("collect", gorm.Expr(expr))
+	result = tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("collect", gorm.Expr(expr))
 	if result.Error != nil {
+		tx.Rollback()
 		return errors.New("更新失败！")
 	}
+
+	tx.Commit()
+
 	return nil
 }

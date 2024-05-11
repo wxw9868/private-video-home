@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/video/service"
+	"github.com/wxw9868/video/utils"
 )
 
 func VideoIndex(c *gin.Context) {
@@ -61,12 +62,33 @@ func VideoPlay(c *gin.Context) {
 		log.Printf("%s\n", err)
 	}
 
+	var collectID uint = 0
+	usc, err := us.CollectLog(GetUserID(c))
+	if err == nil {
+		collectID = usc.ID
+	}
+
+	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
 	c.HTML(http.StatusOK, name, gin.H{
-		"title":        "视频播放",
-		"videoID":      vi.ID,
-		"videoTitle":   vi.Title,
-		"videoActress": vi.Actress,
-		"videoUrl":     videoDir + "/" + vi.Title + ".mp4",
+		"title":         "视频播放",
+		"videoID":       vi.ID,
+		"videoTitle":    vi.Title,
+		"videoActress":  vi.Actress,
+		"videoUrl":      videoDir + "/" + vi.Title + ".mp4",
+		"Size":          size / 1024 / 1024,
+		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
+		"ModTime":       vi.CreationTime.Format("2006-01-02 15:04:05"),
+		"Poster":        vi.Poster,
+		"Width":         vi.Width,
+		"Height":        vi.Height,
+		"CodecName":     vi.CodecName,
+		"ChannelLayout": vi.ChannelLayout,
+		"Collect":       vi.Collect,
+		"Browse":        vi.Browse,
+		"Zan":           vi.Zan,
+		"Cai":           vi.Cai,
+		"Watch":         vi.Watch,
+		"CollectID":     collectID,
 	})
 }
 
@@ -97,7 +119,9 @@ func VideoCollectApi(c *gin.Context) {
 		return
 	}
 
-	if err := vs.Collect(bind.VideoID, bind.Collect); err != nil {
+	userID := GetUserID(c)
+
+	if err := vs.Collect(bind.VideoID, bind.Collect, userID); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 	}
 

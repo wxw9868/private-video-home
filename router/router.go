@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -75,18 +76,13 @@ func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 
-		email, ok1 := session.Get("email").(string)
-		password, ok2 := session.Get("password").(string)
-		if !ok1 || !ok2 {
+		userid, ok := session.Get("userid").(uint)
+		if !ok {
 			c.Redirect(http.StatusMovedPermanently, "/login")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-
-		session.Set("email", email)
-		session.Set("password", password)
-		session.Save()
-
+		fmt.Println("userid: ", userid)
 		c.Next()
 	}
 }
