@@ -24,19 +24,24 @@ type Video struct {
 	Height        int     `json:"height"`
 	CodecName     string  `json:"codec_name"`
 	ChannelLayout string  `json:"channel_layout"`
+	Collect       uint    `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
+	Browse        uint    `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
+	Zan           uint    `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
+	Cai           uint    `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
+	Watch         uint    `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
 }
 
 func (as *VideoService) Find(actressID string) ([]Video, error) {
-	dbVideo := db.Model(&model.Video{})
+	dbVideo := db.Table("video_Video as v")
 	if actressID != "" {
 		var actress model.Actress
 		if err := db.Select("Actress").Where("id = ?", actressID).First(&actress).Error; err != nil {
 			return nil, err
 		}
-		dbVideo = dbVideo.Where("actress = ?", actress.Actress)
+		dbVideo = dbVideo.Where("v.actress = ?", actress.Actress)
 	}
 
-	rows, err := dbVideo.Rows()
+	rows, err := dbVideo.Select("*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog l on l.video_id = v.id").Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -44,22 +49,27 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 
 	var videos []Video
 	for rows.Next() {
-		var modelVideo model.Video
-		db.ScanRows(rows, &modelVideo)
+		var videoInfo VideoInfo
+		db.ScanRows(rows, &videoInfo)
 
-		f, _ := strconv.ParseFloat(strconv.FormatInt(modelVideo.Size, 10), 64)
+		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
 		videos = append(videos, Video{
-			ID:            modelVideo.ID,
-			Title:         modelVideo.Title,
-			Actress:       modelVideo.Actress,
+			ID:            videoInfo.ID,
+			Title:         videoInfo.Title,
+			Actress:       videoInfo.Actress,
 			Size:          f / 1024 / 1024,
-			Duration:      utils.ResolveTime(uint32(modelVideo.Duration)),
-			ModTime:       modelVideo.CreationTime.Format("2006-01-02 15:04:05"),
-			Poster:        modelVideo.Poster,
-			Width:         modelVideo.Width,
-			Height:        modelVideo.Height,
-			CodecName:     modelVideo.CodecName,
-			ChannelLayout: modelVideo.ChannelLayout,
+			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
+			ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
+			Poster:        videoInfo.Poster,
+			Width:         videoInfo.Width,
+			Height:        videoInfo.Height,
+			CodecName:     videoInfo.CodecName,
+			ChannelLayout: videoInfo.ChannelLayout,
+			Collect:       videoInfo.Collect,
+			Browse:        videoInfo.Browse,
+			Zan:           videoInfo.Zan,
+			Cai:           videoInfo.Cai,
+			Watch:         videoInfo.Watch,
 		})
 	}
 	return videos, nil
@@ -162,7 +172,13 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 
 	tx := db.Begin()
 
-	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).Assign("browse = ?", gorm.Expr("browse + 1")).FirstOrCreate(&model.UserBrowseLog{}).Error; err != nil {
+	var userBrowseLog model.UserBrowseLog
+
+	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).FirstOrInit(&userBrowseLog).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).Assign(model.UserBrowseLog{Number: userBrowseLog.Number + 1}).FirstOrCreate(&model.UserBrowseLog{}).Error; err != nil {
 		tx.Rollback()
 		return errors.New("创建失败！")
 	}

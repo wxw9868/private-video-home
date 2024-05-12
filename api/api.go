@@ -63,9 +63,11 @@ func VideoPlay(c *gin.Context) {
 	}
 
 	var collectID uint = 0
-	usc, err := us.CollectLog(GetUserID(c))
+	var isCollect = false
+	usc, err := us.CollectLog(GetUserID(c), vi.ID)
 	if err == nil {
 		collectID = usc.ID
+		isCollect = true
 	}
 
 	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
@@ -89,6 +91,7 @@ func VideoPlay(c *gin.Context) {
 		"Cai":           vi.Cai,
 		"Watch":         vi.Watch,
 		"CollectID":     collectID,
+		"IsCollect":     isCollect,
 	})
 }
 
@@ -138,8 +141,8 @@ type VideoBrowse struct {
 
 // 浏览
 func VideoBrowseApi(c *gin.Context) {
-	var bind VideoCollect
-	if err := c.ShouldBindJSON(&bind); err != nil {
+	var bind VideoBrowse
+	if err := c.ShouldBind(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}

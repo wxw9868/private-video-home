@@ -32,9 +32,9 @@ func (us *UserService) Login(email, password string) (*APIUser, error) {
 	return &user, nil
 }
 
-func (us *UserService) CollectLog(userID uint) (*model.UserCollectLog, error) {
+func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollectLog, error) {
 	var data model.UserCollectLog
-	result := db.Where("user_id = ?", userID).First(&data)
+	result := db.Where("user_id = ? and video_id = ?", userID, videoID).First(&data)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("收藏记录不存在！")
 	}

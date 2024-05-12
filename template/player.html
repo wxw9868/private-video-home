@@ -34,8 +34,8 @@
 							<h5 class="card-title">{{ .videoTitle }}</h5>
 							<p class="card-text">{{ .videoActress }}</p>
 							<p class="card-text d-flex justify-content-start">
-								<span class="d-flex align-items-end statistics_collect" data="{{ .videoID }}">
-									<i class="bi {{if .CollectID}} bi-heart-fill {{else}} bi-heart {{end}}" style="font-size: 1.5rem;">{{ .Collect }}</i>
+								<span class="d-flex align-items-end statistics_collect">
+									<i class="bi {{if .IsCollect}}bi-heart-fill{{else}}bi-heart{{end}}" style="font-size: 1.5rem;">{{ .Collect }}</i>
 									<i class="me-3"></i>
 								</span>
 								<span class="d-flex align-items-end statistics_browse">
@@ -43,7 +43,7 @@
 									<i class="me-3"></i>
 								</span>
 								<span class="d-flex align-items-end">
-									<i class="bi bi-clock" style="font-size: 1.5rem;">{{ .Duration }}</i>
+									<i class="bi bi-clock-fill" style="font-size: 1.5rem;">{{ .Duration }}</i>
 								</span>
 							</p>
 							<p class="card-text d-flex justify-content-start">
@@ -275,6 +275,8 @@
 	</script>
 	<script src="assets/app/js/axios.min.js"></script>
     <script>
+		console.log('{{ .IsCollect }}')
+		var videoID = '{{ .videoID }}' 
         // 统计收藏量
         $('.statistics_collect').click(function(){
             var children = $(this).children()  
@@ -296,7 +298,7 @@
             } 
 
             const formData = {};
-    		formData['video_id'] = parseInt($(this).attr('data'))
+    		formData['video_id'] = parseInt(videoID)
 			formData['collect'] = setCollect
             
             axios.post('/collect',formData,{headers: {'content-type': 'application/json'}})
@@ -327,54 +329,41 @@
             });   
         })
 
-
         // 统计浏览量
+		var children = $('.statistics_browse').children() 
+		var browse = children[0].classList   
+		var count = children[0].textContent  
+		if (browse[1] == 'bi-eye-fill') {
+			count++
+			children[0].textContent = count
+		}
 		
-        $('.statistics_browse').click(function(){
-            var children = $(this).children()  
-            var collect = children[0].classList   
-            var count = children[0].textContent   
-            if (collect[0] == 'bi-eye') {
-                collect.remove('bi-eye')
-                collect.add('bi-eye-fill')
-                count++
-                children[0].textContent = count
-            } else {
-                collect.add('bi-eye')
-                collect.remove('bi-eye-fill')
-                count--
-                children[0].textContent = count
-            }  
-			
-			const formData = {};
-			formData['video_id'] = parseInt($(this).attr('data'))
-			axios.get('/browse',formData,{headers: {'content-type': 'application/json'}})
-			.then(function (response) {
-				console.log(response);
-				if (response) {
-					console.log(response.data);
-				}
-			})
-			.catch(function (error) {
-				if (error.response) {
-					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-					console.log(error.response.data);
-					console.log(error.response.status);
-					console.log(error.response.headers);
-					
-				} else if (error.request) {
-					// 请求已经成功发起，但没有收到响应
-					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-					// 而在node.js中是 http.ClientRequest 的实例
-					console.log(error.request);
-				} else {
-					// 发送请求时出了点问题
-					console.log('Error', error.message);
-				}
-				console.log(error.config);
-				console.log(error); 
-			});   
-        })
+		axios.get('/browse', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
+		.then(function (response) {
+			console.log(response);
+			if (response) {
+				console.log(response.data);
+			}
+		})
+		.catch(function (error) {
+			if (error.response) {
+				// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+				console.log(error.response.data);
+				console.log(error.response.status);
+				console.log(error.response.headers);
+				
+			} else if (error.request) {
+				// 请求已经成功发起，但没有收到响应
+				// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+				// 而在node.js中是 http.ClientRequest 的实例
+				console.log(error.request);
+			} else {
+				// 发送请求时出了点问题
+				console.log('Error', error.message);
+			}
+			console.log(error.config);
+			console.log(error); 
+		});   
     </script>
 </body>
 
