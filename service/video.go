@@ -173,7 +173,6 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 	tx := db.Begin()
 
 	var userBrowseLog model.UserBrowseLog
-
 	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).FirstOrInit(&userBrowseLog).Error; err != nil {
 		tx.Rollback()
 		return err
