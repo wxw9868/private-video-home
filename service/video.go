@@ -191,3 +191,64 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 
 	return nil
 }
+
+func (vs *VideoService) Comment(videoID uint, content string, userID uint) (uint, error) {
+	var user model.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return 0, err
+	}
+
+	comment := model.VideoComment{
+		ParentId:    0,
+		VideoId:     videoID,
+		UserId:      userID,
+		Nickname:    user.Nickname,
+		Avatar:      user.Avatar,
+		Status:      "APPROVED",
+		IsAnonymous: 1,
+		Content:     content,
+		IsShow:      1,
+	}
+
+	result := db.Create(&comment)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return comment.ID, nil
+}
+
+func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userID uint) error {
+	var user model.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return err
+	}
+
+	comment := model.VideoComment{
+		ParentId:    parentID,
+		VideoId:     videoID,
+		UserId:      userID,
+		Nickname:    user.Nickname,
+		Avatar:      user.Avatar,
+		Status:      "APPROVED",
+		IsAnonymous: 1,
+		Content:     content,
+		IsShow:      1,
+	}
+
+	tx := db.Begin()
+
+	if err := tx.Create(&comment).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Model(&model.VideoComment{}).Where("id = ?", parentID).Update("reply_num", gorm.Expr("reply_num + 1")).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
+}

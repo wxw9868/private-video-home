@@ -16,12 +16,12 @@ type APIUser struct {
 	Password string `gorm:"column:password;type:string;comment:账户密码"`
 }
 
-func (us *UserService) Login(email, password string) (*APIUser, error) {
+func (us *UserService) Login(email, password string) (*model.User, error) {
 	password, err := util.DataEncryption(password)
 	if err != nil {
 		return nil, err
 	}
-	var user APIUser
+	var user model.User
 	result := db.Model(&model.User{}).Where("email = ?", email).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("用户不存在！")

@@ -20,19 +20,20 @@ func DoLoginApi(c *gin.Context) {
 	password := c.PostForm("password")
 
 	if email != "" && password != "" {
-		res, err := us.Login(email, password)
+		user, err := us.Login(email, password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
 			return
 		}
-		fmt.Printf("%+v\n", res)
+		fmt.Printf("%+v\n", user)
 
 		session := sessions.Default(c)
-		session.Set("userid", res.ID)
-		session.Set("email", res.Email)
-		session.Set("password", res.Password)
+		session.Set("userID", user.ID)
+		session.Set("userAvatar", user.Avatar)
+		session.Set("userNickname", user.Nickname)
+		session.Set("userEmail", user.Email)
+		session.Set("userMobile", user.Mobile)
 		if err = session.Save(); err != nil {
-			fmt.Println("err: ", err)
 			c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
 			return
 		}

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/wxw9868/util"
@@ -151,10 +152,69 @@ func VideoBrowseApi(c *gin.Context) {
 
 	if err := vs.Browse(bind.VideoID, userID); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
 	}
 
 	msg := "浏览记录成功"
 	c.JSON(http.StatusOK, util.Success(msg, nil))
+}
+
+type VideoComment struct {
+	VideoID uint   `form:"video_id" json:"video_id" binding:"required"`
+	Content string `form:"content" json:"content" binding:"required"`
+}
+
+// 评论
+func VideoCommentApi(c *gin.Context) {
+	var bind VideoComment
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	commentID, err := vs.Comment(bind.VideoID, bind.Content, userID)
+	if err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	session := sessions.Default(c)
+	userAvatar := session.Get("userAvatar").(string)
+	userNickname := session.Get("userNickname").(string)
+
+	data := map[string]interface{}{
+		"commentID":    commentID,
+		"userAvatar":   userAvatar,
+		"userNickname": userNickname,
+		"Content":      bind.Content,
+	}
+	c.JSON(http.StatusOK, util.Success("评论成功", data))
+}
+
+// 回复
+type VideoReply struct {
+	VideoID  uint   `form:"video_id" json:"video_id" binding:"required"`
+	ParentID uint   `form:"parent_id" json:"parent_id" binding:"required"`
+	Content  string `form:"content" json:"content" binding:"required"`
+}
+
+func VideoReplyApi(c *gin.Context) {
+	var bind VideoReply
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	if err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, util.Success("评论成功", nil))
 }
 
 func VideoImport(c *gin.Context) {
