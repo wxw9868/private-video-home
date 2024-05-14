@@ -43,6 +43,6 @@ var as = new(service.ActressService)
 
 func GetUserID(c *gin.Context) uint {
 	session := sessions.Default(c)
-	userID := session.Get("userid").(uint)
+	userID := session.Get("userID").(uint)
 	return userID
 }

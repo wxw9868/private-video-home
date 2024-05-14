@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -251,4 +252,13 @@ func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userI
 	tx.Commit()
 
 	return nil
+}
+
+func (vs *VideoService) CommentList(videoID uint) ([]model.VideoComment, error) {
+	var list []model.VideoComment
+	if err := db.Where("video_id = ?", videoID).Find(&list).Error; err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", list)
+	return list, nil
 }

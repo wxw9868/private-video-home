@@ -22,7 +22,7 @@ func DoLoginApi(c *gin.Context) {
 	if email != "" && password != "" {
 		user, err := us.Login(email, password)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
+			c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 			return
 		}
 		fmt.Printf("%+v\n", user)
@@ -34,6 +34,7 @@ func DoLoginApi(c *gin.Context) {
 		session.Set("userEmail", user.Email)
 		session.Set("userMobile", user.Mobile)
 		if err = session.Save(); err != nil {
+			fmt.Println("err1:", err)
 			c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
 			return
 		}

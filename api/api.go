@@ -217,6 +217,17 @@ func VideoReplyApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("评论成功", nil))
 }
 
+func VideoCommentListApi(c *gin.Context) {
+	id := c.Query("video_id")
+
+	list, err := vs.CommentList(cast.ToUint(id))
+	if err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("评论列表", list))
+}
+
 func VideoImport(c *gin.Context) {
 	service.VideoImport()
 	c.JSON(http.StatusOK, gin.H{

@@ -74,11 +74,11 @@
 						</div>
 						<span class="border border-light-subtle"></span>
 
-						<div class="card-body">
+						<div class="card-body" id="comment-list">
 							<div class="row mt-4">
 								<div class="col-auto">
 									<!-- User Avatar -->
-									<img src="https://via.placeholder.com/50" class="rounded-circle">
+									<img src="https://via.placeholder.com/50" width="50" height="50" class="rounded-circle">
 								</div>
 								<div class="col">
 									<!-- User Name and Location -->
@@ -146,79 +146,6 @@
 									<button class="btn btn-sm btn-light" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></button>
 								</div>
 							</div>
-
-							<div class="row mt-4">
-								<div class="col-auto">
-									<!-- User Avatar -->
-									<img src="https://via.placeholder.com/50" class="rounded-circle">
-								</div>
-								<div class="col">
-									<!-- User Name and Location -->
-									<div class="row">
-										<h5 class="col">用户名 <small class="text-muted">位置</small></h5>
-										<!-- Comment Time -->
-										<small class="col-auto text-muted">3小时前</small>
-									</div>
-									<!-- Comment Text -->
-									<p class="my-2">这是评论内容。用户可以在这里发表自己的看法和意见。</p>
-									<!-- Like, Dislike, Reply, Report Buttons -->
-									<div>
-										<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">100</i>赞</button>
-										<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">10</i>踩</button>
-										<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-										<button class="btn btn-sm btn-outline-warning">举报</button>
-									</div>
-									<!-- 回复表单（默认隐藏） -->
-									<div class="mt-3 reply-form d-none">
-										<form>
-											<div class="mb-3">
-												<textarea class="form-control comment-reply" rows="3" placeholder="回复用户名："></textarea>
-											</div>
-											<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发送回复</button>
-										</form>
-									</div>
-
-									<!-- Reply Area -->
-									<div class="ms-3 mt-3 collapse">
-										<div class="row mt-3">
-											<div class="col-auto">
-												<!-- Reply User Avatar -->
-												<img src="https://via.placeholder.com/50" class="rounded-circle">
-											</div>
-											<div class="col">
-												<!-- Reply User Name and Location -->
-												<div class="row">
-													<h5 class="col">另一用户 <small class="text-muted">位置</small></h5>
-													<!-- Reply Time -->
-													<small class="col-auto text-muted">2小时前</small>
-												</div>
-												<!-- Reply Text -->
-												<p class="my-2">这是评论的回复内容。</p>
-												<!-- Like, Dislike, Reply, Report Buttons -->
-												<div>
-													<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">100</i>赞</button>
-													<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">10</i>踩</button>
-													<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-													<button class="btn btn-sm btn-outline-warning">举报</button>
-												</div>
-												<!-- 回复表单（默认隐藏） -->
-												<div class="mt-3 reply-form d-none">
-													<form>
-														<div class="mb-3">
-															<textarea class="form-control comment-reply" rows="3" placeholder="回复另一用户："></textarea>
-														</div>
-														<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发送回复</button>
-													</form>
-												</div>
-											</div>
-										</div>
-
-									</div>
-									<!-- Show/Hide Reply Button -->
-									<button class="btn btn-sm btn-light" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></button>
-								</div>
-							</div>
-
 						</div>
 
 					</div>
@@ -344,7 +271,7 @@
 	</script>
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
-		videoUrl = 'assets/video/lc.mp4';
+		// videoUrl = 'assets/video/lc.mp4';
 		console.log('{{ .videoTitle }}')
 
 		loadPlayer('');
@@ -589,8 +516,13 @@
 			const form = button.parentNode;	
 			const formData = {};
 			for (let element of form.elements) {
+				console.log(element.tagName)
 				if (element.tagName !== "BUTTON" && element.type !== "SUBMIT") {
-					formData[element.name] = element.value;
+					if (element.tagName === "INPUT") {
+						formData[element.name] = parseInt(element.value);
+					} else {
+						formData[element.name] = element.value;
+					}
 				}
 			}
 			console.log(formData)
@@ -690,7 +622,118 @@
 			console.log(error.config);
 			console.log(error); 
 			});
-		}  
+		}
+		
+		axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
+		.then(function (response) {
+			console.log(response);
+			if (response) {
+				console.log(response.data.data);
+				let list = response.data.data;
+				var html = '';
+				list.forEach(element => {
+					html += 
+					`<div class="row mt-4">
+						<div class="col-auto">
+							<!-- User Avatar -->
+							<img src="assets/image/avatar/Logo.png" width="50" height="50" class="rounded-circle">
+						</div>
+						<div class="col">
+							<!-- User Name and Location -->
+							<div class="row">
+								<h5 class="col">`+element.Nickname+` <small class="text-muted">北京</small></h5>
+								<!-- Comment Time -->
+								<small class="col-auto text-muted">3小时前</small>
+							</div>
+							<!-- Comment Text -->
+							<p class="my-2">`+element.Content+`</p>
+							<!-- Like, Dislike, Reply, Report Buttons -->
+							<div>
+								<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">`+element.Support+`</i>赞</button>
+								<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">`+element.Oppose+`</i>踩</button>
+								<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
+								<button class="btn btn-sm btn-outline-warning">举报</button>
+							</div>
+							<!-- 回复表单（默认隐藏） -->
+							<div class="mt-3 reply-form d-none">
+								<form>
+									<div class="mb-3">
+										<textarea class="form-control comment-reply" rows="3" placeholder="回复`+element.Nickname+`："></textarea>
+									</div>
+									<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发送回复</button>
+								</form>
+							</div>
+
+							<!-- Reply Area -->
+							<div class="ms-3 mt-3 collapse">
+								<div class="row mt-3">
+									<div class="col-auto">
+										<!-- Reply User Avatar -->
+										<img src="https://via.placeholder.com/50" class="rounded-circle">
+									</div>
+									<div class="col">
+										<!-- Reply User Name and Location -->
+										<div class="row">
+											<h5 class="col">另一用户 <small class="text-muted">位置</small></h5>
+											<!-- Reply Time -->
+											<small class="col-auto text-muted">2小时前</small>
+										</div>
+										<!-- Reply Text -->
+										<p class="my-2">这是评论的回复内容。</p>
+										<!-- Like, Dislike, Reply, Report Buttons -->
+										<div>
+											<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">100</i>赞</button>
+											<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">10</i>踩</button>
+											<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
+											<button class="btn btn-sm btn-outline-warning">举报</button>
+										</div>
+										<!-- 回复表单（默认隐藏） -->
+										<div class="mt-3 reply-form d-none">
+											<form>
+												<div class="mb-3">
+													<textarea class="form-control comment-reply" rows="3" placeholder="回复另一用户："></textarea>
+												</div>
+												<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发送回复</button>
+											</form>
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<!-- Show/Hide Reply Button -->
+							<button class="btn btn-sm btn-light" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></button>
+						</div>
+					</div>`;
+				});	
+
+				document.getElementById('comment-list').innerHTML = html
+
+				const commentReplyElementList = document.querySelectorAll('.comment-reply')
+				const commentReplyList = [...commentReplyElementList].map(commentReply)
+
+				const collapseElementList = document.querySelectorAll('.collapse')
+				const collapseList = [...collapseElementList].map(toggleReply)
+			}
+		})
+		.catch(function (error) {
+			if (error.response) {
+				// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+				console.log(error.response.data);
+				console.log(error.response.status);
+				console.log(error.response.headers);
+				
+			} else if (error.request) {
+				// 请求已经成功发起，但没有收到响应
+				// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+				// 而在node.js中是 http.ClientRequest 的实例
+				console.log(error.request);
+			} else {
+				// 发送请求时出了点问题
+				console.log('Error', error.message);
+			}
+			console.log(error.config);
+			console.log(error); 
+		}); 
     </script>
 </body>
 

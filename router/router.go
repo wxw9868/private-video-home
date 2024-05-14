@@ -45,6 +45,7 @@ func Engine() *gin.Engine {
 	auth.GET("/browse", api.VideoBrowseApi)
 	auth.POST("/comment", api.VideoCommentApi)
 	auth.POST("/reply", api.VideoReplyApi)
+	auth.GET("/commentList", api.VideoCommentListApi)
 
 	auth.GET("/rename", api.VideoRename)
 	auth.GET("/import", api.VideoImport)
@@ -79,13 +80,13 @@ func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 
-		userid, ok := session.Get("userid").(uint)
+		userid, ok := session.Get("userID").(uint)
+		fmt.Println("user: ", userid, ok)
 		if !ok {
 			c.Redirect(http.StatusMovedPermanently, "/login")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		fmt.Println("userid: ", userid)
 		c.Next()
 	}
 }
