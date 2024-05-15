@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/video/model"
@@ -9,6 +10,24 @@ import (
 )
 
 type UserService struct{}
+
+func (us *UserService) Register(username, email, password string) error {
+	if !errors.Is(db.Where("email = ?", email).First(&model.User{}).Error, gorm.ErrRecordNotFound) {
+		return errors.New("邮箱已存在！")
+	}
+	if !errors.Is(db.Where("username = ?", username).First(&model.User{}).Error, gorm.ErrRecordNotFound) {
+		return errors.New("用户已存在！")
+	}
+	password, err := util.DataEncryption(password)
+	if err != nil {
+		return err
+	}
+
+	if err := db.Create(&model.User{Username: username, Email: email, Password: password, Avatar: "assets/image/avatar/avatar.png"}).Error; err != nil {
+		return fmt.Errorf("注册失败: %s", err)
+	}
+	return nil
+}
 
 type APIUser struct {
 	ID       uint
