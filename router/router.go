@@ -29,6 +29,7 @@ func Engine() *gin.Engine {
 	router.LoadHTMLGlob("template/*")
 
 	router.Use(InitSession())
+	router.GET("/register", api.RegisterApi)
 	router.GET("/login", api.LoginApi)
 	router.POST("/doLogin", api.DoLoginApi)
 	router.GET("/preivew", func(c *gin.Context) {

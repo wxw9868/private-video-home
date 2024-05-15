@@ -9,8 +9,14 @@ import (
 	"github.com/wxw9868/util"
 )
 
+func RegisterApi(c *gin.Context) {
+	c.HTML(http.StatusOK, "sign-up.html", gin.H{
+		"title": "注册",
+	})
+}
+
 func LoginApi(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{
+	c.HTML(http.StatusOK, "sign-in.html", gin.H{
 		"title": "登录",
 	})
 }
