@@ -38,8 +38,6 @@
         .bg-black-semi-transparent {
             background-color: rgba(0, 0, 0, 0.3);
             /* 黑色半透明 */
-            color: white;
-            /* 文字颜色 */
         }
 
         a {
@@ -120,29 +118,27 @@
         <li class="page-item page-link" id="last-page">尾页</li>
     </ul> -->
 
-    {{ template "common-footer" }}
-
-    <script src="assets/app/js/bootstrap-5.3.0.bundle.min.js"></script>
     <script src="assets/app/js/preloadjs-1.0.1.min.js"></script>
     <script>
         // 假设这是从服务器或其他地方获取的视频列表数据
         let jsonStr = '{{ .data }}';
         let videoList = eval(jsonStr);
 
-        const videosPerPage = 12;
-        let currentPage = 1;
+        let totalCount = videoList.length;
         let totalPages;
+        let currentPage = 1;
+        let numberPerPage = (totalCount < 12) ? totalCount : 12;
 
         // 预加载
         let queue = new createjs.LoadQueue(true);
         // 监听进度事件
         queue.on("progress", function (e) {
             var proNum = Math.ceil(e.progress * 100);
-            var progress = `
+            var progressHTML = `
             <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="`+ proNum + `" aria-valuemin="0" aria-valuemax="100" style="width:100%;height: 20px">
                 <div class="progress-bar progress-bar-striped bg-success" style="width: `+ proNum + `%">` + proNum + `%</div>
             </div>`;
-            $("#videoContainer").html(progress);
+            document.getElementById('videoContainer').innerHTML = progressHTML
         });
         let imgSrcs = [];
         videoList.forEach((item, index) => {
@@ -153,7 +149,6 @@
 
         // 渲染视频列表
         function renderVideoList(start, end) {
-            $('#videoContainer').empty();
             let videoItem = '';
             try {
                 let subArray = videoList.slice(start, end);
@@ -176,7 +171,8 @@
                     //             </div>
                     //         </div>
                     //     </div>`;
-                    videoItem += `<div class="col">
+                    videoItem += 
+                    `<div class="col">
                         <a href="/play?player=player&id=`+ (item.id) + `"target="_blank">
                             <div class="card rounded-4">
                                 <ul class="card-img-overlay d-flex mt-auto justify-content-end">
@@ -211,17 +207,16 @@
                 });
             } catch (error) { }
 
-            $('#videoContainer').append(videoItem);
+            document.getElementById('videoContainer').innerHTML = videoItem
 
-            for (let index = 0; index < videosPerPage; index++) {
-                var id = 'img' + (start + index);
-                var img = queue.getResult(id);
-                // $('.bd-placeholder-img:eq(' + index + ')').append(img);
-                // $('.bd-placeholder-img:eq(' + index + ') > img').attr({ width: "100%", height: "100%", class: "img-fluid" });
-
-                $('.card:eq(' + index + ')').append(img);
-                $('.card:eq(' + index + ') > img').attr({ width: "100%", height: "225", class: "img-fluid card-img rounded-4" });
+            for (let index = start; index < end; index++) {
+                let img = document.getElementsByClassName('card')[index].appendChild(queue.getResult('img' + index))
+                img.setAttribute('width','100%')
+                img.setAttribute('height','225')
+                img.setAttribute('class','img-fluid card-img rounded-4')
             }
+
+            loadBg()
 
             // 更新分页控件
             updatePagination();
@@ -245,7 +240,7 @@
                 btn.textContent = i;
                 btn.addEventListener('click', () => {
                     currentPage = i;
-                    renderVideoList((i - 1) * videosPerPage, i * videosPerPage);
+                    renderVideoList((i - 1) * numberPerPage, i * numberPerPage);
                 });
 
                 if (i === currentPage) {
@@ -291,42 +286,44 @@
         }
 
         // 计算总页数并初始化
-        totalPages = Math.ceil(videoList.length / videosPerPage);
+        totalPages = Math.ceil(videoList.length / numberPerPage);
         // 监听完成事件
         queue.on("complete", function () {
             console.log("加载完成");
-            renderVideoList(0, videosPerPage);
+            renderVideoList(0, numberPerPage);
         });
 
         // 事件监听器
         document.querySelector('#prev-page').addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage--;
-                renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
             }
         });
 
         document.querySelector('#next-page').addEventListener('click', () => {
             if (currentPage < totalPages) {
                 currentPage++;
-                renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
             }
         });
 
         document.querySelector('#first-page').addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage = 1;
-                renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
             }
         });
 
         document.querySelector('#last-page').addEventListener('click', () => {
             if (currentPage < totalPages) {
                 currentPage = totalPages;
-                renderVideoList((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
             }
         });
     </script>
+
+    {{ template "common-footer" }}
 
 </body>
 

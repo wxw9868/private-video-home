@@ -158,7 +158,6 @@
 
 	{{ template "common-footer" }}
 
-	<script src="assets/app/js/bootstrap-5.3.0.bundle.min.js"></script>
 	<script src="assets/app/js/axios.min.js"></script>
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
@@ -432,7 +431,7 @@
 								<div class="mt-3 reply-form d-none">
 									<form>
 										<div class="mb-3">
-											<input type="hidden" name="video_id" value="{{ .videoID }}">
+											<input type="hidden" name="video_id" value="`+videoID+`">
 											<input type="hidden" name="parent_id" value="`+element.ID+`">
 											<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+element.Nickname+`："></textarea>
 										</div>
@@ -469,7 +468,7 @@
 												<div class="mt-3 reply-form d-none">
 													<form>
 														<div class="mb-3">
-															<input type="hidden" name="video_id" value="{{ .videoID }}">
+															<input type="hidden" name="video_id" value="`+videoID+`">
 															<input type="hidden" name="parent_id" value="`+element.ID+`">
 															<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+element.Nickname+`："></textarea>
 														</div>

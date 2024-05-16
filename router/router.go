@@ -34,10 +34,6 @@ func Engine() *gin.Engine {
 	router.POST("/doRegister", api.RegisterApi)
 	router.POST("/doLogin", api.LoginApi)
 
-	router.GET("/preivew", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "preview.html", nil)
-	})
-
 	auth := router.Group("", AuthSession())
 	auth.GET("/logout", api.LogoutApi)
 	auth.GET("/", api.VideoIndex)
