@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -219,10 +218,10 @@ func (vs *VideoService) Comment(videoID uint, content string, userID uint) (uint
 	return comment.ID, nil
 }
 
-func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userID uint) error {
+func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userID uint) (uint, error) {
 	var user model.User
 	if err := db.First(&user, userID).Error; err != nil {
-		return err
+		return 0, err
 	}
 
 	comment := model.VideoComment{
@@ -241,24 +240,65 @@ func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userI
 
 	if err := tx.Create(&comment).Error; err != nil {
 		tx.Rollback()
-		return err
+		return 0, err
 	}
 
 	if err := tx.Model(&model.VideoComment{}).Where("id = ?", parentID).Update("reply_num", gorm.Expr("reply_num + 1")).Error; err != nil {
 		tx.Rollback()
-		return err
+		return 0, err
 	}
 
 	tx.Commit()
 
-	return nil
+	return comment.ID, nil
 }
 
-func (vs *VideoService) CommentList(videoID uint) ([]model.VideoComment, error) {
+func (vs *VideoService) CommentList(videoID uint) ([]*CommentTree, error) {
 	var list []model.VideoComment
 	if err := db.Where("video_id = ?", videoID).Find(&list).Error; err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", list)
-	return list, nil
+	trees := do(list)
+	data := make([]*CommentTree, len(trees))
+	for k, v := range trees {
+		data[k-1] = v
+	}
+	return data, nil
+}
+
+type CommentTree struct {
+	model.VideoComment
+	Childrens []CommentTree
+}
+
+func do(list []model.VideoComment) map[uint]*CommentTree {
+	var data = make(map[uint]*CommentTree)
+	var childrens = make(map[uint][]CommentTree)
+	for _, v := range list {
+		if v.ParentId == 0 {
+			data[v.ID] = &CommentTree{v, nil}
+		} else {
+			childrens[v.ParentId] = append(childrens[v.ParentId], CommentTree{v, nil})
+		}
+	}
+	return Tree(data, childrens)
+}
+
+func Tree(data map[uint]*CommentTree, childrens map[uint][]CommentTree) map[uint]*CommentTree {
+	for _, v := range data {
+		videoComments, ok := childrens[v.ID]
+		if ok {
+			v.Childrens = videoComments
+			delete(childrens, v.ID)
+			if len(childrens) > 0 {
+				data := make(map[uint]*CommentTree, len(videoComments))
+				for _, v := range videoComments {
+					videoComment := v
+					data[v.ID] = &videoComment
+				}
+				Tree(data, childrens)
+			}
+		}
+	}
+	return data
 }

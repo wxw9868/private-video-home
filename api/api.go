@@ -209,12 +209,24 @@ func VideoReplyApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	if err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID); err != nil {
+	commentID, err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID)
+	if err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, util.Success("评论成功", nil))
+	session := sessions.Default(c)
+	userAvatar := session.Get("userAvatar").(string)
+	userNickname := session.Get("userNickname").(string)
+
+	data := map[string]interface{}{
+		"commentID":    commentID,
+		"userAvatar":   userAvatar,
+		"userNickname": userNickname,
+		"Content":      bind.Content,
+	}
+
+	c.JSON(http.StatusOK, util.Success("回复成功", data))
 }
 
 func VideoCommentListApi(c *gin.Context) {
