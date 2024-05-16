@@ -9,13 +9,46 @@ import (
 	"github.com/wxw9868/util"
 )
 
-func LoginApi(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{
+func Register(c *gin.Context) {
+	c.HTML(http.StatusOK, "sign-up.html", gin.H{
+		"title": "注册",
+	})
+}
+
+func Login(c *gin.Context) {
+	c.HTML(http.StatusOK, "sign-in.html", gin.H{
 		"title": "登录",
 	})
 }
 
-func DoLoginApi(c *gin.Context) {
+type RegisterReq struct {
+	Username       string `form:"username" json:"username" binding:"required"`
+	Email          string `form:"email" json:"email" binding:"required,email"`
+	Password       string `form:"password" json:"password" binding:"required"`
+	RepeatPassword string `form:"repeat_password" json:"repeat_password" binding:"required,eqcsfield=Password"`
+}
+
+func RegisterApi(c *gin.Context) {
+	var bind RegisterReq
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	if err := util.VerifyPassword(bind.Password); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	err := us.Register(bind.Username, bind.Email, bind.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("注册成功", nil))
+}
+
+func LoginApi(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 

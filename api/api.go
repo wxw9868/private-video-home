@@ -33,11 +33,11 @@ func VideoList(c *gin.Context) {
 	actressID := c.Query("actress_id")
 	videos, err := vs.Find(actressID)
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
 	}
 	videosBytes, _ := json.Marshal(videos)
 
-	c.HTML(http.StatusOK, "list.html", gin.H{
+	c.HTML(http.StatusOK, "video-list.html", gin.H{
 		"title":       "视频列表",
 		"data":        string(videosBytes),
 		"actressList": actressListSort,
@@ -51,11 +51,11 @@ func VideoPlay(c *gin.Context) {
 
 	var name string
 	if player == "ckplayer" {
-		name = "ckplayer.html"
+		name = "video-ckplayer.html"
 	} else if player == "xgplayer" {
-		name = "xgplayer.html"
+		name = "video-xgplayer.html"
 	} else {
-		name = "player.html"
+		name = "video-player.html"
 	}
 
 	vi, err := vs.Info(cast.ToUint(id))
@@ -104,7 +104,7 @@ func VideoActress(c *gin.Context) {
 
 	actressBytes, _ := json.Marshal(actresss)
 
-	c.HTML(http.StatusOK, "actress.html", gin.H{
+	c.HTML(http.StatusOK, "video-actress.html", gin.H{
 		"title":       "演员列表",
 		"actressList": string(actressBytes),
 	})
@@ -209,12 +209,24 @@ func VideoReplyApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	if err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID); err != nil {
+	commentID, err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID)
+	if err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, util.Success("评论成功", nil))
+	session := sessions.Default(c)
+	userAvatar := session.Get("userAvatar").(string)
+	userNickname := session.Get("userNickname").(string)
+
+	data := map[string]interface{}{
+		"commentID":    commentID,
+		"userAvatar":   userAvatar,
+		"userNickname": userNickname,
+		"Content":      bind.Content,
+	}
+
+	c.JSON(http.StatusOK, util.Success("回复成功", data))
 }
 
 func VideoCommentListApi(c *gin.Context) {
