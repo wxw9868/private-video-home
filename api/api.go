@@ -71,6 +71,9 @@ func VideoPlay(c *gin.Context) {
 		isCollect = true
 	}
 
+	session := sessions.Default(c)
+	userAvatar := session.Get("userAvatar").(string)
+
 	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
 	c.HTML(http.StatusOK, name, gin.H{
 		"title":         "视频播放",
@@ -93,6 +96,7 @@ func VideoPlay(c *gin.Context) {
 		"Watch":         vi.Watch,
 		"CollectID":     collectID,
 		"IsCollect":     isCollect,
+		"Avatar":        userAvatar,
 	})
 }
 
@@ -188,7 +192,7 @@ func VideoCommentApi(c *gin.Context) {
 		"commentID":    commentID,
 		"userAvatar":   userAvatar,
 		"userNickname": userNickname,
-		"Content":      bind.Content,
+		"content":      bind.Content,
 	}
 	c.JSON(http.StatusOK, util.Success("评论成功", data))
 }
@@ -223,7 +227,7 @@ func VideoReplyApi(c *gin.Context) {
 		"commentID":    commentID,
 		"userAvatar":   userAvatar,
 		"userNickname": userNickname,
-		"Content":      bind.Content,
+		"content":      bind.Content,
 	}
 
 	c.JSON(http.StatusOK, util.Success("回复成功", data))

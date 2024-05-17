@@ -84,3 +84,15 @@ func LogoutApi(c *gin.Context) {
 
 	c.JSON(http.StatusOK, nil)
 }
+
+func GetSession(c *gin.Context) {
+	session := sessions.Default(c)
+	data := map[string]interface{}{
+		"userID":       session.Get("userID").(uint),
+		"userAvatar":   session.Get("userAvatar").(string),
+		"userNickname": session.Get("userNickname").(string),
+		"userEmail":    session.Get("userEmail").(string),
+		"userMobile":   session.Get("userMobile").(string),
+	}
+	c.JSON(http.StatusOK, util.Success("获取成功", data))
+}

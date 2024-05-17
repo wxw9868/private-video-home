@@ -36,6 +36,7 @@ func Engine() *gin.Engine {
 
 	auth := router.Group("", AuthSession())
 	auth.GET("/logout", api.LogoutApi)
+	auth.GET("/session", api.GetSession)
 	auth.GET("/", api.VideoIndex)
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)

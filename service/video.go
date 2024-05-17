@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -259,10 +260,16 @@ func (vs *VideoService) CommentList(videoID uint) ([]*CommentTree, error) {
 		return nil, err
 	}
 	trees := do(list)
+	fmt.Println(len(trees))
+	fmt.Printf("%+v\n", trees)
+
 	data := make([]*CommentTree, len(trees))
-	for k, v := range trees {
-		data[k-1] = v
+	i := 0
+	for _, v := range trees {
+		data[i] = v
+		i++
 	}
+	fmt.Printf("%+v\n", data)
 	return data, nil
 }
 

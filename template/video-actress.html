@@ -178,15 +178,19 @@
                 pageNumbers.appendChild(btn);
             }
 
-            // 启用/禁用“首页”和“尾页”按钮
+            // 启用/禁用“首页”按钮
             const firstPageBtn = document.querySelector('#first-page');
             firstPageBtn.disabled = currentPage === 1;
+
+            // 启用/禁用“尾页”按钮
             const lastPageBtn = document.querySelector('#last-page');
             lastPageBtn.disabled = currentPage === totalPages;
 
-            // 启用/禁用“上一页”和“下一页”按钮
+            // 启用/禁用“上一页”按钮
             const prevPageBtn = document.querySelector('#prev-page');
             prevPageBtn.disabled = currentPage === 1;
+
+            // 启用/禁用““下一页”按钮
             const nextPageBtn = document.querySelector('#next-page');
             nextPageBtn.disabled = currentPage === totalPages;
         }

@@ -36,16 +36,18 @@
       <div class="row mb-3">
         <label for="inputPassword3" class="col-sm-3 col-form-label">密码</label>
         <div class="col-sm-9">
-          <input type="password" name="password" class="form-control" id="inputPassword3" placeholder="请设置登录密码" required>
+          <input type="password" name="password" class="form-control" id="inputPassword3" placeholder="请设置登录密码"
+            required>
         </div>
-      </div>  
+      </div>
       <div class="row mb-3">
         <label for="inputPassword" class="col-sm-3 col-form-label">确认密码</label>
         <div class="col-sm-9">
-          <input type="password" name="repeat_password" class="form-control" id="inputPassword" placeholder="请确认登录密码" required>
+          <input type="password" name="repeat_password" class="form-control" id="inputPassword" placeholder="请确认登录密码"
+            required>
         </div>
-      </div>    
-      
+      </div>
+
       <!-- <div class="form-floating">
         <input type="text" name="username" class="form-control" id="floatingInputName" placeholder="请设置用户名" required>
         <label for="floatingInputName">用户名</label>
@@ -86,32 +88,32 @@
         }
       }
       console.log(formData)
-      axios.post('/doRegister',formData,{headers: {'content-type': 'application/json'}})
-      .then(function (response) {
-        console.log(response);
-        if (response) {
-          //3秒钟之后跳转到指定的页面 
-          setTimeout(window.location.href='/login',3); 
-        }
-      })
-      .catch(function (error) {
-        if (error.response) {
-          // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // 请求已经成功发起，但没有收到响应
-          // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-          // 而在node.js中是 http.ClientRequest 的实例
-          console.log(error.request);
-        } else {
-          // 发送请求时出了点问题
-          console.log('Error', error.message);
-        }
-        console.log(error.config);
-        console.log(error); 
-      });
+      axios.post('/doRegister', formData, { headers: { 'content-type': 'application/json' } })
+        .then(function (response) {
+          console.log(response);
+          if (response) {
+            //3秒钟之后跳转到指定的页面 
+            setTimeout(window.location.href = '/login', 3);
+          }
+        })
+        .catch(function (error) {
+          if (error.response) {
+            // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // 请求已经成功发起，但没有收到响应
+            // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+            // 而在node.js中是 http.ClientRequest 的实例
+            console.log(error.request);
+          } else {
+            // 发送请求时出了点问题
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+          console.log(error);
+        });
     });
   </script>
 
