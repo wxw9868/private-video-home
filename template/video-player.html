@@ -319,16 +319,50 @@
 				console.log(error); 
 			}); 
 		}
+
+		function doTime(timeString) {
+			var old = new Date(timeString);
+			var now = new Date();
+			// console.log(old.toLocaleString())
+			// console.log(now.toLocaleString())
+			// console.log(y,m,d,h,i,s)
+
+			let y = now.getFullYear() - old.getFullYear()
+			if (y == 0) {
+				let m = now.getMonth() - old.getMonth()
+				if (m == 0) {
+					let d = now.getDate() - old.getDate()
+					if (d == 0) {
+						let h = now.getHours() - old.getHours()
+						if (h == 0) {
+							let i = now.getMinutes() - old.getMinutes()
+							if (i == 0) {
+								let s = now.getSeconds() - old.getSeconds()
+								return i+'秒钟前'
+							}
+							return i+'分钟前'
+						}
+						return h+'小时前'
+					}
+					return d+'天前'
+				}
+				return m+'月前'
+			}
+			return y+'年前'			
+		}
+
 		// 获取评论数据
 		function loadCommentList() {
 			axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response);
-				// console.log(response.data.data);
+				console.log(response.data.data);
 				let list = response.data.data;
 				if (list) {	
 					let commentHTML = '';
-					list.forEach(element => {
+					list.forEach(element => {	
+						let timeString = doTime(element.CreatedAt)
+						console.log(timeString);
 						// console.log(element);
 						// console.log(element.Childrens);
 						commentHTML += 
@@ -342,7 +376,7 @@
 								<div class="row">
 									<div class="col">`+element.Nickname+` <small class="text-muted">北京</small></div>
 									<!-- Comment Time -->
-									<small class="col-auto text-muted">3小时前</small>
+									<small class="col-auto text-muted">`+timeString+`</small>
 								</div>
 								<!-- Comment Text -->
 								<p class="my-2">`+element.Content+`</p>
@@ -475,7 +509,7 @@
 							<div class="row">
 								<div class="col">`+data.userNickname+` <small class="text-muted">位置</small></div>
 								<!-- Comment Time -->
-								<small class="col-auto text-muted">3小时前</small>
+								<small class="col-auto text-muted">刚刚</small>
 							</div>
 							<!-- Comment Text -->
 							<p class="my-2">`+data.content+`</p>
@@ -561,7 +595,7 @@
 							<div class="row">
 								<div class="col">`+data.userNickname+` <small class="text-muted">位置</small></div>
 								<!-- Reply Time -->
-								<small class="col-auto text-muted">2小时前</small>
+								<small class="col-auto text-muted">刚刚</small>
 							</div>
 							<!-- Reply Text -->
 							<p class="my-2">`+data.content+`</p>

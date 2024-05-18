@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -259,15 +258,7 @@ func (vs *VideoService) CommentList(videoID uint) ([]*CommentTree, error) {
 	if err := db.Where("video_id = ?", videoID).Order("id desc").Find(&list).Error; err != nil {
 		return nil, err
 	}
-	trees := do(list)
-	data := make([]*CommentTree, len(trees))
-	i := 0
-	for _, v := range trees {
-		data[i] = v
-		i++
-	}
-	fmt.Printf("%+v\n", data)
-	return data, nil
+	return tree(list), nil
 }
 
 type CommentTree struct {
@@ -275,20 +266,66 @@ type CommentTree struct {
 	Childrens []CommentTree
 }
 
-func do(list []model.VideoComment) map[uint]*CommentTree {
+func tree(list []model.VideoComment) []*CommentTree {
 	var data = make(map[uint]*CommentTree)
 	var childrens = make(map[uint][]CommentTree)
+	var dataSort []uint
+	var childrensSort []uint
 	for _, v := range list {
 		if v.ParentId == 0 {
 			data[v.ID] = &CommentTree{v, nil}
+			dataSort = append(dataSort, v.ID)
 		} else {
 			childrens[v.ParentId] = append(childrens[v.ParentId], CommentTree{v, nil})
+			childrensSort = append(childrensSort, v.ParentId)
 		}
 	}
-	return Tree(data, childrens)
+
+	trees := recursiveSort(data, childrens, dataSort, childrensSort)
+	result := make([]*CommentTree, len(trees))
+	for k, v := range dataSort {
+		result[k] = trees[v]
+	}
+
+	return result
+	// return recursive(data, childrens)
 }
 
-func Tree(data map[uint]*CommentTree, childrens map[uint][]CommentTree) map[uint]*CommentTree {
+func recursiveSort(data map[uint]*CommentTree, childrens map[uint][]CommentTree, dataSort, childrensSort []uint) map[uint]*CommentTree {
+	for _, v := range dataSort {
+		videoComments, ok := childrens[v]
+		if ok {
+			data[v].Childrens = videoComments
+			delete(childrens, v)
+			childrensSort = deleteArray(childrensSort, v)
+			if len(childrens) > 0 {
+				data := make(map[uint]*CommentTree, len(videoComments))
+				dataSort := make([]uint, len(videoComments))
+				for k, v := range videoComments {
+					videoComment := v
+					data[v.ID] = &videoComment
+					dataSort[k] = v.ID
+				}
+				recursiveSort(data, childrens, dataSort, childrensSort)
+			}
+		}
+	}
+	return data
+}
+
+func deleteArray(d []uint, e uint) []uint {
+	r := make([]uint, len(d)-1)
+	j := 0
+	for i := 0; i < len(d); i++ {
+		if d[i] != e {
+			r[j] = d[i]
+			j++
+		}
+	}
+	return r
+}
+
+func recursive(data map[uint]*CommentTree, childrens map[uint][]CommentTree) map[uint]*CommentTree {
 	for _, v := range data {
 		videoComments, ok := childrens[v.ID]
 		if ok {
@@ -300,7 +337,7 @@ func Tree(data map[uint]*CommentTree, childrens map[uint][]CommentTree) map[uint
 					videoComment := v
 					data[v.ID] = &videoComment
 				}
-				Tree(data, childrens)
+				recursive(data, childrens)
 			}
 		}
 	}
