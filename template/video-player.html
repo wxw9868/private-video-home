@@ -31,7 +31,7 @@
 					<div class="card">
 						<div id="videoContainer" class="card-img-top"></div>
 						<div class="card-body">
-							<h5 class="card-title text-dark">标题</h5>
+							<h5 class="card-title text-dark">{{.videoTitle}}</h5>
 							<p class="card-text text-dark">{{ .videoActress }}</p>
 							<p class="card-text text-dark d-flex justify-content-start">
 								<span class="d-flex align-items-end" onclick="statisticsCollect(this)">
@@ -88,7 +88,7 @@
 
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
-		videoUrl = 'assets/video/lc.mp4';
+		// videoUrl = 'assets/video/lc.mp4';
 
 		loadPlayer();
 		function loadPlayer(playerType) {
@@ -324,7 +324,7 @@
 			axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response);
-				console.log(response.data.data);
+				// console.log(response.data.data);
 				let list = response.data.data;
 				if (list) {	
 					let commentHTML = '';
@@ -457,11 +457,11 @@
 					}
 				}
 			}
-			console.log(formData)
+			// console.log(formData)
 			
 			axios.post('/comment',formData,{headers: {'content-type': 'application/json'}})
 			.then(function (response) {
-				console.log(response);
+				// console.log(response);
 				let data = response.data.data
 				if (data) {
 					let commentHTML = 
@@ -543,13 +543,76 @@
 					}
 				}
 			}
-			console.log(formData)
-			
+			// console.log(formData)
+	
 			axios.post('/reply',formData,{headers: {'content-type': 'application/json'}})
 			.then(function (response) {
-				console.log(response);
-				if (response) {
-					
+				// console.log(response);
+				let data = response.data.data
+				if (data) {
+					let rowHTML = 
+					`<div class="row mt-3">
+						<div class="col-auto">
+							<!-- Reply User Avatar -->
+							<img src="`+data.userAvatar+`" width="50" height="50" class="rounded-circle">
+						</div>
+						<div class="col">
+							<!-- Reply User Name and Location -->
+							<div class="row">
+								<div class="col">`+data.userNickname+` <small class="text-muted">位置</small></div>
+								<!-- Reply Time -->
+								<small class="col-auto text-muted">2小时前</small>
+							</div>
+							<!-- Reply Text -->
+							<p class="my-2">`+data.content+`</p>
+							<!-- Like, Dislike, Reply, Report Buttons -->
+							<div>
+								<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">0</i>赞</button>
+								<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">0</i>踩</button>
+								<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
+								<button class="btn btn-sm btn-outline-warning">举报</button>
+							</div>
+							<!-- 回复表单（默认隐藏） -->
+							<div class="mt-3 reply-form d-none">
+								<form>
+									<div class="mb-3">
+										<input type="hidden" name="video_id" value="`+videoID+`">
+										<input type="hidden" name="parent_id" value="`+data.commentID+`">
+										<textarea class="form-control comment-reply" rows="3" placeholder="回复`+data.userNickname+`："></textarea>
+									</div>
+									<button type="button" class="btn btn-primary" onclick="reply(this)" disabled>发送回复</button>
+								</form>
+							</div>
+						</div>
+					</div>`;
+
+					const replyElement = button.parentNode.parentNode.nextElementSibling;
+					const loadHTML = document.getElementById('loadHTML')
+					if (replyElement) {
+						loadHTML.innerHTML = rowHTML;
+						const node = loadHTML.firstElementChild;
+						replyElement.insertBefore(node, replyElement.children[0]);
+						const msg = '展开 '+ replyElement.children.length +' 条回复';
+						const button = replyElement.nextElementSibling
+						button.setAttribute('data',msg);
+						button.innerHTML = msg+`<i class="bi bi-chevron-down"></i>`;
+					} else {
+						let replyHTML = 
+						`<!-- Reply Area -->
+						<div class="ms-3 mt-3 collapse">
+							`+rowHTML+`
+						</div>
+						<!-- Show/Hide Reply Button -->
+						<button class="btn btn-sm btn-light" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></button>`;
+						loadHTML.innerHTML = replyHTML;
+						const firstNode = loadHTML.firstElementChild; 
+						const lastNode = loadHTML.lastElementChild; 
+						const comment = button.parentNode.parentNode.parentNode;
+						comment.appendChild(firstNode);
+						comment.appendChild(lastNode);
+					}
+					loadCommentReply()
+					loadCollapse()
 				}
 			})
 			.catch(function (error) {
@@ -572,80 +635,7 @@
 			});
 			form.querySelector('textarea').value = '';
 			button.disabled = true;
-		}
-
-
-		let h = 
-					`<div class="row mt-4 text-dark">
-						<div class="col-auto">
-							<!-- User Avatar -->
-							<img src="https://via.placeholder.com/50" width="50" height="50" class="rounded-circle">
-						</div>
-						<div class="col">
-							<!-- User Name and Location -->
-							<div class="row">
-								<div class="col">用户名 <small class="text-muted">位置</small></div>
-								<!-- Comment Time -->
-								<small class="col-auto text-muted">3小时前</small>
-							</div>
-							<!-- Comment Text -->
-							<p class="my-2">这是评论内容。用户可以在这里发表自己的看法和意见。</p>
-							<!-- Like, Dislike, Reply, Report Buttons -->
-							<div>
-								<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">0</i>赞</button>
-								<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">0</i>踩</button>
-								<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-								<button class="btn btn-sm btn-outline-warning">举报</button>
-							</div>
-							<!-- 回复表单（默认隐藏） -->
-							<div class="mt-3 reply-form d-none">
-								<form>
-									<div class="mb-3">
-										<textarea class="form-control comment-reply" rows="3" placeholder="回复用户名："></textarea>
-									</div>
-									<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发送回复</button>
-								</form>
-							</div>
-
-							<!-- Reply Area -->
-							<div class="ms-3 mt-3 collapse">
-								<div class="row mt-3">
-									<div class="col-auto">
-										<!-- Reply User Avatar -->
-										<img src="https://via.placeholder.com/50" class="rounded-circle">
-									</div>
-									<div class="col">
-										<!-- Reply User Name and Location -->
-										<div class="row">
-											<div class="col">另一用户 <small class="text-muted">位置</small></div>
-											<!-- Reply Time -->
-											<small class="col-auto text-muted">2小时前</small>
-										</div>
-										<!-- Reply Text -->
-										<p class="my-2">这是评论的回复内容。</p>
-										<!-- Like, Dislike, Reply, Report Buttons -->
-										<div>
-											<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">100</i>赞</button>
-											<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">10</i>踩</button>
-											<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-											<button class="btn btn-sm btn-outline-warning">举报</button>
-										</div>
-										<!-- 回复表单（默认隐藏） -->
-										<div class="mt-3 reply-form d-none">
-											<form>
-												<div class="mb-3">
-													<textarea class="form-control comment-reply" rows="3" placeholder="回复另一用户："></textarea>
-												</div>
-												<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发送回复</button>
-											</form>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!-- Show/Hide Reply Button -->
-							<button class="btn btn-sm btn-light" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></button>
-						</div>
-					</div>`;
+		}				
 	</script>
 	<script>
 		function loadCommentReply() {

@@ -107,7 +107,7 @@
 
     axios.get('/session')
     .then(function (response) {
-        console.log(response.data.data);
+        // console.log(response.data.data);
         if (response.data.data) {
             document.getElementById('userAvatar').setAttribute('src',response.data.data.userAvatar)
         }
