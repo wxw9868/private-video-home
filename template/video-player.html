@@ -17,6 +17,20 @@
 			/* 这里的0.5 是透明度值，可以根据需要调整 */
 			background-color: rgba(255, 255, 255, 0.1);
 		}
+
+		.reply-collapse {
+            color: #A3A7AD; /* 这里可以改成你想要的颜色 */
+        }
+        .reply-collapse:hover {
+            color: #606266;  /* 这里可以改成你想要的颜色 */ 
+        }
+
+		a {
+            color: unset;
+            /* 设置为浏览器默认的颜色 */
+            text-decoration: none;
+            /* 移除超链接下划线 */
+        }
 	</style>
 </head>
 
@@ -67,7 +81,7 @@
 											<input type="hidden" name="video_id" value="{{ .videoID }}">
 											<textarea name="content" class="form-control comment-reply" rows="3" placeholder="发一条友善的评论吧～"></textarea>
 										</div>				
-										<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发布评论</button>
+										<button type="button" class="btn btn-sm btn-primary" onclick="comment(this)" disabled>发布评论</button>
 									</form>
 								</div>
 							</div>
@@ -88,7 +102,7 @@
 
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
-		// videoUrl = 'assets/video/lc.mp4';
+		videoUrl = 'assets/video/lc.mp4';
 
 		loadPlayer();
 		function loadPlayer(playerType) {
@@ -321,8 +335,8 @@
 		}
 
 		function doTime(timeString) {
-			var old = new Date(timeString);
-			var now = new Date();
+			let old = new Date(timeString);
+			let now = new Date();
 			// console.log(old.toLocaleString())
 			// console.log(now.toLocaleString())
 			// console.log(y,m,d,h,i,s)
@@ -382,8 +396,8 @@
 								<p class="my-2">`+element.Content+`</p>
 								<!-- Like, Dislike, Reply, Report Buttons -->
 								<div>
-									<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">`+element.Support+`</i>赞</button>
-									<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">`+element.Oppose+`</i>踩</button>
+									<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>`+element.Support+`</span></button>
+									<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>`+element.Oppose+`</span></button>
 									<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
 									<button class="btn btn-sm btn-outline-warning">举报</button>
 								</div>
@@ -395,7 +409,7 @@
 											<input type="hidden" name="parent_id" value="`+element.ID+`">
 											<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+element.Nickname+`："></textarea>
 										</div>
-										<button type="button" class="btn btn-primary" onclick="reply(this)" disabled>发送回复</button>
+										<button type="button" class="btn btn-sm btn-primary" onclick="reply(this)" disabled>发送回复</button>
 									</form>
 								</div>`;
 								if (element.Childrens) {
@@ -420,8 +434,8 @@
 												<p class="my-2">`+element.Content+`</p>
 												<!-- Like, Dislike, Reply, Report Buttons -->
 												<div>
-													<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">`+element.Support+`</i>赞</button>
-													<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">`+element.Oppose+`</i>踩</button>
+													<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>`+element.Support+`</span></button>
+													<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>`+element.Oppose+`</span></button>
 													<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
 													<button class="btn btn-sm btn-outline-warning">举报</button>
 												</div>
@@ -433,7 +447,7 @@
 															<input type="hidden" name="parent_id" value="`+element.ID+`">
 															<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+element.Nickname+`："></textarea>
 														</div>
-														<button type="button" class="btn btn-primary" onclick="reply(this)" disabled>发送回复</button>
+														<button type="button" class="btn btn-sm btn-primary" onclick="reply(this)" disabled>发送回复</button>
 													</form>
 												</div>
 											</div>
@@ -443,7 +457,7 @@
 									commentHTML += 
 									`</div>
 									<!-- Show/Hide Reply Button -->
-									<button class="btn btn-sm btn-light" data="展开 `+count+` 条回复" onclick="toggleReplyCollapse(this)">展开 `+count+` 条回复 <i class="bi bi-chevron-down"></i></button>`;
+									<div class="reply-collapse" data="展开 `+count+` 条回复" onclick="toggleReplyCollapse(this)">展开 `+count+` 条回复 <i class="bi bi-chevron-down"></i></div>`;
 								}
 							commentHTML += 
 							`</div>
@@ -515,8 +529,8 @@
 							<p class="my-2">`+data.content+`</p>
 							<!-- Like, Dislike, Reply, Report Buttons -->
 							<div>
-								<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">0</i>赞</button>
-								<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">0</i>踩</button>
+								<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
+								<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
 								<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
 								<button class="btn btn-sm btn-outline-warning">举报</button>
 							</div>
@@ -528,7 +542,7 @@
 										<input type="hidden" name="parent_id" value="`+data.commentID+`">
 										<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+data.userNickname+`："></textarea>
 									</div>
-									<button type="button" class="btn btn-primary" onclick="comment(this)" disabled>发送回复</button>
+									<button type="button" class="btn btn-sm btn-primary" onclick="comment(this)" disabled>发送回复</button>
 								</form>
 							</div>
 						</div>
@@ -601,8 +615,8 @@
 							<p class="my-2">`+data.content+`</p>
 							<!-- Like, Dislike, Reply, Report Buttons -->
 							<div>
-								<button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up">0</i>赞</button>
-								<button class="btn btn-sm btn-outline-danger"><i class="bi bi-hand-thumbs-down">0</i>踩</button>
+								<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
+								<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
 								<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
 								<button class="btn btn-sm btn-outline-warning">举报</button>
 							</div>
@@ -614,7 +628,7 @@
 										<input type="hidden" name="parent_id" value="`+data.commentID+`">
 										<textarea class="form-control comment-reply" rows="3" placeholder="回复`+data.userNickname+`："></textarea>
 									</div>
-									<button type="button" class="btn btn-primary" onclick="reply(this)" disabled>发送回复</button>
+									<button type="button" class="btn btn-sm btn-primary" onclick="reply(this)" disabled>发送回复</button>
 								</form>
 							</div>
 						</div>
@@ -637,7 +651,7 @@
 							`+rowHTML+`
 						</div>
 						<!-- Show/Hide Reply Button -->
-						<button class="btn btn-sm btn-light" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></button>`;
+						<div class="reply-collapse" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></div>`;
 						loadHTML.innerHTML = replyHTML;
 						const firstNode = loadHTML.firstElementChild; 
 						const lastNode = loadHTML.lastElementChild; 
@@ -669,7 +683,113 @@
 			});
 			form.querySelector('textarea').value = '';
 			button.disabled = true;
-		}				
+		}
+		
+		// 赞
+		function commentZan(button) {
+			let children = button.children
+			let zan = children[0].classList
+			let num = 0
+			if (zan[1] == 'bi-hand-thumbs-up') {
+				zan.remove('bi-hand-thumbs-up')
+				zan.add('bi-hand-thumbs-up-fill')
+				children[1].textContent = parseInt(children[1].textContent) + 1
+				num = 1
+			} else {
+				zan.remove('bi-hand-thumbs-up-fill')
+				zan.add('bi-hand-thumbs-up')
+				children[1].textContent = parseInt(children[1].textContent) - 1
+				num = -1
+			}
+			console.log(children[0].classList[1])
+			console.log(children[1].textContent)
+		 
+			const formData = {};
+    		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
+			formData['zan'] = num
+
+			console.log(formData)
+			return
+            
+            axios.post('/zan',formData,{headers: {'content-type': 'application/json'}})
+            .then(function (response) {
+                console.log(response);
+                if (response) {
+                    console.log(response.data);
+                }
+            })
+            .catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+            });   
+		}
+		// 踩
+		function commentCai(button) {
+			let children = button.children
+			let zan = children[0].classList
+			let num = 0
+			if (zan[1] == 'bi-hand-thumbs-down') {
+				zan.remove('bi-hand-thumbs-down')
+				zan.add('bi-hand-thumbs-down-fill')
+				children[1].textContent = parseInt(children[1].textContent) + 1
+				num = 1
+			} else {
+				zan.remove('bi-hand-thumbs-down-fill')
+				zan.add('bi-hand-thumbs-down')
+				children[1].textContent = parseInt(children[1].textContent) - 1
+				num = 1
+			}
+			console.log(children[0].classList[1])
+			console.log(children[1].textContent)
+
+			const formData = {};
+    		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
+			formData['cai'] = num
+			console.log(formData)
+			return
+
+			axios.post('/cai',formData,{headers: {'content-type': 'application/json'}})
+            .then(function (response) {
+                console.log(response);
+                if (response) {
+                    console.log(response.data);
+                }
+            })
+            .catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+            });   
+		}
 	</script>
 	<script>
 		function loadCommentReply() {
@@ -702,7 +822,7 @@
 			const collapseList = [...collapseElementList].map(toggleReply)
 		}
 		function toggleReply(value, index, array) {
-			if (index > 0) {
+			// if (index > 0) {
 				let replyArea = value;
 				let toggleReply = value.nextElementSibling;
 				
@@ -712,7 +832,7 @@
 				replyArea.addEventListener('hide.bs.collapse', function () {
 					toggleReply.innerHTML = toggleReply.getAttribute('data')+` <i class="bi bi-chevron-down"></i>`;
 				})
-			}
+			// }
 		}
 
 		function toggleReplyCollapse(button) {

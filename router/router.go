@@ -46,6 +46,8 @@ func Engine() *gin.Engine {
 	auth.POST("/comment", api.VideoCommentApi)
 	auth.POST("/reply", api.VideoReplyApi)
 	auth.GET("/commentList", api.VideoCommentListApi)
+	auth.POST("/zan", api.CommentZanApi)
+	auth.POST("/cai", api.CommentCaiApi)
 
 	auth.GET("/rename", api.VideoRename)
 	auth.GET("/import", api.VideoImport)

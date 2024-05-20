@@ -197,13 +197,13 @@ func VideoCommentApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("评论成功", data))
 }
 
-// 回复
 type VideoReply struct {
 	VideoID  uint   `form:"video_id" json:"video_id" binding:"required"`
 	ParentID uint   `form:"parent_id" json:"parent_id" binding:"required"`
 	Content  string `form:"content" json:"content" binding:"required"`
 }
 
+// 回复
 func VideoReplyApi(c *gin.Context) {
 	var bind VideoReply
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -249,6 +249,58 @@ func VideoImport(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "SUCCESS",
 	})
+}
+
+type CommentZan struct {
+	CommentID uint `form:"comment_id" json:"comment_id" binding:"required"`
+	Zan       int  `form:"zan" json:"zan" binding:"required,oneof=1 -1"`
+}
+
+// 赞
+func CommentZanApi(c *gin.Context) {
+	var bind CommentZan
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	if err := vs.Zan(bind.CommentID, userID, bind.Zan); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+	}
+
+	msg := "点赞成功"
+	if bind.Zan == -1 {
+		msg = "取消点赞"
+	}
+	c.JSON(http.StatusOK, util.Success(msg, nil))
+}
+
+type CommentCai struct {
+	CommentID uint `form:"comment_id" json:"comment_id" binding:"required"`
+	Cai       int  `form:"cai" json:"cai" binding:"required,oneof=1 -1"`
+}
+
+// 踩
+func CommentCaiApi(c *gin.Context) {
+	var bind CommentCai
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	if err := vs.Cai(bind.CommentID, userID, bind.Cai); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+	}
+
+	msg := "点踩成功"
+	if bind.Cai == -1 {
+		msg = "取消踩"
+	}
+	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
 func VideoRename(c *gin.Context) {
