@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -24,11 +25,11 @@ type Video struct {
 	Height        int     `json:"height"`
 	CodecName     string  `json:"codec_name"`
 	ChannelLayout string  `json:"channel_layout"`
-	Collect       uint    `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
-	Browse        uint    `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
-	Zan           uint    `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
-	Cai           uint    `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
-	Watch         uint    `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
+	Collect       uint    `json:"collect"`
+	Browse        uint    `json:"browse"`
+	Zan           uint    `json:"zan"`
+	Cai           uint    `json:"cai"`
+	Watch         uint    `json:"watch"`
 }
 
 func (as *VideoService) Find(actressID string) ([]Video, error) {
@@ -127,8 +128,7 @@ func (vs *VideoService) Create(videos []model.Video) error {
 
 func (vs *VideoService) Collect(videoID uint, collect int, userID uint) error {
 	var video model.Video
-	result := db.First(&video, videoID)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if errors.Is(db.First(&video, videoID).Error, gorm.ErrRecordNotFound) {
 		return errors.New("视频不存在！")
 	}
 
@@ -152,8 +152,7 @@ func (vs *VideoService) Collect(videoID uint, collect int, userID uint) error {
 			return errors.New("删除失败！")
 		}
 	}
-	result = tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("collect", gorm.Expr(expr))
-	if result.Error != nil {
+	if err := tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("collect", gorm.Expr(expr)).Error; err != nil {
 		tx.Rollback()
 		return errors.New("更新失败！")
 	}
@@ -165,8 +164,7 @@ func (vs *VideoService) Collect(videoID uint, collect int, userID uint) error {
 
 func (vs *VideoService) Browse(videoID uint, userID uint) error {
 	var video model.Video
-	result := db.First(&video, videoID)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if errors.Is(db.First(&video, videoID).Error, gorm.ErrRecordNotFound) {
 		return errors.New("视频不存在！")
 	}
 
@@ -179,12 +177,11 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 	}
 	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).Assign(model.UserBrowseLog{Number: userBrowseLog.Number + 1}).FirstOrCreate(&model.UserBrowseLog{}).Error; err != nil {
 		tx.Rollback()
-		return errors.New("创建失败！")
+		return fmt.Errorf("创建失败: %s", err)
 	}
-	result = tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("browse", gorm.Expr("browse + 1"))
-	if result.Error != nil {
+	if err := tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("browse", gorm.Expr("browse + 1")).Error; err != nil {
 		tx.Rollback()
-		return errors.New("更新失败！")
+		return fmt.Errorf("更新失败: %s", err)
 	}
 
 	tx.Commit()
@@ -259,6 +256,74 @@ func (vs *VideoService) CommentList(videoID uint) ([]*CommentTree, error) {
 		return nil, err
 	}
 	return tree(list), nil
+}
+
+func (vs *VideoService) Zan(commentID, userID uint, zan int) error {
+	var comment model.VideoComment
+	if errors.Is(db.First(&comment, commentID).Error, gorm.ErrRecordNotFound) {
+		return errors.New("评论不存在！")
+	}
+
+	tx := db.Begin()
+
+	var expr string
+	var support uint
+	if zan == 1 {
+		// 增加1
+		support = 1
+		expr = "support + 1"
+	} else {
+		// 减少1
+		support = 0
+		expr = "support - 1"
+	}
+
+	if err := tx.Where(model.UserCommentLog{UserID: userID, VideoID: comment.VideoId, CommentID: commentID}).Assign(model.UserCommentLog{Support: support}).FirstOrCreate(&model.UserCommentLog{}).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("创建失败: %s", err)
+	}
+	if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", comment.VideoId, commentID).Update("support", gorm.Expr(expr)).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("更新失败: %s", err)
+	}
+
+	tx.Commit()
+
+	return nil
+}
+
+func (vs *VideoService) Cai(commentID, userID uint, cai int) error {
+	var comment model.VideoComment
+	if errors.Is(db.First(&comment, commentID).Error, gorm.ErrRecordNotFound) {
+		return errors.New("评论不存在！")
+	}
+
+	tx := db.Begin()
+
+	var expr string
+	var oppose uint
+	if cai == 1 {
+		// 增加1
+		oppose = 1
+		expr = "oppose + 1"
+	} else {
+		// 减少1
+		oppose = 0
+		expr = "oppose - 1"
+	}
+
+	if err := tx.Where(model.UserCommentLog{UserID: userID, VideoID: comment.VideoId, CommentID: commentID}).Assign(model.UserCommentLog{Oppose: oppose}).FirstOrCreate(&model.UserCommentLog{}).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("创建失败: %s", err)
+	}
+	if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", comment.VideoId, commentID).Update("oppose", gorm.Expr(expr)).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("更新失败: %s", err)
+	}
+
+	tx.Commit()
+
+	return nil
 }
 
 type CommentTree struct {
