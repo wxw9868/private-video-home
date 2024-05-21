@@ -250,9 +250,19 @@ func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userI
 	return comment.ID, nil
 }
 
+type VideoComment struct {
+	model.VideoComment
+	LogId uint `gorm:"column:log_id;type:uint;not null;default:0;comment:日志ID"`
+	Zan   uint `gorm:"column:zan;type:uint;not null;default:0;comment:支持（赞）"`
+	Cai   uint `gorm:"column:cai;type:uint;not null;default:0;comment:反对（踩）"`
+}
+
 func (vs *VideoService) CommentList(videoID uint) ([]*CommentTree, error) {
-	var list []model.VideoComment
-	if err := db.Where("video_id = ?", videoID).Order("id desc").Find(&list).Error; err != nil {
+	var list []VideoComment
+	if err := db.Table("video_VideoComment as c").
+		Where("c.video_id = ?", videoID).
+		Select("c.*", "l.support as zan", "l.oppose as cai").
+		Joins("left join video_UserCommentLog l on l.comment_id = c.id").Order("c.id desc").Find(&list).Error; err != nil {
 		return nil, err
 	}
 	return tree(list), nil
@@ -278,11 +288,13 @@ func (vs *VideoService) Zan(commentID, userID uint, zan int) error {
 		expr = "support - 1"
 	}
 
+	fmt.Println(support, expr)
+
 	if err := tx.Where(model.UserCommentLog{UserID: userID, VideoID: comment.VideoId, CommentID: commentID}).Assign(model.UserCommentLog{Support: support}).FirstOrCreate(&model.UserCommentLog{}).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("创建失败: %s", err)
 	}
-	if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", comment.VideoId, commentID).Update("support", gorm.Expr(expr)).Error; err != nil {
+	if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", commentID, comment.VideoId).Update("support", gorm.Expr(expr)).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("更新失败: %s", err)
 	}
@@ -327,17 +339,20 @@ func (vs *VideoService) Cai(commentID, userID uint, cai int) error {
 }
 
 type CommentTree struct {
-	model.VideoComment
+	VideoComment
+	// model.VideoComment
 	Childrens []CommentTree
 }
 
-func tree(list []model.VideoComment) []*CommentTree {
+func tree(list []VideoComment) []*CommentTree {
+	// func tree(list []model.VideoComment) []*CommentTree {
 	var data = make(map[uint]*CommentTree)
 	var childrens = make(map[uint][]CommentTree)
 	var dataSort []uint
 	var childrensSort []uint
 	for _, v := range list {
 		if v.ParentId == 0 {
+			fmt.Printf("%+v\n", v)
 			data[v.ID] = &CommentTree{v, nil}
 			dataSort = append(dataSort, v.ID)
 		} else {
@@ -347,6 +362,9 @@ func tree(list []model.VideoComment) []*CommentTree {
 	}
 
 	trees := recursiveSort(data, childrens, dataSort, childrensSort)
+	fmt.Println(len(trees), len(dataSort))
+	fmt.Printf("%+v\n", dataSort)
+	fmt.Printf("%+v\n", trees)
 	result := make([]*CommentTree, len(trees))
 	for k, v := range dataSort {
 		result[k] = trees[v]

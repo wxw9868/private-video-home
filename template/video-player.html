@@ -370,7 +370,7 @@
 			axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response);
-				console.log(response.data.data);
+				// console.log(response.data.data);
 				let list = response.data.data;
 				if (list) {	
 					let commentHTML = '';
@@ -708,8 +708,8 @@
     		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
 			formData['zan'] = num
 
-			console.log(formData)
-			return
+			// console.log(formData)
+			// return
             
             axios.post('/zan',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
@@ -760,8 +760,9 @@
 			const formData = {};
     		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
 			formData['cai'] = num
-			console.log(formData)
-			return
+
+			// console.log(formData)
+			// return
 
 			axios.post('/cai',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
