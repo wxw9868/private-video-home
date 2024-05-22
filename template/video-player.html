@@ -209,12 +209,22 @@
 					defaultPlaybackRate: 1.0,
 					width: 'auto',
 					hight: 'auto',
+					mini: true, //开启小窗插件
+					// isScrollSwitch: true,
+					// scrollTop: true,
 					// poster: '',
 				});
 				const Events = window.Player.Events;
 				player.on(Events.TIME_UPDATE, (data) => {
 					storage.setItem(videoUrl, data.currentTime);
 				});
+				player.on(Events.MINI_STATE_CHANGE, (isMini) => {
+				if (isMini) {
+					console.log('enter miniScreen')
+				} else {
+					console.log('exit miniScreen')
+				}
+				})
 			}
 		}
 		// 加载Ckplayer
