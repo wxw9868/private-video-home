@@ -45,20 +45,28 @@ func VideoList(c *gin.Context) {
 	})
 }
 
+type Play struct {
+	ID     string `form:"id" binding:"required"`
+	Player string `form:"player" binding:"required,oneof=ckplayer xgplayer player"`
+}
+
 func VideoPlay(c *gin.Context) {
-	id := c.Query("id")
-	player := c.Query("player")
+	var play Play
+	if err := c.Bind(&play); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
 
 	var name string
-	if player == "ckplayer" {
+	if play.Player == "ckplayer" {
 		name = "video-ckplayer.html"
-	} else if player == "xgplayer" {
+	} else if play.Player == "xgplayer" {
 		name = "video-xgplayer.html"
 	} else {
 		name = "video-player.html"
 	}
 
-	vi, err := vs.Info(cast.ToUint(id))
+	vi, err := vs.Info(cast.ToUint(play.ID))
 	if err != nil {
 		log.Printf("%s\n", err)
 	}

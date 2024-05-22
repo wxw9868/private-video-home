@@ -35,9 +35,9 @@ type UserBrowseLog struct {
 
 type UserCommentLog struct {
 	gorm.Model
-	UserID    uint `gorm:"column:user_id;type:uint;not null;default:0;comment:用户ID"`
-	VideoID   uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
-	CommentID uint `gorm:"column:comment_id;type:uint;not null;default:0;comment:评论ID"`
-	Support   uint `gorm:"column:support;type:uint;not null;default:0;comment:支持（赞）"`
-	Oppose    uint `gorm:"column:oppose;type:uint;not null;default:0;comment:反对（踩）"`
+	UserID    uint  `gorm:"column:user_id;type:uint;not null;default:0;comment:用户ID"`
+	VideoID   uint  `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
+	CommentID uint  `gorm:"column:comment_id;type:uint;not null;default:0;comment:评论ID"`
+	Support   *uint `gorm:"column:support;type:uint;not null;default:0;comment:支持（赞）"`
+	Oppose    *uint `gorm:"column:oppose;type:uint;not null;default:0;comment:反对（踩）"`
 }

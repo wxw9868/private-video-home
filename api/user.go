@@ -80,9 +80,10 @@ func LoginApi(c *gin.Context) {
 func LogoutApi(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
-	session.Save()
-
-	c.JSON(http.StatusOK, nil)
+	if err := session.Save(); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+	}
+	c.JSON(http.StatusOK, util.Success("登出成功", nil))
 }
 
 func GetSession(c *gin.Context) {

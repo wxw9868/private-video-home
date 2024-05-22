@@ -47,23 +47,24 @@
 						<div class="card-body">
 							<h5 class="card-title text-dark">{{.videoTitle}}</h5>
 							<p class="card-text text-dark">{{ .videoActress }}</p>
-							<p class="card-text text-dark d-flex justify-content-start">
+							<p class="card-text text-dark d-flex justify-content-start" style="font-size: 1.5rem;">
 								<span class="d-flex align-items-end" onclick="statisticsCollect(this)">
-									<i class="bi {{if .IsCollect}}bi-heart-fill{{else}}bi-heart{{end}}" style="font-size: 1.5rem;">{{ .Collect }}</i>
-									<i class="me-3"></i>
+									<i class="bi {{if .IsCollect}}bi-heart-fill{{else}}bi-heart{{end}}"></i> 
+									<span class="ms-1">{{ .Collect }}</span>
 								</span>
-								<span class="d-flex align-items-end" id="statistics-browse">
-									<i class="bi bi-eye-fill" style="font-size: 1.5rem;">{{ .Browse }}</i>
-									<i class="me-3"></i>
+								<span class="d-flex align-items-end ms-4" id="statistics-browse">
+									<i class="bi bi-eye-fill"> </i>
+									<span class="ms-1">{{ .Browse }}</span>
 								</span>
-								<span class="d-flex align-items-end">
-									<i class="bi bi-clock-fill" style="font-size: 1.5rem;">{{ .Duration }}</i>
+								<span class="d-flex align-items-end ms-4">
+									<i class="bi bi-clock-fill"> </i> 
+									<span class="ms-1">{{ .Duration }}</span>
 								</span>
 							</p>
 							<p class="card-text d-flex justify-content-start">
 								<span class="fs-3"><small class="text-muted">切换播放器：</small></span>
-								<img onclick="loadPlayer('xgplayer')" src="assets/image/logo/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
-								<img onclick="loadPlayer('ckplayer')" src="assets/image/logo/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('xgplayer')" src="assets/image/player/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('ckplayer')" src="assets/image/player/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
 							</p>
 						</div>	
 					</div>
@@ -249,25 +250,22 @@
 		function statisticsCollect(span) {
 			let children = span.children
 			let collect = children[0].classList   
-            let count = children[0].textContent 
-			let setCollect = 0
+			let num = 0
             if (collect[1] == 'bi-heart') {
                 collect.remove('bi-heart')
                 collect.add('bi-heart-fill')
-                count++
-                children[0].textContent = count
-				setCollect = 1
+                children[1].textContent = parseInt(children[1].textContent) + 1
+				num = 1
             } else {
                 collect.add('bi-heart')
                 collect.remove('bi-heart-fill')
-                count--
-                children[0].textContent = count
-				setCollect = -1
+                children[1].textContent = parseInt(children[1].textContent) - 1
+				num = -1
             } 
 
 			const formData = {};
     		formData['video_id'] = parseInt(videoID)
-			formData['collect'] = setCollect
+			formData['collect'] = num
             
             axios.post('/collect',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
@@ -303,14 +301,14 @@
         // 统计浏览量
 		function loadBrowse() {
 			let children = document.getElementById('statistics-browse').children 
-			let count = children[0].textContent  
+			let count = children[1].textContent  
 			
 			axios.get('/browse', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response.data);
 				if (response.data) {
 					count++
-					children[0].textContent = count	
+					children[1].textContent = count	
 				}
 			})
 			.catch(function (error) {
@@ -370,13 +368,26 @@
 			axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response);
-				// console.log(response.data.data);
+				console.log(response.data.data);
 				let list = response.data.data;
 				if (list) {	
+					let userID = storage.getItem("userID");
+					// console.log(userID);
 					let commentHTML = '';
 					list.forEach(element => {	
-						let timeString = doTime(element.CreatedAt)
-						console.log(timeString);
+						let timeString = doTime(element.CreatedAt);
+						// console.log(timeString);
+						let isZan = 'bi-hand-thumbs-up'
+						let isCai = 'bi-hand-thumbs-down'
+						if (element.LogUserID == userID) {
+							if (element.Zan == 1) {
+								isZan = 'bi-hand-thumbs-up-fill'
+							}
+							if (element.Cai == 1) {
+								isCai = 'bi-hand-thumbs-down-fill'
+							}	
+						}
+						console.log(isZan,isCai);
 						// console.log(element);
 						// console.log(element.Childrens);
 						commentHTML += 
@@ -396,8 +407,8 @@
 								<p class="my-2">`+element.Content+`</p>
 								<!-- Like, Dislike, Reply, Report Buttons -->
 								<div>
-									<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>`+element.Support+`</span></button>
-									<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>`+element.Oppose+`</span></button>
+									<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
+									<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
 									<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
 									<button class="btn btn-sm btn-outline-warning">举报</button>
 								</div>
@@ -683,8 +694,7 @@
 			});
 			form.querySelector('textarea').value = '';
 			button.disabled = true;
-		}
-		
+		}	
 		// 赞
 		function commentZan(button) {
 			let children = button.children
@@ -701,8 +711,8 @@
 				children[1].textContent = parseInt(children[1].textContent) - 1
 				num = -1
 			}
-			console.log(children[0].classList[1])
-			console.log(children[1].textContent)
+			// console.log(children[0].classList[1])
+			// console.log(children[1].textContent)
 		 
 			const formData = {};
     		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
@@ -713,7 +723,7 @@
             
             axios.post('/zan',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
-                console.log(response);
+                // console.log(response);
                 if (response) {
                     console.log(response.data);
                 }
@@ -752,21 +762,18 @@
 				zan.remove('bi-hand-thumbs-down-fill')
 				zan.add('bi-hand-thumbs-down')
 				children[1].textContent = parseInt(children[1].textContent) - 1
-				num = 1
+				num = -1
 			}
-			console.log(children[0].classList[1])
-			console.log(children[1].textContent)
+			// console.log(children[0].classList[1])
+			// console.log(children[1].textContent)
 
 			const formData = {};
     		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
 			formData['cai'] = num
 
-			// console.log(formData)
-			// return
-
 			axios.post('/cai',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
-                console.log(response);
+                // console.log(response);
                 if (response) {
                     console.log(response.data);
                 }
@@ -823,17 +830,15 @@
 			const collapseList = [...collapseElementList].map(toggleReply)
 		}
 		function toggleReply(value, index, array) {
-			// if (index > 0) {
-				let replyArea = value;
-				let toggleReply = value.nextElementSibling;
-				
-				replyArea.addEventListener('show.bs.collapse', function () {
-					toggleReply.innerHTML = '收起回复'+` <i class="bi bi-chevron-up"></i>`;
-				})
-				replyArea.addEventListener('hide.bs.collapse', function () {
-					toggleReply.innerHTML = toggleReply.getAttribute('data')+` <i class="bi bi-chevron-down"></i>`;
-				})
-			// }
+			let replyArea = value;
+			let toggleReply = value.nextElementSibling;
+			
+			replyArea.addEventListener('show.bs.collapse', function () {
+				toggleReply.innerHTML = '收起回复'+` <i class="bi bi-chevron-up"></i>`;
+			})
+			replyArea.addEventListener('hide.bs.collapse', function () {
+				toggleReply.innerHTML = toggleReply.getAttribute('data')+` <i class="bi bi-chevron-down"></i>`;
+			})
 		}
 
 		function toggleReplyCollapse(button) {

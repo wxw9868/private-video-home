@@ -10,12 +10,32 @@ import (
 	"github.com/wxw9868/video/api"
 )
 
-func Engine() *gin.Engine {
+func Engine(addr string) *gin.Engine {
 	router := gin.Default()
 
+	// Setup Security Headers
+	// router.Use(func(c *gin.Context) {
+	// 	if c.Request.Host != addr {
+	// 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
+	// 		return
+	// 	}
+	// 	c.Header("X-Frame-Options", "DENY")
+	// 	c.Header("Content-Security-Policy", "default-src 'self'; connect-src *; font-src *; script-src-elem * 'unsafe-inline'; img-src * data:; style-src * 'unsafe-inline';")
+	// 	c.Header("X-XSS-Protection", "1; mode=block")
+	// 	c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+	// 	c.Header("Referrer-Policy", "strict-origin")
+	// 	c.Header("X-Content-Type-Options", "nosniff")
+	// 	c.Header("Permissions-Policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()")
+	// 	c.Next()
+	// })
+
 	// 允许跨域
-	//router.Use(cors.Default())
+	// router.Use(cors.Default())
+
+	//
 	router.NoRoute(NoRoute())
+
+	//
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
@@ -85,6 +105,7 @@ func AuthSession() gin.HandlerFunc {
 		userid, ok := session.Get("userID").(uint)
 		fmt.Println("user: ", userid, ok)
 		if !ok {
+			fmt.Println("user out: ", userid, ok)
 			c.Redirect(http.StatusMovedPermanently, "/login")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
