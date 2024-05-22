@@ -103,7 +103,7 @@
 
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
-		videoUrl = 'assets/video/lc.mp4';
+		// videoUrl = 'assets/video/lc.mp4';
 
 		loadPlayer();
 		function loadPlayer(playerType) {
@@ -363,12 +363,26 @@
 			return y+'年前'			
 		}
 
+		function isZanAndCai(logUserID,userID,zan,cai) {
+			let isZan = 'bi-hand-thumbs-up'
+			let isCai = 'bi-hand-thumbs-down'
+			if (logUserID == userID) {
+				if (zan == 1) {
+					isZan = 'bi-hand-thumbs-up-fill'
+				}
+				if (cai == 1) {
+					isCai = 'bi-hand-thumbs-down-fill'
+				}	
+			}
+			return {isZan,isCai}
+		}
+
 		// 获取评论数据
 		function loadCommentList() {
 			axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response);
-				console.log(response.data.data);
+				// console.log(response.data.data);
 				let list = response.data.data;
 				if (list) {	
 					let userID = storage.getItem("userID");
@@ -377,17 +391,8 @@
 					list.forEach(element => {	
 						let timeString = doTime(element.CreatedAt);
 						// console.log(timeString);
-						let isZan = 'bi-hand-thumbs-up'
-						let isCai = 'bi-hand-thumbs-down'
-						if (element.LogUserID == userID) {
-							if (element.Zan == 1) {
-								isZan = 'bi-hand-thumbs-up-fill'
-							}
-							if (element.Cai == 1) {
-								isCai = 'bi-hand-thumbs-down-fill'
-							}	
-						}
-						console.log(isZan,isCai);
+						const { isZan, isCai } = isZanAndCai(element.LogUserID,userID,element.Zan,element.Cai) 
+						// console.log(isZan,isCai);
 						// console.log(element);
 						// console.log(element.Childrens);
 						commentHTML += 
@@ -428,6 +433,7 @@
 									`<!-- Reply Area -->
 									<div class="ms-3 mt-3 collapse">`;
 									element.Childrens.forEach(element => {
+										const { isZan, isCai } = isZanAndCai(element.LogUserID,userID,element.Zan,element.Cai) 
 										commentHTML += 
 										`<div class="row mt-3">
 											<div class="col-auto">
@@ -445,8 +451,8 @@
 												<p class="my-2">`+element.Content+`</p>
 												<!-- Like, Dislike, Reply, Report Buttons -->
 												<div>
-													<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>`+element.Support+`</span></button>
-													<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>`+element.Oppose+`</span></button>
+													<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
+													<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
 													<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
 													<button class="btn btn-sm btn-outline-warning">举报</button>
 												</div>

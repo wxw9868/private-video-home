@@ -244,7 +244,9 @@ func VideoReplyApi(c *gin.Context) {
 func VideoCommentListApi(c *gin.Context) {
 	id := c.Query("video_id")
 
-	list, err := vs.CommentList(cast.ToUint(id))
+	userID := GetUserID(c)
+
+	list, err := vs.CommentList(cast.ToUint(id), userID)
 	if err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return

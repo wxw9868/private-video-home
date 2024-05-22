@@ -257,12 +257,13 @@ type VideoComment struct {
 	Cai       uint `gorm:"column:cai;type:uint;not null;default:0;comment:反对（踩）"`
 }
 
-func (vs *VideoService) CommentList(videoID uint) ([]*CommentTree, error) {
+func (vs *VideoService) CommentList(videoID, userID uint) ([]*CommentTree, error) {
 	var list []VideoComment
+	query := db.Model(&model.UserCommentLog{}).Where("video_id = ? and user_id = ?", videoID, userID)
 	if err := db.Table("video_VideoComment as c").
 		Where("c.video_id = ?", videoID).
 		Select("c.*", "l.user_id as log_user_id", "l.support as zan", "l.oppose as cai").
-		Joins("left join video_UserCommentLog l on l.comment_id = c.id").Order("c.id desc").Find(&list).Error; err != nil {
+		Joins("left join (?) l on l.comment_id = c.id", query).Order("c.id desc").Find(&list).Error; err != nil {
 		return nil, err
 	}
 	return tree(list), nil
@@ -361,6 +362,9 @@ func tree(list []VideoComment) []*CommentTree {
 	}
 
 	trees := recursiveSort(data, childrens, dataSort, childrensSort)
+	fmt.Println(len(dataSort), len(trees))
+	fmt.Printf("%+v\n", trees)
+	fmt.Printf("%+v\n", dataSort)
 	result := make([]*CommentTree, len(trees))
 	for k, v := range dataSort {
 		result[k] = trees[v]
