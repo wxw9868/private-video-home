@@ -8,7 +8,7 @@
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.108.0">
 	<title>{{.title}}</title>
-	<link href="assets/image/favicon/video/favicon.ico" rel="shortcut icon">
+	<link href="assets/image/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
 	<link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
 	<link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
 	<style>
@@ -75,6 +75,9 @@
 								<span class="fs-3"><small class="text-muted">切换播放器：</small></span>
 								<img onclick="loadPlayer('xgplayer')" src="assets/image/player/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
 								<img onclick="loadPlayer('ckplayer')" src="assets/image/player/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('artplayer')" src="assets/image/player/artplayer.png" alt="artplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('dplayer')" src="assets/image/player/dplayer.png" alt="dplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('muiplayer')" src="assets/image/player/muiplayer.png" alt="muiplayer" width="40" height="40" class="rounded-circle me-2">
 							</p>
 						</div>	
 					</div>
@@ -113,7 +116,7 @@
 
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
-		// videoUrl = 'assets/video/lc.mp4';
+		videoUrl = 'assets/video/lc.mp4';
 
 		loadPlayer();
 		function loadPlayer(playerType) {
@@ -138,9 +141,16 @@
 			if (playerType == "ckplayer") {
 				loadCSS("assets/player/ckplayer-x3/css/ckplayer.css");
 				loadJavaScript("assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
-			} else {
+			} else if (playerType == "xgplayer") {
 				loadCSS("assets/player/xgplayer-3.0.10/index.min.css");
 				loadJavaScript("assets/player/xgplayer-3.0.10/index.min.js", loadXgplayer);
+			} else if (playerType == "dplayer") {
+				loadJavaScript("assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
+			} else if (playerType == "muiplayer") {
+				loadCSS("assets/player/mui-player/dist/mui-player.min.css");
+				loadJavaScript("assets/player/mui-player/dist/mui-player.min.js", loadMuiPlayer);
+			} else {
+				loadJavaScript("https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js", loadArtplayer);
 			}
 			storage.setItem("player", playerType);
 		}
@@ -262,6 +272,104 @@
 			};
 			var player = new ckplayer(videoObject)//调用播放器并赋值给变量player
 			player.screenshot()//截图并返回图片地址
+		}
+		// 加载Artplayer
+		function loadArtplayer() {
+			document.getElementById('videoPlayer').style = 'aspect-ratio: 16/9';
+			var art = new Artplayer({
+				container: '#videoPlayer',
+				url: videoUrl,
+				// poster: '/assets/sample/poster.jpg',
+				volume: 0.5,
+				muted: false, // 是否默认静音
+				autoplay: false, // 是否自动播放
+				pip: true,
+				autoSize: true,
+				autoMini: true,
+				screenshot: true,
+				setting: true,
+				loop: true, // 是否循环播放
+				flip: true,
+				playbackRate: true,
+				aspectRatio: true,
+				fullscreen: true,
+				fullscreenWeb: true,
+				subtitleOffset: true,
+				miniProgressBar: true,
+				mutex: false, // 假如页面里同时存在多个播放器，是否只能让一个播放器播放
+				backdrop: true,
+				playsInline: true,
+				autoPlayback: true,
+				airplay: true,
+				theme: '#23ade5',
+				lang: navigator.language.toLowerCase(),
+				moreVideoAttr: {
+					crossOrigin: 'anonymous',
+				},
+				contextmenu: [
+					{
+						html: '',
+					},
+				],
+				quality: [
+					{
+						default: true,
+						html: 'HD 1080P',
+						url: videoUrl,
+					},
+				],
+			});
+		}
+		// 加载DPlayer
+		function loadDPlayer() {
+			const dp = new DPlayer({
+				container: document.getElementById('videoPlayer'),
+				autoplay: false,
+				theme: '#FADFA3',
+				loop: true,
+				lang: 'zh-cn',
+				lang: navigator.language.toLowerCase(),
+				screenshot: true,
+				hotkey: true,
+				airplay: true,
+				chromecast: true,
+				preload: 'auto',
+				// logo: 'logo.png',
+				volume: 0.7,
+				playbackSpeed: [0.5, 0.75, 1, 1.25, 1.5, 2],
+				mutex: false,
+				video: {
+					quality: [
+						{
+							name: 'HD',
+							url: videoUrl,
+							type: 'normal',
+						},
+					],
+					// url: videoUrl,
+					// pic: 'dplayer.png',
+					defaultQuality: 0,
+				},
+			});
+		}
+		// 加载MuiPlayer
+		function loadMuiPlayer() {
+			// 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
+			var mp = new MuiPlayer({
+				container:'#videoPlayer',
+				title: '{{.videoTitle}}',
+				src: videoUrl,
+				poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg',
+				videoAttribute:[
+					{attrKey:'webkit-playsinline',attrValue:''},
+					{attrKey:'playsinline',attrValue:''},
+					{attrKey:'x5-playsinline',attrValue:''},
+					{attrKey:'t7-video-player-type',attrValue:'inline'},
+					{attrKey:'x5-video-player-type',attrValue:'h5-page'},
+					{attrKey:'x-webkit-airplay',attrValue:'allow'},
+					{attrKey:'controlslist',attrValue:'nodownload'},
+				],
+			})
 		}
 	</script>	
     <script>
