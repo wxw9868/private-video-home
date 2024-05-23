@@ -31,6 +31,16 @@
             text-decoration: none;
             /* 移除超链接下划线 */
         }
+
+		.comment-title {
+			font-size: small;
+		}
+		.comment-text {
+			font-size:0.94rem;
+		}
+		.comment-button {
+			font-size:0.833rem;
+		}
 	</style>
 </head>
 
@@ -82,7 +92,7 @@
 											<input type="hidden" name="video_id" value="{{ .videoID }}">
 											<textarea name="content" class="form-control comment-reply" rows="3" placeholder="发一条友善的评论吧～"></textarea>
 										</div>				
-										<button type="button" class="btn btn-sm btn-primary" onclick="comment(this)" disabled>发布评论</button>
+										<button type="button" class="btn btn-sm btn-primary" style="font-size:14px;" onclick="comment(this)" disabled>发布评论</button>
 									</form>
 								</div>
 							</div>
@@ -413,19 +423,19 @@
 							</div>
 							<div class="col text-dark">
 								<!-- User Name and Location -->
-								<div class="row">
+								<div class="row comment-title">
 									<div class="col">`+element.Nickname+` <small class="text-muted">北京</small></div>
 									<!-- Comment Time -->
 									<small class="col-auto text-muted">`+timeString+`</small>
 								</div>
 								<!-- Comment Text -->
-								<p class="my-2">`+element.Content+`</p>
+								<p class="my-2 comment-text">`+element.Content+`</p>
 								<!-- Like, Dislike, Reply, Report Buttons -->
-								<div>
-									<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
-									<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
-									<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-									<button class="btn btn-sm btn-outline-warning">举报</button>
+								<div class="comment-button">
+									<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
+									<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
+									<button class="btn btn-sm border-0" onclick="toggleReplyForm(this)">回复</button>
+									<button class="btn btn-sm border-0">举报</button>
 								</div>
 								<!-- 回复表单（默认隐藏） -->
 								<div class="mt-3 reply-form d-none">
@@ -452,19 +462,19 @@
 											</div>
 											<div class="col">
 												<!-- Reply User Name and Location -->
-												<div class="row">
-													<div class="col">`+element.Nickname+` <small class="text-muted">位置</small></div>
+												<div class="row comment-title">
+													<div class="col" style="font-size: small;">`+element.Nickname+` <small class="text-muted">位置</small></div>
 													<!-- Reply Time -->
-													<small class="col-auto text-muted">2小时前</small>
+													<small class="col-auto text-muted" style="font-size: small;">2小时前</small>
 												</div>
 												<!-- Reply Text -->
-												<p class="my-2">`+element.Content+`</p>
+												<p class="my-2 comment-text">`+element.Content+`</p>
 												<!-- Like, Dislike, Reply, Report Buttons -->
-												<div>
-													<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
-													<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
-													<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-													<button class="btn btn-sm btn-outline-warning">举报</button>
+												<div class="comment-button">
+													<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
+													<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
+													<button class="btn btn-sm border-0"onclick="toggleReplyForm(this)">回复</button>
+													<button class="btn btn-sm border-0">举报</button>
 												</div>
 												<!-- 回复表单（默认隐藏） -->
 												<div class="mt-3 reply-form d-none">
@@ -484,7 +494,7 @@
 									commentHTML += 
 									`</div>
 									<!-- Show/Hide Reply Button -->
-									<div class="reply-collapse" data="展开 `+count+` 条回复" onclick="toggleReplyCollapse(this)">展开 `+count+` 条回复 <i class="bi bi-chevron-down"></i></div>`;
+									<div class="reply-collapse" data="展开 `+count+` 条回复" onclick="toggleReplyCollapse(this)" style="font-size:0.833rem;">展开 `+count+` 条回复 <i class="bi bi-chevron-down"></i></div>`;
 								}
 							commentHTML += 
 							`</div>
@@ -547,19 +557,19 @@
 						</div>
 						<div class="col">
 							<!-- User Name and Location -->
-							<div class="row">
+							<div class="row comment-title">
 								<div class="col">`+data.userNickname+` <small class="text-muted">位置</small></div>
 								<!-- Comment Time -->
 								<small class="col-auto text-muted">刚刚</small>
 							</div>
 							<!-- Comment Text -->
-							<p class="my-2">`+data.content+`</p>
+							<p class="my-2 comment-text">`+data.content+`</p>
 							<!-- Like, Dislike, Reply, Report Buttons -->
-							<div>
-								<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
-								<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
-								<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-								<button class="btn btn-sm btn-outline-warning">举报</button>
+							<div class="comment-button">
+								<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0" onclick="toggleReplyForm(this)">回复</button>
+								<button class="btn btn-sm border-0">举报</button>
 							</div>
 							<!-- 回复表单（默认隐藏） -->
 							<div class="mt-3 reply-form d-none">
@@ -633,19 +643,19 @@
 						</div>
 						<div class="col">
 							<!-- Reply User Name and Location -->
-							<div class="row">
+							<div class="row comment-title">
 								<div class="col">`+data.userNickname+` <small class="text-muted">位置</small></div>
 								<!-- Reply Time -->
 								<small class="col-auto text-muted">刚刚</small>
 							</div>
 							<!-- Reply Text -->
-							<p class="my-2">`+data.content+`</p>
+							<p class="my-2 comment-text">`+data.content+`</p>
 							<!-- Like, Dislike, Reply, Report Buttons -->
-							<div>
-								<button class="btn btn-sm btn-outline-success comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
-								<button class="btn btn-sm btn-outline-danger comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
-								<button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(this)">回复</button>
-								<button class="btn btn-sm btn-outline-warning">举报</button>
+							<div class="comment-button">
+								<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0" onclick="toggleReplyForm(this)">回复</button>
+								<button class="btn btn-sm border-0">举报</button>
 							</div>
 							<!-- 回复表单（默认隐藏） -->
 							<div class="mt-3 reply-form d-none">
