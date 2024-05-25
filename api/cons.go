@@ -1,6 +1,10 @@
 package api
 
-import "github.com/wxw9868/video/service"
+import (
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
+	"github.com/wxw9868/video/service"
+)
 
 type video struct {
 	ID            int     `json:"id"`
@@ -33,5 +37,12 @@ var actresss []actress
 var actressList = make(map[string][]int)
 var actressListSort []string
 
+var us = new(service.UserService)
 var vs = new(service.VideoService)
 var as = new(service.ActressService)
+
+func GetUserID(c *gin.Context) uint {
+	session := sessions.Default(c)
+	userID := session.Get("userid").(uint)
+	return userID
+}
