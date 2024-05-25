@@ -116,18 +116,14 @@
 
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
-		videoUrl = 'assets/video/lc.mp4';
+		// videoUrl = 'assets/video/lc.mp4';
 
 		loadPlayer();
 		function loadPlayer(playerType) {
 			remove();
 
-			var player = storage.getItem("player");
-			if (playerType == '' && player == '') {
-				playerType = 'xgplayer';
-			} else if (playerType == '' && player != '') {
-				playerType = player;
-			}
+			playerType = (playerType)? playerType : storage.getItem("playerType"); 
+			storage.setItem("playerType", playerType);
 			
 			var div = document.createElement("div");
 			div.setAttribute("id", "videoPlayer");
@@ -138,21 +134,28 @@
 			div.classList.add(...classList);
 			document.getElementById("videoContainer").appendChild(div);
 
-			if (playerType == "ckplayer") {
-				loadCSS("assets/player/ckplayer-x3/css/ckplayer.css");
-				loadJavaScript("assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
-			} else if (playerType == "xgplayer") {
-				loadCSS("assets/player/xgplayer-3.0.10/index.min.css");
-				loadJavaScript("assets/player/xgplayer-3.0.10/index.min.js", loadXgplayer);
-			} else if (playerType == "dplayer") {
-				loadJavaScript("assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
-			} else if (playerType == "muiplayer") {
-				loadCSS("assets/player/mui-player/dist/mui-player.min.css");
-				loadJavaScript("assets/player/mui-player/dist/mui-player.min.js", loadMuiPlayer);
-			} else {
-				loadJavaScript("https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js", loadArtplayer);
-			}
-			storage.setItem("player", playerType);
+			switch(playerType) {
+				case 'ckplayer':
+					loadCSS("assets/player/ckplayer-x3/css/ckplayer.css");
+					loadJavaScript("assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
+					break;
+				case 'xgplayer':
+					loadCSS("assets/player/xgplayer-3.0.10/index.min.css");
+					loadJavaScript("assets/player/xgplayer-3.0.10/index.min.js", loadXgplayer);
+					break;
+				case 'dplayer':
+					loadJavaScript("assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
+					break;
+				case 'muiplayer':
+					loadCSS("assets/player/mui-player/dist/mui-player.min.css");
+					loadJavaScript("assets/player/mui-player/dist/mui-player.min.js", loadMuiPlayer);
+					break;
+				case 'artplayer':
+					loadJavaScript("https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js", loadArtplayer);
+					break;
+				default:
+					loadJavaScript("https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js", loadArtplayer);
+			} 
 		}
 		function remove() {
 			var videoPlayer = document.getElementById("videoPlayer");
