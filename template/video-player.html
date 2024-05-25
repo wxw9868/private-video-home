@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.108.0">
+	<title>{{.title}}</title>
+	<link href="assets/image/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
+	<link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+	<link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+	<style>
+		.card {
+			border: none;
+			/* 这里的0.5 是透明度值，可以根据需要调整 */
+			background-color: rgba(255, 255, 255, 0.1);
+		}
+
+		.reply-collapse {
+            color: #A3A7AD; /* 这里可以改成你想要的颜色 */
+        }
+        .reply-collapse:hover {
+            color: #606266;  /* 这里可以改成你想要的颜色 */ 
+        }
+
+		a {
+            color: unset;
+            /* 设置为浏览器默认的颜色 */
+            text-decoration: none;
+            /* 移除超链接下划线 */
+        }
+
+		.comment-title {
+			font-size: small;
+		}
+		.comment-text {
+			font-size:0.94rem;
+		}
+		.comment-button {
+			font-size:0.833rem;
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<div class="container">
+			{{ template "common-header" }}
+        </div>
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-12">
+					<div class="card">
+						<div id="videoContainer" class="card-img-top"></div>
+						<div class="card-body">
+							<h5 class="card-title text-dark">{{.videoTitle}}</h5>
+							<p class="card-text text-dark">{{ .videoActress }}</p>
+							<p class="card-text text-dark d-flex justify-content-start" style="font-size: 1.5rem;">
+								<span class="d-flex align-items-end" onclick="statisticsCollect(this)">
+									<i class="bi {{if .IsCollect}}bi-heart-fill{{else}}bi-heart{{end}}"></i> 
+									<span class="ms-1">{{ .Collect }}</span>
+								</span>
+								<span class="d-flex align-items-end ms-4" id="statistics-browse">
+									<i class="bi bi-eye-fill"> </i>
+									<span class="ms-1">{{ .Browse }}</span>
+								</span>
+								<span class="d-flex align-items-end ms-4">
+									<i class="bi bi-clock-fill"> </i> 
+									<span class="ms-1">{{ .Duration }}</span>
+								</span>
+							</p>
+							<p class="card-text d-flex justify-content-start">
+								<span class="fs-3"><small class="text-muted">切换播放器：</small></span>
+								<img onclick="loadPlayer('xgplayer')" src="assets/image/player/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('ckplayer')" src="assets/image/player/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('artplayer')" src="assets/image/player/artplayer.png" alt="artplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('dplayer')" src="assets/image/player/dplayer.png" alt="dplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('muiplayer')" src="assets/image/player/muiplayer.png" alt="muiplayer" width="40" height="40" class="rounded-circle me-2">
+							</p>
+						</div>	
+					</div>
+
+					<!-- 评论 -->
+					<div class="card">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-auto">
+									<img src="{{ .Avatar }}" width="40" height="40" class="rounded-circle">
+								</div>
+								<div class="col">
+									<form>
+										<div class="mb-3">
+											<input type="hidden" name="video_id" value="{{ .videoID }}">
+											<textarea name="content" class="form-control comment-reply" rows="3" placeholder="发一条友善的评论吧～"></textarea>
+										</div>				
+										<button type="button" class="btn btn-sm btn-primary" style="font-size:14px;" onclick="comment(this)" disabled>发布评论</button>
+									</form>
+								</div>
+							</div>
+						</div>
+						<span class="border border-light-subtle"></span>
+						<div class="card-body text-dark" id="comment-list"></div>
+					</div>
+					<!-- 评论 -->
+
+				</div>
+			</div>
+		</div>
+
+		<div class="collapse" id="loadHTML"></div>
+	</main>
+
+	{{ template "common-footer" }}
+
+	<script>
+		let videoUrl = '{{ .videoUrl }}';
+		videoUrl = 'assets/video/lc.mp4';
+
+		loadPlayer();
+		function loadPlayer(playerType) {
+			remove();
+
+			var player = storage.getItem("player");
+			if (playerType == '' && player == '') {
+				playerType = 'xgplayer';
+			} else if (playerType == '' && player != '') {
+				playerType = player;
+			}
+			
+			var div = document.createElement("div");
+			div.setAttribute("id", "videoPlayer");
+			var classList = ["img-fluid"];
+			if (playerType == "ckplayer") {
+				classList.push("ratio", "ratio-16x9");
+			}
+			div.classList.add(...classList);
+			document.getElementById("videoContainer").appendChild(div);
+
+			if (playerType == "ckplayer") {
+				loadCSS("assets/player/ckplayer-x3/css/ckplayer.css");
+				loadJavaScript("assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
+			} else if (playerType == "xgplayer") {
+				loadCSS("assets/player/xgplayer-3.0.10/index.min.css");
+				loadJavaScript("assets/player/xgplayer-3.0.10/index.min.js", loadXgplayer);
+			} else if (playerType == "dplayer") {
+				loadJavaScript("assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
+			} else if (playerType == "muiplayer") {
+				loadCSS("assets/player/mui-player/dist/mui-player.min.css");
+				loadJavaScript("assets/player/mui-player/dist/mui-player.min.js", loadMuiPlayer);
+			} else {
+				loadJavaScript("https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js", loadArtplayer);
+			}
+			storage.setItem("player", playerType);
+		}
+		function remove() {
+			var videoPlayer = document.getElementById("videoPlayer");
+			if (videoPlayer) {
+				document.getElementById("videoContainer").removeChild(videoPlayer);
+			}
+			var ckplayerMenus = document.getElementsByClassName("ckplayer-ckplayer-menu");
+			if (ckplayerMenus.length > 0) {
+				for (let index = 0; index < ckplayerMenus.length; index++) {
+					const element = ckplayerMenus[index];
+					element.remove();
+				}
+			}
+
+			var links = document.getElementsByTagName("link");
+			if (links.length > 0) {
+				for (let index = 0; index < links.length; index++) {
+					const element = links[index];
+					var video = element.getAttribute("video");
+					if (video == "css") {
+						element.remove();
+					}
+				}
+			}
+			var scripts = document.getElementsByTagName("script");
+			if (scripts.length > 0) {
+				for (let index = 0; index < scripts.length; index++) {
+					const element = scripts[index];
+					var video = element.getAttribute("video");
+					if (video == "js") {
+						element.remove();
+					}
+				}
+			}
+		}
+		// 动态加载CSS文件
+		function loadCSS(href) {
+			var link = document.createElement("link");
+			link.rel = "stylesheet";
+			link.type = "text/css";
+			link.href = href;
+			link.setAttribute("video", "css");
+			document.getElementsByTagName("head")[0].appendChild(link);
+		}
+		// 动态加载JavaScript文件
+		function loadJavaScript(url, callback) {
+			var script = document.createElement("script");
+			script.type = "text/javascript";
+			script.src = url;
+			script.setAttribute("video", "js");
+			document.getElementsByTagName("head")[0].appendChild(script);
+			script.onload = function () {callback();};	
+		}
+		// 加载西瓜播放器
+		function loadXgplayer() {
+			if (typeof Player !== "undefined") {
+				let player = new Player({
+					id: 'videoPlayer',
+					autoplay: true, // 是否自动播放
+					volume: 0.6, // 默认音量, 取值范围0 ~ 1
+					loop: true, // 是否循环播放
+					url: videoUrl,
+					lang: 'zh-cn', // 播放器初始显示语言
+					startTime: storage.getItem(videoUrl), // 初始起播时间，仅点播
+					fitVideoSize: 'auto', // 初始起播时间，仅点播
+					seekedStatus: 'auto', // seek操作结束之后播放器的状态，如果取值为auto，则维持原播放状态, 默认是seek之后直接播放
+					pip: true, // 是否使用画中画插件
+					rotate: true,// 是否使用旋转插件
+					screenShot: true, //显示截图按钮
+					videoAttributes: {
+						crossOrigin: 'anonymous'
+					},
+					playbackRate: [0.5, 0.75, 1, 1.5, 2, 3, 4],
+					defaultPlaybackRate: 1.0,
+					width: 'auto',
+					hight: 'auto',
+					mini: true, //开启小窗插件
+					// isScrollSwitch: true,
+					// scrollTop: true,
+					// poster: '',
+				});
+				const Events = window.Player.Events;
+				player.on(Events.TIME_UPDATE, (data) => {
+					storage.setItem(videoUrl, data.currentTime);
+				});
+				player.on(Events.MINI_STATE_CHANGE, (isMini) => {
+				if (isMini) {
+					console.log('enter miniScreen')
+				} else {
+					console.log('exit miniScreen')
+				}
+				})
+			}
+		}
+		// 加载Ckplayer
+		function loadCkplayer() {
+			var videoObject = {
+				container: '#videoPlayer', // 视频容器
+				volume: 0.6, // 默认音量，范围0-1
+				autoplay: true, // 是否自动播放
+				loop: true, // 是否需要循环播放
+				seek: 'cookie', // 指定跳转到cookie记录的时间，使用该属性必需配置属性cookie
+				cookie: 'video', // cookie名称,请在同一域中保持唯一
+				video: videoUrl, // 视频地址
+				webFull: true, // 是否启用页面全屏按钮，默认不启用
+				screenshot: true, // 截图功能是否开启
+				crossOrigin:'Anonymous',//发送跨域字符
+				title: '{{ .videoActress }}',// 视频标题
+				playbackrateOpen: true, // 是否开启控制栏倍速选项
+				playbackrate: 1, // 默认倍速
+				playbackrateList: [0.75, 1, 1.25, 1.5, 2, 4], // 倍速配置值 
+				controls: true,//是否显示自带控制栏
+				rightBar: true,//是否开启右边控制栏
+				menu: [], // 右键菜单
+				// poster: 'assets/ckplayer-x3/video/poster.png',// 封面图片
+				// logo: 'assets/image/favicon/video/favicon-32x32.png',
+			};
+			var player = new ckplayer(videoObject)//调用播放器并赋值给变量player
+			player.screenshot()//截图并返回图片地址
+		}
+		// 加载Artplayer
+		function loadArtplayer() {
+			document.getElementById('videoPlayer').style = 'aspect-ratio: 16/9';
+			var art = new Artplayer({
+				container: '#videoPlayer',
+				url: videoUrl,
+				// poster: '/assets/sample/poster.jpg',
+				volume: 0.5,
+				muted: false, // 是否默认静音
+				autoplay: false, // 是否自动播放
+				pip: true,
+				autoSize: true,
+				autoMini: true,
+				screenshot: true,
+				setting: true,
+				loop: true, // 是否循环播放
+				flip: true,
+				playbackRate: true,
+				aspectRatio: true,
+				fullscreen: true,
+				fullscreenWeb: true,
+				subtitleOffset: true,
+				miniProgressBar: true,
+				mutex: false, // 假如页面里同时存在多个播放器，是否只能让一个播放器播放
+				backdrop: true,
+				playsInline: true,
+				autoPlayback: true,
+				airplay: true,
+				theme: '#23ade5',
+				lang: navigator.language.toLowerCase(),
+				moreVideoAttr: {
+					crossOrigin: 'anonymous',
+				},
+				contextmenu: [
+					{
+						html: '',
+					},
+				],
+				quality: [
+					{
+						default: true,
+						html: 'HD 1080P',
+						url: videoUrl,
+					},
+				],
+			});
+		}
+		// 加载DPlayer
+		function loadDPlayer() {
+			const dp = new DPlayer({
+				container: document.getElementById('videoPlayer'),
+				autoplay: false,
+				theme: '#FADFA3',
+				loop: true,
+				lang: 'zh-cn',
+				lang: navigator.language.toLowerCase(),
+				screenshot: true,
+				hotkey: true,
+				airplay: true,
+				chromecast: true,
+				preload: 'auto',
+				// logo: 'logo.png',
+				volume: 0.7,
+				playbackSpeed: [0.5, 0.75, 1, 1.25, 1.5, 2],
+				mutex: false,
+				video: {
+					quality: [
+						{
+							name: 'HD',
+							url: videoUrl,
+							type: 'normal',
+						},
+					],
+					// url: videoUrl,
+					// pic: 'dplayer.png',
+					defaultQuality: 0,
+				},
+			});
+		}
+		// 加载MuiPlayer
+		function loadMuiPlayer() {
+			// 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
+			var mp = new MuiPlayer({
+				container:'#videoPlayer',
+				title: '{{.videoTitle}}',
+				src: videoUrl,
+				poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg',
+				videoAttribute:[
+					{attrKey:'webkit-playsinline',attrValue:''},
+					{attrKey:'playsinline',attrValue:''},
+					{attrKey:'x5-playsinline',attrValue:''},
+					{attrKey:'t7-video-player-type',attrValue:'inline'},
+					{attrKey:'x5-video-player-type',attrValue:'h5-page'},
+					{attrKey:'x-webkit-airplay',attrValue:'allow'},
+					{attrKey:'controlslist',attrValue:'nodownload'},
+				],
+			})
+		}
+	</script>	
+    <script>
+		var videoID = '{{ .videoID }}' 
+        // 统计收藏量
+		function statisticsCollect(span) {
+			let children = span.children
+			let collect = children[0].classList   
+			let num = 0
+            if (collect[1] == 'bi-heart') {
+                collect.remove('bi-heart')
+                collect.add('bi-heart-fill')
+                children[1].textContent = parseInt(children[1].textContent) + 1
+				num = 1
+            } else {
+                collect.add('bi-heart')
+                collect.remove('bi-heart-fill')
+                children[1].textContent = parseInt(children[1].textContent) - 1
+				num = -1
+            } 
+
+			const formData = {};
+    		formData['video_id'] = parseInt(videoID)
+			formData['collect'] = num
+            
+            axios.post('/collect',formData,{headers: {'content-type': 'application/json'}})
+            .then(function (response) {
+                console.log(response);
+                if (response) {
+                    console.log(response.data);
+                }
+            })
+            .catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+            });   
+		}
+
+		loadBrowse()
+		loadCommentList()
+
+        // 统计浏览量
+		function loadBrowse() {
+			let children = document.getElementById('statistics-browse').children 
+			let count = children[1].textContent  
+			
+			axios.get('/browse', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
+			.then(function (response) {
+				// console.log(response.data);
+				if (response.data) {
+					count++
+					children[1].textContent = count	
+				}
+			})
+			.catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+			}); 
+		}
+
+		function doTime(timeString) {
+			let old = new Date(timeString);
+			let now = new Date();
+			// console.log(old.toLocaleString())
+			// console.log(now.toLocaleString())
+			// console.log(y,m,d,h,i,s)
+
+			let y = now.getFullYear() - old.getFullYear()
+			if (y == 0) {
+				let m = now.getMonth() - old.getMonth()
+				if (m == 0) {
+					let d = now.getDate() - old.getDate()
+					if (d == 0) {
+						let h = now.getHours() - old.getHours()
+						if (h == 0) {
+							let i = now.getMinutes() - old.getMinutes()
+							if (i == 0) {
+								let s = now.getSeconds() - old.getSeconds()
+								return i+'秒钟前'
+							}
+							return i+'分钟前'
+						}
+						return h+'小时前'
+					}
+					return d+'天前'
+				}
+				return m+'月前'
+			}
+			return y+'年前'			
+		}
+
+		function isZanAndCai(logUserID,userID,zan,cai) {
+			let isZan = 'bi-hand-thumbs-up'
+			let isCai = 'bi-hand-thumbs-down'
+			if (logUserID == userID) {
+				if (zan == 1) {
+					isZan = 'bi-hand-thumbs-up-fill'
+				}
+				if (cai == 1) {
+					isCai = 'bi-hand-thumbs-down-fill'
+				}	
+			}
+			return {isZan,isCai}
+		}
+
+		// 获取评论数据
+		function loadCommentList() {
+			axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
+			.then(function (response) {
+				// console.log(response);
+				// console.log(response.data.data);
+				let list = response.data.data;
+				if (list) {	
+					let userID = storage.getItem("userID");
+					// console.log(userID);
+					let commentHTML = '';
+					list.forEach(element => {	
+						let timeString = doTime(element.CreatedAt);
+						// console.log(timeString);
+						const { isZan, isCai } = isZanAndCai(element.LogUserID,userID,element.Zan,element.Cai) 
+						// console.log(isZan,isCai);
+						// console.log(element);
+						// console.log(element.Childrens);
+						commentHTML += 
+						`<div class="row mt-4">
+							<div class="col-auto">
+								<!-- User Avatar -->
+								<img src="`+element.Avatar+`" width="40" height="40" class="rounded-circle">
+							</div>
+							<div class="col text-dark">
+								<!-- User Name and Location -->
+								<div class="row comment-title">
+									<div class="col">`+element.Nickname+` <small class="text-muted">北京</small></div>
+									<!-- Comment Time -->
+									<small class="col-auto text-muted">`+timeString+`</small>
+								</div>
+								<!-- Comment Text -->
+								<p class="my-2 comment-text">`+element.Content+`</p>
+								<!-- Like, Dislike, Reply, Report Buttons -->
+								<div class="comment-button">
+									<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
+									<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
+									<button class="btn btn-sm border-0" onclick="toggleReplyForm(this)">回复</button>
+									<button class="btn btn-sm border-0">举报</button>
+								</div>
+								<!-- 回复表单（默认隐藏） -->
+								<div class="mt-3 reply-form d-none">
+									<form>
+										<div class="mb-3">
+											<input type="hidden" name="video_id" value="`+videoID+`">
+											<input type="hidden" name="parent_id" value="`+element.ID+`">
+											<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+element.Nickname+`："></textarea>
+										</div>
+										<button type="button" class="btn btn-sm btn-primary" onclick="reply(this)" disabled>发送回复</button>
+									</form>
+								</div>`;
+								if (element.Childrens) {
+									commentHTML += 
+									`<!-- Reply Area -->
+									<div class="ms-3 mt-3 collapse">`;
+									element.Childrens.forEach(element => {
+										const { isZan, isCai } = isZanAndCai(element.LogUserID,userID,element.Zan,element.Cai) 
+										commentHTML += 
+										`<div class="row mt-3">
+											<div class="col-auto">
+												<!-- Reply User Avatar -->
+												<img src="`+element.Avatar+`" width="24" height="24" class="rounded-circle">
+											</div>
+											<div class="col">
+												<!-- Reply User Name and Location -->
+												<div class="row comment-title">
+													<div class="col" style="font-size: small;">`+element.Nickname+` <small class="text-muted">位置</small></div>
+													<!-- Reply Time -->
+													<small class="col-auto text-muted" style="font-size: small;">2小时前</small>
+												</div>
+												<!-- Reply Text -->
+												<p class="my-2 comment-text">`+element.Content+`</p>
+												<!-- Like, Dislike, Reply, Report Buttons -->
+												<div class="comment-button">
+													<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi `+isZan+`"></i> <span>`+element.Support+`</span></button>
+													<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi `+isCai+`"></i> <span>`+element.Oppose+`</span></button>
+													<button class="btn btn-sm border-0"onclick="toggleReplyForm(this)">回复</button>
+													<button class="btn btn-sm border-0">举报</button>
+												</div>
+												<!-- 回复表单（默认隐藏） -->
+												<div class="mt-3 reply-form d-none">
+													<form>
+														<div class="mb-3">
+															<input type="hidden" name="video_id" value="`+videoID+`">
+															<input type="hidden" name="parent_id" value="`+element.ID+`">
+															<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+element.Nickname+`："></textarea>
+														</div>
+														<button type="button" class="btn btn-sm btn-primary" onclick="reply(this)" disabled>发送回复</button>
+													</form>
+												</div>
+											</div>
+										</div>`;
+									});
+									let count = element.Childrens.length;
+									commentHTML += 
+									`</div>
+									<!-- Show/Hide Reply Button -->
+									<div class="reply-collapse" data="展开 `+count+` 条回复" onclick="toggleReplyCollapse(this)" style="font-size:0.833rem;">展开 `+count+` 条回复 <i class="bi bi-chevron-down"></i></div>`;
+								}
+							commentHTML += 
+							`</div>
+						</div>`;
+					});	
+
+					document.getElementById('comment-list').innerHTML = commentHTML;
+
+					loadCommentReply()
+					loadCollapse()
+				}
+			})
+			.catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+			}); 
+		}
+		// 评论
+		function comment(button) {
+			// 处理表单数据的代码
+			const form = button.parentNode;
+			const formData = {};
+			for (let element of form.elements) {
+				// console.log(element.tagName)
+				if (element.tagName !== "BUTTON" && element.type !== "SUBMIT") {
+					if (element.tagName === "INPUT") {
+						formData[element.name] = parseInt(element.value);
+					} else {
+						formData[element.name] = element.value;
+					}
+				}
+			}
+			// console.log(formData)
+			
+			axios.post('/comment',formData,{headers: {'content-type': 'application/json'}})
+			.then(function (response) {
+				// console.log(response);
+				let data = response.data.data
+				if (data) {
+					let commentHTML = 
+					`<div class="row mt-4">
+						<div class="col-auto">
+							<!-- User Avatar -->
+							<img src="`+data.userAvatar+`" width="40" height="40" class="rounded-circle">
+						</div>
+						<div class="col">
+							<!-- User Name and Location -->
+							<div class="row comment-title">
+								<div class="col">`+data.userNickname+` <small class="text-muted">位置</small></div>
+								<!-- Comment Time -->
+								<small class="col-auto text-muted">刚刚</small>
+							</div>
+							<!-- Comment Text -->
+							<p class="my-2 comment-text">`+data.content+`</p>
+							<!-- Like, Dislike, Reply, Report Buttons -->
+							<div class="comment-button">
+								<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0" onclick="toggleReplyForm(this)">回复</button>
+								<button class="btn btn-sm border-0">举报</button>
+							</div>
+							<!-- 回复表单（默认隐藏） -->
+							<div class="mt-3 reply-form d-none">
+								<form>
+									<div class="mb-3">
+										<input type="hidden" name="video_id" value="`+videoID+`">
+										<input type="hidden" name="parent_id" value="`+data.commentID+`">
+										<textarea name="content" class="form-control comment-reply" rows="3" placeholder="回复`+data.userNickname+`："></textarea>
+									</div>
+									<button type="button" class="btn btn-sm btn-primary" onclick="comment(this)" disabled>发送回复</button>
+								</form>
+							</div>
+						</div>
+					</div>`;
+
+					document.getElementById('loadHTML').innerHTML = commentHTML;
+					let node = document.getElementById('loadHTML').firstElementChild;
+					let commentList = document.getElementById('comment-list');
+					commentList.insertBefore(node, commentList.children[0]);
+				}
+			})
+			.catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+			});
+			
+			form.querySelector('textarea').value = '';
+			button.disabled = true;
+		}
+		// 回复
+		function reply(button) {
+			// 处理表单数据的代码
+			const form = button.parentNode;	
+			const formData = {};
+			for (let element of form.elements) {
+				// console.log(element.tagName)
+				if (element.tagName !== "BUTTON" && element.type !== "SUBMIT") {
+					if (element.tagName === "INPUT") {
+						formData[element.name] = parseInt(element.value);
+					} else {
+						formData[element.name] = element.value;
+					}
+				}
+			}
+			// console.log(formData)
+	
+			axios.post('/reply',formData,{headers: {'content-type': 'application/json'}})
+			.then(function (response) {
+				// console.log(response);
+				let data = response.data.data
+				if (data) {
+					let rowHTML = 
+					`<div class="row mt-3">
+						<div class="col-auto">
+							<!-- Reply User Avatar -->
+							<img src="`+data.userAvatar+`" width="24" height="24" class="rounded-circle">
+						</div>
+						<div class="col">
+							<!-- Reply User Name and Location -->
+							<div class="row comment-title">
+								<div class="col">`+data.userNickname+` <small class="text-muted">位置</small></div>
+								<!-- Reply Time -->
+								<small class="col-auto text-muted">刚刚</small>
+							</div>
+							<!-- Reply Text -->
+							<p class="my-2 comment-text">`+data.content+`</p>
+							<!-- Like, Dislike, Reply, Report Buttons -->
+							<div class="comment-button">
+								<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0" onclick="toggleReplyForm(this)">回复</button>
+								<button class="btn btn-sm border-0">举报</button>
+							</div>
+							<!-- 回复表单（默认隐藏） -->
+							<div class="mt-3 reply-form d-none">
+								<form>
+									<div class="mb-3">
+										<input type="hidden" name="video_id" value="`+videoID+`">
+										<input type="hidden" name="parent_id" value="`+data.commentID+`">
+										<textarea class="form-control comment-reply" rows="3" placeholder="回复`+data.userNickname+`："></textarea>
+									</div>
+									<button type="button" class="btn btn-sm btn-primary" onclick="reply(this)" disabled>发送回复</button>
+								</form>
+							</div>
+						</div>
+					</div>`;
+
+					const replyElement = button.parentNode.parentNode.nextElementSibling;
+					const loadHTML = document.getElementById('loadHTML')
+					if (replyElement) {
+						loadHTML.innerHTML = rowHTML;
+						const node = loadHTML.firstElementChild;
+						replyElement.insertBefore(node, replyElement.children[0]);
+						const msg = '展开 '+ replyElement.children.length +' 条回复';
+						const button = replyElement.nextElementSibling
+						button.setAttribute('data',msg);
+						button.innerHTML = msg+`<i class="bi bi-chevron-down"></i>`;
+					} else {
+						let replyHTML = 
+						`<!-- Reply Area -->
+						<div class="ms-3 mt-3 collapse">
+							`+rowHTML+`
+						</div>
+						<!-- Show/Hide Reply Button -->
+						<div class="reply-collapse" data="展开 1 条回复" onclick="toggleReplyCollapse(this)">展开 1 条回复 <i class="bi bi-chevron-down"></i></div>`;
+						loadHTML.innerHTML = replyHTML;
+						const firstNode = loadHTML.firstElementChild; 
+						const lastNode = loadHTML.lastElementChild; 
+						const comment = button.parentNode.parentNode.parentNode;
+						comment.appendChild(firstNode);
+						comment.appendChild(lastNode);
+					}
+					loadCommentReply()
+					loadCollapse()
+				}
+			})
+			.catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+			});
+			form.querySelector('textarea').value = '';
+			button.disabled = true;
+		}	
+		// 赞
+		function commentZan(button) {
+			let children = button.children
+			let zan = children[0].classList
+			let num = 0
+			if (zan[1] == 'bi-hand-thumbs-up') {
+				zan.remove('bi-hand-thumbs-up')
+				zan.add('bi-hand-thumbs-up-fill')
+				children[1].textContent = parseInt(children[1].textContent) + 1
+				num = 1
+			} else {
+				zan.remove('bi-hand-thumbs-up-fill')
+				zan.add('bi-hand-thumbs-up')
+				children[1].textContent = parseInt(children[1].textContent) - 1
+				num = -1
+			}
+			// console.log(children[0].classList[1])
+			// console.log(children[1].textContent)
+		 
+			const formData = {};
+    		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
+			formData['zan'] = num
+
+			// console.log(formData)
+			// return
+            
+            axios.post('/zan',formData,{headers: {'content-type': 'application/json'}})
+            .then(function (response) {
+                // console.log(response);
+                if (response) {
+                    console.log(response.data);
+                }
+            })
+            .catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+            });   
+		}
+		// 踩
+		function commentCai(button) {
+			let children = button.children
+			let zan = children[0].classList
+			let num = 0
+			if (zan[1] == 'bi-hand-thumbs-down') {
+				zan.remove('bi-hand-thumbs-down')
+				zan.add('bi-hand-thumbs-down-fill')
+				children[1].textContent = parseInt(children[1].textContent) + 1
+				num = 1
+			} else {
+				zan.remove('bi-hand-thumbs-down-fill')
+				zan.add('bi-hand-thumbs-down')
+				children[1].textContent = parseInt(children[1].textContent) - 1
+				num = -1
+			}
+			// console.log(children[0].classList[1])
+			// console.log(children[1].textContent)
+
+			const formData = {};
+    		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
+			formData['cai'] = num
+
+			axios.post('/cai',formData,{headers: {'content-type': 'application/json'}})
+            .then(function (response) {
+                // console.log(response);
+                if (response) {
+                    console.log(response.data);
+                }
+            })
+            .catch(function (error) {
+				if (error.response) {
+					// 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+					
+				} else if (error.request) {
+					// 请求已经成功发起，但没有收到响应
+					// `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+					// 而在node.js中是 http.ClientRequest 的实例
+					console.log(error.request);
+				} else {
+					// 发送请求时出了点问题
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+				console.log(error); 
+            });   
+		}
+	</script>
+	<script>
+		function loadCommentReply() {
+			const commentReplyElementList = document.querySelectorAll('.comment-reply')
+			const commentReplyList = [...commentReplyElementList].map(commentReply)
+		}
+		function commentReply(value, index, array) {
+			let replyButton = value.parentNode.nextElementSibling
+			value.addEventListener('input', function () {
+				if(this.value.length === 0) {
+					replyButton.disabled = true;
+				} else {
+					replyButton.disabled = false;
+				}
+			})
+		}
+
+        function toggleReplyForm(button) {
+			if (button.textContent == '回复') {
+				button.textContent = '取消回复'
+			} else {
+				button.textContent = '回复'
+			}
+            const replyForm = button.parentNode.nextElementSibling
+            replyForm.classList.toggle('d-none');
+        }
+
+		function loadCollapse() {
+			const collapseElementList = document.querySelectorAll('.collapse')
+			const collapseList = [...collapseElementList].map(toggleReply)
+		}
+		function toggleReply(value, index, array) {
+			let replyArea = value;
+			let toggleReply = value.nextElementSibling;
+			
+			replyArea.addEventListener('show.bs.collapse', function () {
+				toggleReply.innerHTML = '收起回复'+` <i class="bi bi-chevron-up"></i>`;
+			})
+			replyArea.addEventListener('hide.bs.collapse', function () {
+				toggleReply.innerHTML = toggleReply.getAttribute('data')+` <i class="bi bi-chevron-down"></i>`;
+			})
+		}
+
+		function toggleReplyCollapse(button) {
+			const collapseEl = button.previousElementSibling
+			new bootstrap.Collapse(collapseEl)
+		}        
+    </script>
+</body>
+
+</html>

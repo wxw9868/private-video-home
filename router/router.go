@@ -10,12 +10,32 @@ import (
 	"github.com/wxw9868/video/api"
 )
 
-func Engine() *gin.Engine {
+func Engine(addr string) *gin.Engine {
 	router := gin.Default()
 
+	// Setup Security Headers
+	// router.Use(func(c *gin.Context) {
+	// 	if c.Request.Host != addr {
+	// 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
+	// 		return
+	// 	}
+	// 	c.Header("X-Frame-Options", "DENY")
+	// 	c.Header("Content-Security-Policy", "default-src 'self'; connect-src *; font-src *; script-src-elem * 'unsafe-inline'; img-src * data:; style-src * 'unsafe-inline';")
+	// 	c.Header("X-XSS-Protection", "1; mode=block")
+	// 	c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+	// 	c.Header("Referrer-Policy", "strict-origin")
+	// 	c.Header("X-Content-Type-Options", "nosniff")
+	// 	c.Header("Permissions-Policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()")
+	// 	c.Next()
+	// })
+
 	// 允许跨域
-	//router.Use(cors.Default())
+	// router.Use(cors.Default())
+
+	//
 	router.NoRoute(NoRoute())
+
+	//
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
@@ -29,20 +49,25 @@ func Engine() *gin.Engine {
 	router.LoadHTMLGlob("template/*")
 
 	router.Use(InitSession())
-	router.GET("/login", api.LoginApi)
-	router.POST("/doLogin", api.DoLoginApi)
-	router.GET("/preivew", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "preview.html", nil)
-	})
+	router.GET("/register", api.Register)
+	router.GET("/login", api.Login)
+	router.POST("/doRegister", api.RegisterApi)
+	router.POST("/doLogin", api.LoginApi)
 
 	auth := router.Group("", AuthSession())
 	auth.GET("/logout", api.LogoutApi)
+	auth.GET("/session", api.GetSession)
 	auth.GET("/", api.VideoIndex)
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
 	auth.POST("/collect", api.VideoCollectApi)
 	auth.GET("/browse", api.VideoBrowseApi)
+	auth.POST("/comment", api.VideoCommentApi)
+	auth.POST("/reply", api.VideoReplyApi)
+	auth.GET("/commentList", api.VideoCommentListApi)
+	auth.POST("/zan", api.CommentZanApi)
+	auth.POST("/cai", api.CommentCaiApi)
 
 	auth.GET("/rename", api.VideoRename)
 	auth.GET("/import", api.VideoImport)
@@ -77,13 +102,14 @@ func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 
-		userid, ok := session.Get("userid").(uint)
+		userid, ok := session.Get("userID").(uint)
+		fmt.Println("user: ", userid, ok)
 		if !ok {
+			fmt.Println("user out: ", userid, ok)
 			c.Redirect(http.StatusMovedPermanently, "/login")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		fmt.Println("userid: ", userid)
 		c.Next()
 	}
 }

@@ -1,0 +1,42 @@
+{{ define "common-header" }}
+<header class="navbar navbar-expand-lg d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4">
+    <a href="/" class="d-flex align-items-center col-md-auto mb-2 mb-md-0 text-dark text-decoration-none">
+        <img src="assets/image/favicon/logo.png" alt="Bootstrap" class="bi me-2" width="40" height="32">
+    </a>
+
+    <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav col-md-auto mb-2 align-items-center mb-md-0">
+            <li class="nav-item"><a class="nav-link px-2" href="/">首页</a></li>
+            <li class="nav-item"><a class="nav-link px-2" href="/list">电影</a></li>
+            <li class="nav-item"><a class="nav-link px-2" href="/actress">演员</a></li>
+            <li class="nav-item"><a class="nav-link px-2 disabled" href="/play">播放器</a></li>
+        </ul>
+    </div>
+
+    <div id="login" class="col-md-auto text-end">
+        <button type="button" class="btn btn-outline-primary me-2" onclick="login()">登录</button>
+        <button type="button" class="btn btn-primary">注册</button>
+    </div>
+
+    <div id="settings" class="col-md-auto dropdown text-end">
+        <a href="javascript:void(0)" class="link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="assets/image/avatar/avatar.png" id="userAvatar" alt="mdo" width="32" height="32" class="rounded-circle">
+        </a>
+        <ul class="dropdown-menu text-small">
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">账号设置</a></li>
+            <li><a class="dropdown-item" href="#">会员中心</a></li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item" href="#" onclick="logout()">退出登录</a></li>
+        </ul>
+        <a href="javascript:void(0)" class="link-dark text-decoration-none">
+            <img src="assets/image/icon/sun-fill.svg" alt="mdo" id="setBackgroundColor" onclick="setBackground(this)" width="32" height="32" style="color: cornflowerblue;">
+        </a>
+    </div>
+</header>
+{{ end }}

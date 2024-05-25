@@ -32,3 +32,12 @@ type UserBrowseLog struct {
 	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
 	Number  uint `gorm:"column:number;type:uint;not null;default:0;comment:数"`
 }
+
+type UserCommentLog struct {
+	gorm.Model
+	UserID    uint  `gorm:"column:user_id;type:uint;not null;default:0;comment:用户ID"`
+	VideoID   uint  `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
+	CommentID uint  `gorm:"column:comment_id;type:uint;not null;default:0;comment:评论ID"`
+	Support   *uint `gorm:"column:support;type:uint;not null;default:0;comment:支持（赞）"`
+	Oppose    *uint `gorm:"column:oppose;type:uint;not null;default:0;comment:反对（踩）"`
+}

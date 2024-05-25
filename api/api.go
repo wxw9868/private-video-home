@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/wxw9868/util"
@@ -32,11 +33,11 @@ func VideoList(c *gin.Context) {
 	actressID := c.Query("actress_id")
 	videos, err := vs.Find(actressID)
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
 	}
 	videosBytes, _ := json.Marshal(videos)
 
-	c.HTML(http.StatusOK, "list.html", gin.H{
+	c.HTML(http.StatusOK, "video-list.html", gin.H{
 		"title":       "视频列表",
 		"data":        string(videosBytes),
 		"actressList": actressListSort,
@@ -44,20 +45,28 @@ func VideoList(c *gin.Context) {
 	})
 }
 
-func VideoPlay(c *gin.Context) {
-	id := c.Query("id")
-	player := c.Query("player")
+type Play struct {
+	ID     string `form:"id" binding:"required"`
+	Player string `form:"player" binding:"required,oneof=ckplayer xgplayer player"`
+}
 
-	var name string
-	if player == "ckplayer" {
-		name = "ckplayer.html"
-	} else if player == "xgplayer" {
-		name = "xgplayer.html"
-	} else {
-		name = "player.html"
+func VideoPlay(c *gin.Context) {
+	var play Play
+	if err := c.Bind(&play); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
 	}
 
-	vi, err := vs.Info(cast.ToUint(id))
+	var name string
+	if play.Player == "ckplayer" {
+		name = "video-ckplayer.html"
+	} else if play.Player == "xgplayer" {
+		name = "video-xgplayer.html"
+	} else {
+		name = "video-player.html"
+	}
+
+	vi, err := vs.Info(cast.ToUint(play.ID))
 	if err != nil {
 		log.Printf("%s\n", err)
 	}
@@ -69,6 +78,9 @@ func VideoPlay(c *gin.Context) {
 		collectID = usc.ID
 		isCollect = true
 	}
+
+	session := sessions.Default(c)
+	userAvatar := session.Get("userAvatar").(string)
 
 	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
 	c.HTML(http.StatusOK, name, gin.H{
@@ -92,6 +104,7 @@ func VideoPlay(c *gin.Context) {
 		"Watch":         vi.Watch,
 		"CollectID":     collectID,
 		"IsCollect":     isCollect,
+		"Avatar":        userAvatar,
 	})
 }
 
@@ -103,7 +116,7 @@ func VideoActress(c *gin.Context) {
 
 	actressBytes, _ := json.Marshal(actresss)
 
-	c.HTML(http.StatusOK, "actress.html", gin.H{
+	c.HTML(http.StatusOK, "video-actress.html", gin.H{
 		"title":       "演员列表",
 		"actressList": string(actressBytes),
 	})
@@ -151,10 +164,94 @@ func VideoBrowseApi(c *gin.Context) {
 
 	if err := vs.Browse(bind.VideoID, userID); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
 	}
 
 	msg := "浏览记录成功"
 	c.JSON(http.StatusOK, util.Success(msg, nil))
+}
+
+type VideoComment struct {
+	VideoID uint   `form:"video_id" json:"video_id" binding:"required"`
+	Content string `form:"content" json:"content" binding:"required"`
+}
+
+// 评论
+func VideoCommentApi(c *gin.Context) {
+	var bind VideoComment
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	commentID, err := vs.Comment(bind.VideoID, bind.Content, userID)
+	if err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	session := sessions.Default(c)
+	userAvatar := session.Get("userAvatar").(string)
+	userNickname := session.Get("userNickname").(string)
+
+	data := map[string]interface{}{
+		"commentID":    commentID,
+		"userAvatar":   userAvatar,
+		"userNickname": userNickname,
+		"content":      bind.Content,
+	}
+	c.JSON(http.StatusOK, util.Success("评论成功", data))
+}
+
+type VideoReply struct {
+	VideoID  uint   `form:"video_id" json:"video_id" binding:"required"`
+	ParentID uint   `form:"parent_id" json:"parent_id" binding:"required"`
+	Content  string `form:"content" json:"content" binding:"required"`
+}
+
+// 回复
+func VideoReplyApi(c *gin.Context) {
+	var bind VideoReply
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	commentID, err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID)
+	if err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	session := sessions.Default(c)
+	userAvatar := session.Get("userAvatar").(string)
+	userNickname := session.Get("userNickname").(string)
+
+	data := map[string]interface{}{
+		"commentID":    commentID,
+		"userAvatar":   userAvatar,
+		"userNickname": userNickname,
+		"content":      bind.Content,
+	}
+
+	c.JSON(http.StatusOK, util.Success("回复成功", data))
+}
+
+func VideoCommentListApi(c *gin.Context) {
+	id := c.Query("video_id")
+
+	userID := GetUserID(c)
+
+	list, err := vs.CommentList(cast.ToUint(id), userID)
+	if err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("评论列表", list))
 }
 
 func VideoImport(c *gin.Context) {
@@ -162,6 +259,58 @@ func VideoImport(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "SUCCESS",
 	})
+}
+
+type CommentZan struct {
+	CommentID uint `form:"comment_id" json:"comment_id" binding:"required"`
+	Zan       int  `form:"zan" json:"zan" binding:"required,oneof=1 -1"`
+}
+
+// 赞
+func CommentZanApi(c *gin.Context) {
+	var bind CommentZan
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	if err := vs.Zan(bind.CommentID, userID, bind.Zan); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+	}
+
+	msg := "点赞成功"
+	if bind.Zan == -1 {
+		msg = "取消点赞"
+	}
+	c.JSON(http.StatusOK, util.Success(msg, nil))
+}
+
+type CommentCai struct {
+	CommentID uint `form:"comment_id" json:"comment_id" binding:"required"`
+	Cai       int  `form:"cai" json:"cai" binding:"required,oneof=1 -1"`
+}
+
+// 踩
+func CommentCaiApi(c *gin.Context) {
+	var bind CommentCai
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	userID := GetUserID(c)
+
+	if err := vs.Cai(bind.CommentID, userID, bind.Cai); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+	}
+
+	msg := "点踩成功"
+	if bind.Cai == -1 {
+		msg = "取消踩"
+	}
+	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
 func VideoRename(c *gin.Context) {

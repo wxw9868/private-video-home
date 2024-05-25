@@ -70,3 +70,11 @@ chmod 755 myvideo
 + [一个工具箱 - 好用的在线工具都在这里！](http://www.atoolbox.net/)
 
 * bootstrap-5.3.0
+
+## 数据库操作命令
+```sql
+-- 删除数据
+DELETE FROM video_UserCommentLog;
+-- 重置主键
+UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'video_UserCommentLog';
+```

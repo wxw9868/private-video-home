@@ -1,0 +1,158 @@
+{{ define "common-footer" }}
+<footer class="py-5">
+    <div class="container">
+        <p class="float-end mb-1">
+            <a href="#">Back to top</a>
+        </p>
+        <p class="mb-1">视频网站</p>
+    </div>
+</footer>
+
+<script src="assets/app/js/bootstrap-5.3.0.bundle.min.js"></script>
+<script>
+    var storage = Object;
+    if (!window.localStorage) {
+        alert('浏览器不支持localStorage')
+    } else {
+        storage = window.localStorage;
+    }
+
+    if (window.location.pathname) {
+        let navs = document.getElementById('navbarNav').querySelectorAll('a');
+        let pathname = window.location.pathname
+        switch(pathname) {
+            case "/list":
+                navs[1].classList.add('active');
+                break;
+            case "/actress":
+                navs[2].classList.add('active');
+                break;
+            case "/play":
+                navs[3].classList.add('active');
+                break;
+            default:
+                navs[0].classList.add('active');
+        }
+    }
+
+    if (document.cookie != "") {
+        document.getElementById("login").style.display = "none";
+    } else {
+        document.getElementById("settings").style.display = "none";
+    }
+
+    function login() {
+        window.location.href = "/login";
+    }
+
+    let body = document.getElementsByTagName('body')[0];
+    let cards = document.getElementsByClassName('card');
+
+    loadBackground()
+    function loadBackground() {
+        if (storage.getItem("backgroundColor") == "dark") {
+            setBgDark()
+            document.getElementById('setBackgroundColor').setAttribute('src','assets/image/icon/moon-stars-fill.svg')
+        } else {
+            setBgLight()
+        }
+    }
+    function setBackground(img) {
+        if (storage.getItem("backgroundColor") == "dark") {
+            setBgLight()
+            img.setAttribute('src','assets/image/icon/sun-fill.svg'); 
+        } else {
+            setBgDark()
+            img.setAttribute('src','assets/image/icon/moon-stars-fill.svg')  
+        }
+    }
+    
+    function setBgDark() {
+        body.classList.remove('bg-light')
+        body.classList.add('bg-dark','text-secondary')
+
+        for (let index = 0; index < cards.length; index++) {
+            const element = cards[index];
+            element.classList.remove('text-light')   
+            element.classList.add('text-secondary')
+        }
+        
+        storage.setItem("backgroundColor", "dark");
+    }
+    function setBgLight() {
+        body.classList.remove('bg-dark','text-secondary')
+        body.classList.add('bg-light')
+
+        let cards = document.getElementsByClassName('card')
+        for (let index = 0; index < cards.length; index++) {
+            const element = cards[index];
+            element.classList.remove('text-secondary')
+            element.classList.add('text-light')            
+        }
+
+        storage.setItem("backgroundColor", "light");
+    }
+</script>
+<script src="assets/app/js/axios.min.js"></script>
+<script>
+    function logout() {
+        axios.get('/logout')
+        .then(function (response) {
+            // console.log(response);
+            if (response.data) {
+                window.location.reload();
+            }
+        }).catch(function (error) {
+            if (error.response) {
+                // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+                
+            } else if (error.request) {
+                // 请求已经成功发起，但没有收到响应
+                // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+                // 而在node.js中是 http.ClientRequest 的实例
+                console.log(error.request);
+            } else {
+                // 发送请求时出了点问题
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+            console.log(error); 
+        }); 
+    }
+
+    axios.get('/session')
+    .then(function (response) {
+        // console.log(response.data.data);
+        let data = response.data.data;
+        if (data) {
+            storage.setItem("userID", data.userID);
+            storage.setItem("userAvatar", data.userAvatar);
+            storage.setItem("userNickname", data.userNickname);
+            storage.setItem("userEmail", data.userEmail);
+            storage.setItem("userMobile", data.userMobile);
+            document.getElementById('userAvatar').setAttribute('src',data.userAvatar);
+        }
+    }).catch(function (error) {
+        if (error.response) {
+            // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+            
+        } else if (error.request) {
+            // 请求已经成功发起，但没有收到响应
+            // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+            // 而在node.js中是 http.ClientRequest 的实例
+            console.log(error.request);
+        } else {
+            // 发送请求时出了点问题
+            console.log('Error', error.message);
+        }
+        console.log(error.config);
+        console.log(error); 
+    }); 
+</script>
+{{ end }}
