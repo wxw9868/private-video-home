@@ -3,84 +3,89 @@
 
 <head>
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="http://127.0.0.1:8081/assets/player/mui-player/dist/mui-player.min.css" rel="stylesheet">
+  <script src="http://127.0.0.1:8081/assets/player/mui-player/dist/mui-player.min.js"></script>
 </head>
 
 <body>
 
-  <form>
-    <div class="mb-3">
-      <textarea name="content" class="form-control is-invalid" rows="3" placeholder="发一条友善的评论吧～" required></textarea>
-      <div class="invalid-feedback">
-        请输入评论内容。
-      </div>
-    </div>
-    <input type="hidden" name="video_id" value="{{ .videoID }}">
-    <button type="submit" class="btn btn-primary">发布评论</button>
-  </form>
+  <main>
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-12">
+					<div class="card">
+						<div id="videoContainer" class="card-img-top">
+              <div id="videoPlayer">
+                <template slot="castScreen">
+                  <svg t="1573891279687" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3272" width="20" height="20"><path d="M853.015273 814.545455h-161.419637a34.909091 34.909091 0 0 1 0-69.818182h161.419637A54.690909 54.690909 0 0 0 907.636364 690.106182V264.075636A54.690909 54.690909 0 0 0 853.015273 209.454545H170.961455A54.667636 54.667636 0 0 0 116.363636 264.075636v426.030546A54.667636 54.667636 0 0 0 170.961455 744.727273h141.358545a34.909091 34.909091 0 0 1 0 69.818182H170.961455A124.555636 124.555636 0 0 1 46.545455 690.106182V264.075636A124.555636 124.555636 0 0 1 170.961455 139.636364h682.053818A124.578909 124.578909 0 0 1 977.454545 264.075636v426.030546A124.578909 124.578909 0 0 1 853.015273 814.545455zM674.909091 907.636364H349.090909l162.909091-209.454546 162.909091 209.454546z" fill="#ffffff" p-id="3273"></path></svg>
+                </template>
+                <template slot="nextMedia">
+                  <svg t="1584686776454" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1682" width="22" height="22"><path d="M783.14692466 563.21664097L240.85307534 879.55472126c-39.1656664 24.10194914-90.38230866-6.02548665-90.38230865-51.21664226v-632.676158c0-45.19115433 51.21664097-75.31859011 90.38230865-51.21664226l542.29384932 316.33808029c39.1656664 21.08920518 39.1656664 81.34407804 0 102.43328194z" p-id="1683" fill="#ffffff"></path><path d="M873.52923331 734.94302767c0 42.17841036-39.1656664 78.33133408-90.38230865 78.33133407s-90.38230866-36.15292371-90.38230735-78.33133407V289.05697233c0-42.17841036 39.1656664-78.33133408 90.38230735-78.33133407s90.38230866 36.15292371 90.38230865 78.33133407v445.88605534z" p-id="1684" fill="#ffffff"></path></svg>
+                </template>
+            </div>
+            </div>	
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</main>
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/app/js/jquery-3.5.1.min.js"></script>
   <script>
-		let storage = Object;
-		if (!window.localStorage) {
-			alert('浏览器不支持localStorage')
-		} else {
-			storage = window.localStorage;
-		}
-
-		var bg = storage.getItem("bg");
-		if (bg == "dark") {
-			setBgDark()
-		} else if (bg == "light") {
-			setBgLight()
-		} else {
-			setBgLight()
-		}
-
-    var cookieString = document.cookie;
-    if (cookieString != "") {
-        document.getElementById("login").style.display = "none";
-    } else {
-        document.getElementById("settings").style.display = "none";
-    }
-
-    function login() {
-        window.location.href = "/login";
-    }
-    function logout() {
-        $.get("/logout", function (data, status) {
-            if (status = "success") {
-                window.location.reload();
-            }
-        });
-    }
-    
-    $('#setbg').click(function(){
-      var src = $("#setbg > img").attr("src")
-      if (src == "assets/image/icon/sun-fill.svg") {
-        setBgDark();
-      } else {
-        setBgLight();
-      }
-    });
-
-    function setBgDark() {
-			$("#setbg > img").attr("src", "assets/image/icon/moon-stars-fill.svg");
-			$("body").removeClass("bg-light").addClass("bg-dark text-secondary");
-			$(".card").removeClass("text-light").addClass("text-secondary");
-			$("footer").removeClass("bg-light").addClass("text-secondary");
-			
-			storage.setItem("bg", "dark");
-		}
-
-		function setBgLight() {
-			$("#setbg > img").attr("src", "assets/image/icon/sun-fill.svg");
-			$("body").removeClass("bg-dark text-secondary").addClass("bg-light");
-			$(".card").removeClass("text-secondary").addClass("bg-light");
-			$("footer").removeClass("text-secondary").addClass("bg-light");
-
-			storage.setItem("bg", "light");
+    loadMuiPlayer()
+		function loadMuiPlayer() {
+			// 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
+			var mp = new MuiPlayer({
+				container:'#videoPlayer',
+				title: '测试',
+				src: 'http://127.0.0.1:8081/assets/video/lc.mp4',
+				autoplay: true,
+				loop: true,
+				muted: false,
+				width: 'auto',
+				height: 'auto',
+				lang: navigator.language,
+				volume: 0.7,
+				autoFit: true, // 播放器容器是否自适应视频高度
+				dragSpotShape: 'circula',
+				poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg',
+				videoAttribute:[
+					{attrKey:'webkit-playsinline',attrValue:'webkit-playsinline'},
+					{attrKey:'playsinline',attrValue:'playsinline'},
+					{attrKey:'x5-video-player-type',attrValue:'h5-page'},
+					{attrKey:'t7-video-player-type',attrValue:'inline'},
+					{attrKey:'x-webkit-airplay',attrValue:'allow'},
+					{attrKey:'controlslist',attrValue:'nodownload'},
+				],
+				themeColor: '#1e98d4',
+				showMiniProgress: true,
+				pageHead: true,
+				custom:{
+					headControls:[
+						{
+							slot:'castScreen', // 对应定义的 slot 值
+							click:function(e) { // 按钮点击事件回调
+								console.log('cast screen button click...');
+							},
+							style:{}, // 自定义添加控件样式
+						}
+					],
+					footerControls:[
+						{
+							slot:'nextMedia', // 对应定义的 slot 值
+							position:'left', // 显示的位置，可选 left、right
+							tooltip:'下一集', // 鼠标悬浮在控件上显示的文字提示
+							oftenShow:false, // 是否常显示。默认为false，在 mobile 环境下竖屏状态下隐藏，pc环境判下视频容器小于500px时隐藏
+							click:function(e) { // 按钮点击事件回调
+								console.log('next media button click...');
+							},
+							style:{}, // 自定义添加控件样式
+						},
+					],
+				}
+			})
 		}
 	</script>
 </body>
