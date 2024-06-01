@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -42,6 +43,22 @@ func VideoList(c *gin.Context) {
 		"data":        string(videosBytes),
 		"actressList": actressListSort,
 		"actressID":   -1,
+	})
+}
+
+func VideoActress(c *gin.Context) {
+	fmt.Println("ACTRESS")
+	return
+	actresss, err := as.Find()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	actressBytes, _ := json.Marshal(actresss)
+
+	c.HTML(http.StatusOK, "video-actress.html", gin.H{
+		"title":       "演员列表",
+		"actressList": string(actressBytes),
 	})
 }
 
@@ -105,20 +122,6 @@ func VideoPlay(c *gin.Context) {
 		"CollectID":     collectID,
 		"IsCollect":     isCollect,
 		"Avatar":        userAvatar,
-	})
-}
-
-func VideoActress(c *gin.Context) {
-	actresss, err := as.Find()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	actressBytes, _ := json.Marshal(actresss)
-
-	c.HTML(http.StatusOK, "video-actress.html", gin.H{
-		"title":       "演员列表",
-		"actressList": string(actressBytes),
 	})
 }
 
