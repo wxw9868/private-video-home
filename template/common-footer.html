@@ -125,15 +125,16 @@
 
     axios.get('/session')
     .then(function (response) {
-        // console.log(response.data.data);
+        console.log(response.data.data);
         let data = response.data.data;
         if (data) {
-            storage.setItem("userID", data.userID);
-            storage.setItem("userAvatar", data.userAvatar);
-            storage.setItem("userNickname", data.userNickname);
-            storage.setItem("userEmail", data.userEmail);
-            storage.setItem("userMobile", data.userMobile);
-            document.getElementById('userAvatar').setAttribute('src',data.userAvatar);
+            storage.setItem("userID", data.id);
+            storage.setItem("userAvatar", data.avatar);
+            storage.setItem("userUsername", data.username);
+            storage.setItem("userNickname", data.nickname);
+            storage.setItem("userEmail", data.email);
+            storage.setItem("userMobile", data.mobile);
+            document.getElementById('userAvatar').setAttribute('src',data.avatar);
         }
     }).catch(function (error) {
         if (error.response) {

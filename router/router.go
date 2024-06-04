@@ -56,6 +56,8 @@ func Engine(addr string) *gin.Engine {
 
 	auth := router.Group("", AuthSession())
 	auth.GET("/session", api.GetSession)
+	auth.GET("/account", api.Account)
+
 	auth.GET("/logout", api.LogoutApi)
 
 	auth.GET("/", api.VideoIndex)

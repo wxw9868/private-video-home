@@ -102,7 +102,7 @@ func VideoImport() {
 			}
 		}
 
-		err = db.Transaction(func(tx *gorm.DB) error {
+		_ = db.Transaction(func(tx *gorm.DB) error {
 			if err := tx.CreateInBatches(videos, 30).Error; err != nil {
 				return err
 			}

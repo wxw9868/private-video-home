@@ -148,13 +148,13 @@
 					break;
 				case 'muiplayer':
 					loadCSS("assets/player/mui-player/dist/mui-player.min.css");
-					loadJavaScript("assets/player/mui-player/dist/mui-player.min.js", loadMuiPlayer);
+					loadAllScriptsAndExecute();
 					break;
 				case 'artplayer':
-					loadJavaScript("https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js", loadArtplayer);
+					loadJavaScript("assets/player/artplayer/dist/artplayer.js", loadArtplayer);
 					break;
 				default:
-					loadJavaScript("https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js", loadArtplayer);
+					loadJavaScript("assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
 			} 
 		}
 		function remove() {
@@ -201,14 +201,48 @@
 			document.getElementsByTagName("head")[0].appendChild(link);
 		}
 		// 动态加载JavaScript文件
-		function loadJavaScript(url, callback) {
+		function loadJavaScript(src, callback) {
 			var script = document.createElement("script");
 			script.type = "text/javascript";
-			script.src = url;
+			script.src = src;
 			script.setAttribute("video", "js");
 			document.getElementsByTagName("head")[0].appendChild(script);
 			script.onload = function () {callback();};	
 		}
+
+		// 加载多个 js 脚本载完后执行函数
+		// 创建一个加载脚本的函数，该函数返回一个Promise
+		function loadScript(src) {
+			return new Promise((resolve, reject) => {
+				const script = document.createElement('script');
+				script.type = "text/javascript";
+				script.src = src;
+				script.onload = resolve;
+				script.onerror = reject;
+				document.head.appendChild(script);
+			});
+		}
+		// 定义一个异步函数，该函数会等待所有脚本加载完成
+		async function loadAllScriptsAndExecute() {
+			try {
+				// 创建一个Promise数组来保存所有加载脚本的Promise
+				const scriptPromises = [
+					loadScript('assets/player/mui-player/dist/mui-player-desktop-plugin.min.js'),
+					loadScript('assets/player/mui-player/dist/mui-player.min.js'),
+					// ... 添加更多脚本的加载Promise
+				];
+
+				// 使用Promise.all等待所有脚本加载完成
+				await Promise.all(scriptPromises);
+
+				// 所有脚本加载完毕后执行的函数
+				loadMuiPlayer();
+			} catch (error) {
+				console.error('Error loading scripts:', error);
+			}
+		}
+		// 加载多个 js 脚本载完后执行函数
+
 		// 加载西瓜播放器
 		function loadXgplayer() {
 			if (typeof Player !== "undefined") {
@@ -356,24 +390,177 @@
 			});
 		}
 		// 加载MuiPlayer
+		var mp = null;
 		function loadMuiPlayer() {
+			var items = [
+				{
+					functions:'清晰度',
+					model:'select',
+					show:true,
+					zIndex:0,
+					childConfig:[
+						{functions:'蓝光1080P'},
+						{functions:'超清'},
+						{functions:'高清',selected:true},
+						{functions:'标清'},
+					],
+					onToggle:onToggleVideo,
+				},
+				{
+					functions:'视频显示尺寸',
+					model:'select',
+					show:true,
+					zIndex:0,
+					childConfig:[
+						{functions:'50%'},
+						{functions:'75%'},
+						{functions:'100%',selected:true},
+						{functions:'填充'},
+					],
+					onToggle:onSetVideoObjectFit,
+				},
+			]
 			// 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
-			var mp = new MuiPlayer({
+			mp = new MuiPlayer({
 				container:'#videoPlayer',
 				title: '{{.videoTitle}}',
 				src: videoUrl,
+				autoplay: true,
+				loop: true,
+				muted: false,
+				width: 'auto',
+				height: 'auto',
+				lang: navigator.language,
+				volume: 0.7,
+				autoFit: true, // 播放器容器是否自适应视频高度
+				dragSpotShape: 'circula',
 				poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg',
 				videoAttribute:[
-					{attrKey:'webkit-playsinline',attrValue:''},
-					{attrKey:'playsinline',attrValue:''},
-					{attrKey:'x5-playsinline',attrValue:''},
-					{attrKey:'t7-video-player-type',attrValue:'inline'},
+					{attrKey:'webkit-playsinline',attrValue:'webkit-playsinline'},
+					{attrKey:'playsinline',attrValue:'playsinline'},
 					{attrKey:'x5-video-player-type',attrValue:'h5-page'},
+					{attrKey:'t7-video-player-type',attrValue:'inline'},
 					{attrKey:'x-webkit-airplay',attrValue:'allow'},
 					{attrKey:'controlslist',attrValue:'nodownload'},
 				],
+				themeColor: '#1e98d4',
+				showMiniProgress: true,
+				pageHead: true,
+				custom:{
+					headControls:[
+						{
+							slot:'castScreen', // 对应定义的 slot 值
+							click:function(e) { // 按钮点击事件回调
+								console.log('cast screen button click...');
+							},
+							style:{}, // 自定义添加控件样式
+						}
+					],
+					footerControls:[
+						{
+							slot:'nextMedia', // 对应定义的 slot 值
+							position:'left', // 显示的位置，可选 left、right
+							tooltip:'下一集', // 鼠标悬浮在控件上显示的文字提示
+							oftenShow:false, // 是否常显示。默认为false，在 mobile 环境下竖屏状态下隐藏，pc环境判下视频容器小于500px时隐藏
+							click:function(e) { // 按钮点击事件回调
+								console.log('next media button click...');
+							},
+							style:{}, // 自定义添加控件样式
+						},
+					],
+				},
+
+				plugins:[ // 添加播放插件
+					typeof MuiPlayerDesktopPlugin == 'function' ? new MuiPlayerDesktopPlugin({
+						fullScaling:1.2,// 全屏控件缩放比例
+						leaveHiddenControls:false, // 鼠标指针移出播放器时是否隐藏控件
+						customSetting:items, // 自定义设置组菜单
+						// thumbnails:thumbnails, // 缩略图配置
+						contextmenu:[ // 自定义右键菜单
+							{
+								name:'share',
+								context:'Share',
+								zIndex:0,
+								show:true,
+								click:function(close) {
+									mp.showToast('Trigger Click！');
+									close();
+								}
+							},
+						],
+					}) : {}
+       			],
 			})
+			
+			document.getElementById('progress').style = 'background-color: rgba(255, 255, 255, 0)';
 		}
+		// 切换视频
+		function onToggleVideo(data,selected) {
+			let onToggleLoad = (state) => {
+				mp.once('ready',function() {
+					let _video = mp.video();
+					let _execute = function() {
+						_video.currentTime = state.currentTime;
+						state.paused ? _video.pause() : _video.play();
+					}
+
+					if(_video.readyState == 0) {
+						_video.addEventListener('durationchange',function(e) {
+							_execute();
+						},{ once:true })
+					}else {
+						_execute();
+					}
+
+					// init video default size
+					for(var item of items[1].childConfig) {
+						item.functions == '100%' ? item.selected = true : delete item.selected;
+					}
+					
+					// init setting video origin select item
+					for(var item of items[0].childConfig) {
+						item.functions == data.functions ? item.selected = true : delete item.selected;
+					}
+				})
+			}
+
+			let selectIndex = ['标清','高清'].indexOf(data.functions);
+			if(selectIndex != -1) {
+				selected instanceof Function ? selected() : '';
+				
+				let _video = mp.video();
+				onToggleLoad({
+					currentTime:_video.currentTime,
+					paused:_video.paused
+				});
+
+				selectIndex == 0 ? mp.reloadUrl(videoUrl) : mp.reloadUrl(videoUrl);
+			}else {
+				mp.showToast('没用可用的视频源');
+			}
+		}
+		// 设置视频显示尺寸
+		function onSetVideoObjectFit(data,selected,back) {
+			var videoEl = mp.video();
+			videoEl.classList.remove('covered');
+			switch (data.functions) {
+				case '50%':
+					videoEl.style.width = '50%';
+					break;
+				case '75%':
+					videoEl.style.width = '70%';
+					break;
+				case '100%':
+					videoEl.style.width = '100%';
+					break;
+				case '填充':
+					videoEl.classList.add('covered');
+					videoEl.style.width = videoEl.getAttribute('width');
+				break;
+			}
+			selected();
+		}
+		
 	</script>	
     <script>
 		var videoID = '{{ .videoID }}' 

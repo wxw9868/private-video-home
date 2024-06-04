@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/wxw9868/util"
+	"github.com/wxw9868/util/randomname"
 	"github.com/wxw9868/video/model"
 	"gorm.io/gorm"
 )
@@ -23,7 +24,7 @@ func (us *UserService) Register(username, email, password string) error {
 		return err
 	}
 
-	if err := db.Create(&model.User{Username: username, Email: email, Password: password, Avatar: "assets/image/avatar/avatar.png"}).Error; err != nil {
+	if err := db.Create(&model.User{Username: username, Nickname: randomname.GenerateName(1), Password: password, Email: email, Avatar: "assets/image/avatar/avatar.png"}).Error; err != nil {
 		return fmt.Errorf("注册失败: %s", err)
 	}
 	return nil
