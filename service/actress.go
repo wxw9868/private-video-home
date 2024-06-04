@@ -1,6 +1,8 @@
 package service
 
-import "github.com/wxw9868/video/model"
+import (
+	"github.com/wxw9868/video/model"
+)
 
 type ActressService struct{}
 

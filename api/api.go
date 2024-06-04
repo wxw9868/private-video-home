@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -47,8 +46,6 @@ func VideoList(c *gin.Context) {
 }
 
 func VideoActress(c *gin.Context) {
-	fmt.Println("ACTRESS")
-	return
 	actresss, err := as.Find()
 	if err != nil {
 		log.Fatal(err)
