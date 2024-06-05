@@ -55,19 +55,22 @@ func Engine(addr string) *gin.Engine {
 	router.POST("/doLogin", api.LoginApi)
 
 	auth := router.Group("", AuthSession())
-	auth.GET("/logout", api.LogoutApi)
 	auth.GET("/session", api.GetSession)
 	auth.GET("/account", api.Account)
 
+	auth.GET("/logout", api.LogoutApi)
+
 	auth.GET("/", api.VideoIndex)
+
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
-	auth.POST("/collect", api.VideoCollectApi)
+
 	auth.GET("/browse", api.VideoBrowseApi)
+	auth.POST("/collect", api.VideoCollectApi)
+	auth.GET("/commentList", api.VideoCommentListApi)
 	auth.POST("/comment", api.VideoCommentApi)
 	auth.POST("/reply", api.VideoReplyApi)
-	auth.GET("/commentList", api.VideoCommentListApi)
 	auth.POST("/zan", api.CommentZanApi)
 	auth.POST("/cai", api.CommentCaiApi)
 

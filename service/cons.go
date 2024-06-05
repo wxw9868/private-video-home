@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -112,4 +113,59 @@ func VideoImport() {
 			return nil
 		})
 	})
+}
+
+func ImportActress() {
+	var data []model.Actress
+	var actressMap = make(map[string]struct{})
+
+	ReadFileToMap("actress.json", &actressMap)
+	fmt.Printf("map: %+v\n", actressMap)
+
+	rows, err := db.Model(&model.Actress{}).Rows()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var modelActress model.Actress
+		db.ScanRows(rows, &modelActress)
+		if _, ok := actressMap[modelActress.Actress]; ok {
+			delete(actressMap, modelActress.Actress)
+		}
+	}
+
+	fmt.Printf("map: %+v\n", actressMap)
+	for k, _ := range actressMap {
+		nameSlice := []rune(k)
+		avatarPath := avatarDir + "/" + k + ".png"
+
+		_, err := os.Stat(avatarPath)
+		if os.IsNotExist(err) {
+			if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
+				log.Fatal(err)
+			}
+		}
+		data = append(data, model.Actress{
+			Actress: k,
+			Avatar:  avatarPath,
+		})
+	}
+	fmt.Printf("data: %+v\n", data)
+
+	err = db.CreateInBatches(data, 30).Error
+	fmt.Printf("err: %+v\n", err)
+}
+
+// 读取文件数据到 map
+func ReadFileToMap(name string, v any) error {
+	bytes, err := os.ReadFile(name)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(bytes, &v); err != nil {
+		return err
+	}
+	return nil
 }

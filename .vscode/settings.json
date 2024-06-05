@@ -1,8 +1,27 @@
 {
     "editor.fontSize": 13,
     "workbench.activityBar.iconClickBehavior": "toggle",
-    "workbench.activityBar.location": "default",
     "workbench.colorTheme": "Default Dark Modern",
     "editor.tabSize": 4,
-    "go.useCodeSnippetsOnFunctionSuggest":true
+    "go.useLanguageServer": true,
+    "[go]": {
+        "editor.snippetSuggestions": "none",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "gopls": {
+        "completeUnimported": true,
+        "usePlaceholders": true,
+        "completionDocumentation": true,
+        "deepCompletion": true,
+        "matcher": "fuzzy",
+        "hoverKind": "SynopsisDocumentation" //No/Synopsis/Full,defaultSynopsis
+    },
+    "files.eol": "\n", //formattingonlysupportsLFlineendings
+    "emmet.excludeLanguages": [
+        "markdown"
+    ],
+    "go.addTags": {}
 }
