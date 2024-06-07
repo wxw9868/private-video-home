@@ -21,6 +21,12 @@ func Login(c *gin.Context) {
 	})
 }
 
+func Account(c *gin.Context) {
+	c.HTML(http.StatusOK, "account.html", gin.H{
+		"title": "账号设置",
+	})
+}
+
 type RegisterReq struct {
 	Username       string `form:"username" json:"username" binding:"required"`
 	Email          string `form:"email" json:"email" binding:"required,email"`
@@ -63,11 +69,11 @@ func LoginApi(c *gin.Context) {
 		session := sessions.Default(c)
 		session.Set("userID", user.ID)
 		session.Set("userAvatar", user.Avatar)
+		session.Set("userUsername", user.Username)
 		session.Set("userNickname", user.Nickname)
 		session.Set("userEmail", user.Email)
 		session.Set("userMobile", user.Mobile)
 		if err = session.Save(); err != nil {
-			fmt.Println("err1:", err)
 			c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
 			return
 		}
@@ -89,11 +95,12 @@ func LogoutApi(c *gin.Context) {
 func GetSession(c *gin.Context) {
 	session := sessions.Default(c)
 	data := map[string]interface{}{
-		"userID":       session.Get("userID").(uint),
-		"userAvatar":   session.Get("userAvatar").(string),
-		"userNickname": session.Get("userNickname").(string),
-		"userEmail":    session.Get("userEmail").(string),
-		"userMobile":   session.Get("userMobile").(string),
+		"id":       session.Get("userID").(uint),
+		"avatar":   session.Get("userAvatar").(string),
+		"username": session.Get("userUsername").(string),
+		"nickname": session.Get("userNickname").(string),
+		"email":    session.Get("userEmail").(string),
+		"mobile":   session.Get("userMobile").(string),
 	}
 	c.JSON(http.StatusOK, util.Success("获取成功", data))
 }

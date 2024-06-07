@@ -166,6 +166,8 @@ github.com/ugorji/go/codec v1.2.11 h1:BMaWp1Bb6fHwEtbplGBGJ498wD+LKlNSl25MjdZY4d
 github.com/ugorji/go/codec v1.2.11/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/wxw9868/util v0.0.0-20240409125452-e5fe9a10b52f h1:2fjC1//YSLpQUecli/lg55Ee0iWy/lqAI5Yca1Voj8c=
 github.com/wxw9868/util v0.0.0-20240409125452-e5fe9a10b52f/go.mod h1:PF6pk415ptqlDiTBG1b9idZuAQPnQO2Mx3ucBGNvMRE=
+github.com/wxw9868/util v0.0.0-20240528085236-c08630affd31 h1:2w4e3DWDuh07/mOji7SVXsLdZvGfQAEhz2f/kJRR834=
+github.com/wxw9868/util v0.0.0-20240528085236-c08630affd31/go.mod h1:PF6pk415ptqlDiTBG1b9idZuAQPnQO2Mx3ucBGNvMRE=
 gocv.io/x/gocv v0.25.0/go.mod h1:Rar2PS6DV+T4FL+PM535EImD/h13hGVaHhnCu1xarBs=
 golang.org/x/arch v0.0.0-20210923205945-b76863e36670/go.mod h1:5om86z9Hs0C8fWVUuoMHwpExlXzs5Tkyp9hOrfG7pp8=
 golang.org/x/arch v0.3.0 h1:02VY4/ZcO/gBOH6PUaoiptASxtXU10jazRCP865E97k=

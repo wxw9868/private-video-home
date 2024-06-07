@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>mui-player 自定义扩展控件示例</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="http://127.0.0.1:8081/assets/player/mui-player/dist/mui-player.min.css" rel="stylesheet">
+    <script src="http://127.0.0.1:8081/assets/player/mui-player/dist/mui-player.min.js"></script>
+    <script src="http://127.0.0.1:8081/assets/player/mui-player/dist/mui-player-desktop-plugin.min.js"></script>
+</head>
+
+<body>
+    <h3 style="text-align: center;">自定义扩展控件示例</h3>
+    <div id="mui-player" style="max-width: 700px;margin: auto">
+        <!-- 自定义头部导航 -->
+        <template slot="likeButton">
+            <svg t="1607603509184" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2765">
+                <path d="M333.90592 437.4016H174.7968v-187.5968H40.50944v524.288H174.7968v-219.648h159.10912v219.648h134.28736v-524.288H333.90592v187.5968z m639.90784-22.4256a235.24352 235.24352 0 0 0-37.60128-85.1968 179.05664 179.05664 0 0 0-91.98592-68.5056 275.69152 275.69152 0 0 0-80.896-11.4688H534.84544v524.288h229.84704c77.9776 0 139.776-34.5088 177.2544-99.84 28.01664-48.3328 41.6256-106.8032 41.59488-174.2848a397.4144 397.4144 0 0 0-9.728-84.992z m-141.4656 179.8144a100.57728 100.57728 0 0 1-34.12992 46.6944 87.808 87.808 0 0 1-52.56192 14.9504h-78.848v-288.9728h78.848a134.30784 134.30784 0 0 1 52.224 8.704 56.32 56.32 0 0 1 27.70944 23.552c13.55776 22.9376 21.41184 58.7776 21.36064 107.2128a236.75904 236.75904 0 0 1-14.60224 87.8592z" p-id="2766" fill="#ffffff"></path>
+            </svg>
+        </template>
+
+        <!-- 自定义底部导航 -->
+        <template slot="nextMedia1">
+            <svg t="1584686776454" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1682">
+                <path d="M783.14692466 563.21664097L240.85307534 879.55472126c-39.1656664 24.10194914-90.38230866-6.02548665-90.38230865-51.21664226v-632.676158c0-45.19115433 51.21664097-75.31859011 90.38230865-51.21664226l542.29384932 316.33808029c39.1656664 21.08920518 39.1656664 81.34407804 0 102.43328194z" p-id="1683" fill="#ffffff"></path>
+                <path d="M873.52923331 734.94302767c0 42.17841036-39.1656664 78.33133408-90.38230865 78.33133407s-90.38230866-36.15292371-90.38230735-78.33133407V289.05697233c0-42.17841036 39.1656664-78.33133408 90.38230735-78.33133407s90.38230866 36.15292371 90.38230865 78.33133407v445.88605534z" p-id="1684" fill="#ffffff"></path>
+            </svg>
+        </template>
+
+        <!-- 自定义弹出右侧栏窗口 -->
+        <template slot="HD">
+            <div style="color: white;display: flex;flex-direction: column;align-items: center;justify-content: center;height: 100%;">
+                <p type="toggleHD" style="cursor: pointer">蓝光1080P</p>
+                <p type="toggleHD" style="cursor: pointer">超清</p>
+                <p type="toggleHD" style="cursor: pointer">高清</p>
+                <p type="toggleHD" style="cursor: pointer">标清</p>
+            </div>
+        </template>
+    </div>
+</body>
+
+<script>
+    var mp = null; 
+
+    // 切换视频
+    function onToggleVideo(data,selected) {
+        let onToggleLoad = (state) => {
+            mp.once('ready',function() {
+                let _video = mp.video();
+                let _execute = function() {
+                    _video.currentTime = state.currentTime;
+                    state.paused ? _video.pause() : _video.play();
+                }
+
+                if(_video.readyState == 0) {
+                    _video.addEventListener('durationchange',function(e) {
+                        _execute();
+                    },{ once:true })
+                }else {
+                    _execute();
+                }
+
+                // init video default size
+                for(var item of items[1].childConfig) {
+                    item.functions == '100%' ? item.selected = true : delete item.selected;
+                }
+                
+                // init setting video origin select item
+                for(var item of items[0].childConfig) {
+                    item.functions == data.functions ? item.selected = true : delete item.selected;
+                }
+            })
+        }
+
+        let selectIndex = ['标清','高清'].indexOf(data.functions);
+        if(selectIndex != -1) {
+            selected instanceof Function ? selected() : '';
+            
+            let _video = mp.video();
+            onToggleLoad({
+                currentTime:_video.currentTime,
+                paused:_video.paused
+            });
+
+            selectIndex == 0 ? mp.reloadUrl('https://muiplayer.js.org/media/media_sd.mp4') : mp.reloadUrl('https://muiplayer.js.org/media/media.mp4');
+        }else {
+            mp.showToast('没用可用的视频源');
+        }
+    }
+
+    // 设置视频显示尺寸
+    function onSetVideoObjectFit(data,selected,back) {
+        var videoEl = mp.video();
+        videoEl.classList.remove('covered');
+        switch (data.functions) {
+            case '50%':
+                videoEl.style.width = '50%';
+                break;
+            case '75%':
+                videoEl.style.width = '70%';
+                break;
+            case '100%':
+                videoEl.style.width = '100%';
+                break;
+            case '填充':
+                videoEl.classList.add('covered');
+                videoEl.style.width = videoEl.getAttribute('width');
+            break;
+        }
+        selected();
+    }
+
+    var items = [
+        {
+            functions:'清晰度',
+            model:'select',
+            show:true,
+            zIndex:0,
+            childConfig:[
+                {functions:'蓝光1080P'},
+                {functions:'超清'},
+                {functions:'高清',selected:true},
+                {functions:'标清'},
+            ],
+            onToggle:onToggleVideo,
+        },
+        {
+            functions:'视频显示尺寸',
+            model:'select',
+            show:true,
+            zIndex:0,
+            childConfig:[
+                {functions:'50%'},
+                {functions:'75%'},
+                {functions:'100%',selected:true},
+                {functions:'填充'},
+            ],
+            onToggle:onSetVideoObjectFit,
+        },
+    ]
+
+    var customKernelFun = function(video,src) {
+        let _destroy = (kernel) => {
+            setTimeout(() => {
+                mp.on('error',function() {
+                    kernel.destroy();
+                })
+            },500);
+        }
+
+        // hls decode
+        let hlsDecodeAction = () => {
+            console.log('custom hls create...');
+            let hlsConfig = {
+                autoStartLoad:true,
+                debug:false,
+            }
+            let hls = new Hls(hlsConfig);
+            hls.attachMedia(video);
+
+            hls.on(Hls.Events.MEDIA_ATTACHED,function() {
+                hls.loadSource(src);
+            })
+
+            hls.on(Hls.Events.ERROR,function(errMes) {
+                console.error(errMes);
+                // 发送错误报告
+                mp.sendError(errMes);
+            });
+
+            // observe destroy
+            _destroy(hls)
+        }
+
+        // flv decode
+        let flvDecodeAction = () => {
+            console.log('custom flv create...');
+            let flvConfig = {
+                type:'flv',
+                url:src,
+            }
+            let flv = Flv.createPlayer(flvConfig);
+            flv.attachMediaElement(video);
+            flv.load();
+
+            flv.on(Flv.Events.ERROR,function(errMes) {
+                console.error(errMes);
+                // 发送错误报告
+                mp.sendError(errMes);
+            });
+
+            // observe destroy
+            _destroy(flv)
+        }
+
+        // dash decode
+        let dashDecodeAction = () => {
+            let dashMedia = dashjs.MediaPlayer().create();
+            dashMedia.initialize(video, src,false);
+            dashMedia.on(dashjs.MediaPlayer.events.ERROR,function(errMes) {
+                console.error(errMes);
+                // 发送错误报告
+                mp.sendError(errMes);
+
+                dashMedia.reset();
+            })
+
+            // observe destroy
+            _destroy(dashMedia)
+        }
+
+        // mp4 decode play
+        let mp4DecodeAction = () => {
+            console.log('>> mp4 parse medie resource paly');
+            video.src = src;
+        }
+
+        // execute the appropriate decoder
+        src.indexOf('.m3u8') != -1 ? hlsDecodeAction() : '';
+        src.indexOf('.flv') != -1 ? flvDecodeAction() : '';
+        src.indexOf('.mpd') != -1 ? dashDecodeAction() : '';
+        src.indexOf('.mp4') != -1 ? mp4DecodeAction() : '';
+    }
+
+    var parseConfig = {
+        // type:'hls',
+        // loader:Hls,
+        // config:{
+        //     debug:false,
+        // },
+
+        // type:'flv',
+        // loader:Flv,
+        // config:{ 
+        //     cors:true
+        // },
+
+        customKernel:customKernelFun, // 自定义核心解码加载程序
+    }
+
+
+    var config =  {
+        // --------------------- 主要配置 ---------------------
+        container:'#mui-player',
+        src:'https://muiplayer.js.org/media/media.mp4',
+        
+        title:'Your Title',
+        autoplay:false, // 视频是否自动播放,默认为false，IOS H5环境无效
+        preload:'auto', // 视频是否预加载,可选值 none、metadata、auto。如果 autoplay=true，则忽略该属性。
+        loop:false, // 是否循环播放
+        width:'auto', // 初始化播放器宽度
+        height:'225px', // 初始化播放器高度，默认高度 225px
+        volume:1, // 初始化设置视频音量，取值 0 - 1
+        autoFit:true, // 播放器高度是否自适应视频高度，默认为true
+        poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg', //视频封面的资源地址
+        live:false, // 是否开启直播模式，直播模式默认菜单配置不允许切换播放速度以及循环播放
+        initFullFixed:false, // 初始化是否网页全屏播放
+        
+        // 全屏时否自动切换方向，如果运行环境在html5 plus中，那么切换全屏时会自动旋转屏幕，部分手机浏览器全屏时自动旋转方向。
+        // Tag：ios全屏切换时稍有差异，平台播放默认设置为同层播放，非全屏模式可操作播放器控件，全屏模式时调用系统全屏播放。
+        autoOrientaion:true, 
+        dragSpotShape:'circular', // 设置进度条拖动点的形状. 可选值 circular/square 默认为circular
+        objectFit:'contain', // 视频大小与video 容器的表现形式。可选 contain 或者 cover。默认为 contain
+        
+        // 此属性为添加更多H5 Video 标签的属性。参数为接受每个为Object的对象.注意如果该数组中属性值在已有设置中存在，那么会覆盖。
+        videoAttribute:[
+            {attrKey:'webkit-playsinline',attrValue:''},
+            {attrKey:'playsinline',attrValue:''},
+            {attrKey:'x5-playsinline',attrValue:''},
+            {attrKey:'t7-video-player-type',attrValue:'inline'},
+            {attrKey:'x5-video-player-type',attrValue:'h5-page'},
+            {attrKey:'x-webkit-airplay',attrValue:'allow'},
+            {attrKey:'controlslist',attrValue:'nodownload'},
+        ],
+        
+        // subtitle:globals.subtitle, // 字幕配置
+        parse:parseConfig, // 视频编解码
+
+        plugins:[ // 添加播放插件
+            typeof MuiPlayerDesktopPlugin == 'function' ? new MuiPlayerDesktopPlugin({
+                fullScaling:1.2,// 全屏控件缩放比例
+                leaveHiddenControls:false, // 鼠标指针移出播放器时是否隐藏控件
+                customSetting:items, // 自定义设置组菜单
+                // thumbnails:thumbnails, // 缩略图配置
+                contextmenu:[ // 自定义右键菜单
+                    {
+                        name:'share',
+                        context:'Share',
+                        zIndex:0,
+                        show:true,
+                        click:function(close) {
+                            mp.showToast('Trigger Click！');
+                            close();
+                        }
+                    },
+                ],
+            }) : {}
+        ],
+        
+        // --------------------- 自定义播放器配置 ---------------------
+        // lang:'en', // 语言，可选值: en | zh-cn | zh-tw
+        // themeColor:'#55c612', // 主题颜色，默认为 #1e98d4 
+        showMiniProgress:true, // 是否显示底部迷你进度条控件，当视图操纵控件隐藏时显示。当配置项 live=true 时无效。
+        pageHead:true, // 非全屏模式下，是否显示头部操作控件。头部操作控件通常包括返回按钮，标题、菜单操作按钮等
+        custom:{
+            headControls:[ //自定义播放器头控件列表，参数接受一个数组配置选项，最大可配置对象为5个.
+                {
+                    slot:'castScreen',
+                    click:function(e) {
+                        console.log('The head first custom button is clicked >>>');
+                    }
+                },
+                {
+                    slot:'likeButton',
+                    click:function(e) {
+                        console.log('The head second custom button is clicked >>>');
+                        mp.showRightSidebar('HD');
+                    }
+                }
+            ],
+            footerControls:[ // 自定义播放器页脚控件列表，参数接受一个数组配置选项，最大可配置对象为5个.
+                {
+                    slot:'nextMedia',
+                    position:'left', // 显示的位置，可选 left、right
+                    tooltip:'下一集', // 鼠标悬浮在控件上显示的文字提示
+                    oftenShow:false, // 是否常显示。默认为false，表示在mobile环境下横屏状态下隐藏，pc环境判下视频容器大小小于500px时隐藏
+                    style:{},
+                    click:function(e) {
+                        console.log('The footer first custom button is clicked >>>');
+                    }
+                },
+                {
+                    slot:'toggleleProgram',
+                    position:'right',
+                    tooltip:'切换选集',
+                    oftenShow:false,
+                    style:{
+                        padding: 0,
+                    },
+                    click:function(e) {
+                        console.log('The footer second custom button is clicked >>>');
+                    },
+                },
+            ],
+            rightSidebar:[ // 自定义播放器弹出右侧栏，参数接受一个配置数组，最大可配置对象为5个
+                { slot:'HD',width:'200px' }
+            ],
+        },
+    }
+
+    console.log(config);
+    mp = new MuiPlayer(config);
+
+    listener()
+function listener() {
+    // --------------------- mui-player.js ---------------------
+    // 播放器创建完成
+    mp.on('ready',function() {
+        // var controls = mp.getControls();
+        // console.log(controls);
+        // controls[6].remove();
+
+        initExample();
+        
+        var th = document.querySelectorAll('[type="toggleHD"]');
+        for(var i = 0;i < th.length;i++) {
+            th[i].onclick = (e) => {
+                onToggleVideo({ functions:e.currentTarget.innerHTML });
+            }
+        }
+    });
+
+    // 当视频时长已更改时触发
+    mp.on('duration-change',function(data) {
+    });
+
+    // 当用户在视频寻址时触发
+    mp.on('seek-progress',function(data) {
+    });
+
+    // 返回按钮点击时触发，注意该回调函数仅在非全屏模式下触发
+    mp.on('back',function() {
+    });
+
+    // 切换 controls 显示隐藏时触发
+    mp.on('controls-toggle',function(data) {
+    });
+
+    // 视频播放发生错误
+    mp.on('error',function(e) {
+        console.error(e);
+    });
+
+    // 视频销毁事件触发
+    mp.on('destroy',function() {
+    })
+
+    // 监听视频播放方向发生改变时触发
+    mp.on('fullscreen-change',function(event) {
+        var setHeaderStyle = function() {
+            var isImmersedStatusbar = plus.navigator.isImmersedStatusbar();
+            if(!isImmersedStatusbar) { return };
+            
+            if(event.direction == 'landscape') {
+                document.getElementById("mplayer-header").style.paddingTop = '16px';
+            }else {
+                var statusHeight = plus.navigator.getStatusbarHeight();
+                document.getElementById("mplayer-header").style.paddingTop = Math.round(statusHeight) + 'px';
+            }
+        };
+
+        // window.plus ? setHeaderStyle() : '';
+    });
+
+
+    // --------------------- mui-player-mobile-plugin.js ---------------------
+    // 监听音量调节回调触发
+    mp.on('volume-change',function(e) {
+        if(window.plus) {
+            plus.device.setVolume(e.size);
+        }else {
+            mp.video().volume = e.size;
+        }
+    });
+    
+    // 监听亮度调节回调触发
+    mp.on('luminance-change',function(e) {
+        console.log(e);
+        if(window.plus) {
+            plus.screen.setBrightness(e.size);
+        }
+    });
+    
+    // 监听分享事件
+    mp.on('share',function(e) {
+        console.log(e);
+    });
+}
+
+function initExample() {
+    // 你也可以在 JavaScript 代码中为元素添加 onclick 事件处理器
+    // document.getElementById('myButton').onclick = function() {
+    //     alert('通过 JavaScript 设置的 onclick 也被触发了！');
+    // };
+
+    document.getElementById('mpVideo').onclick = function() {
+        var video = mp.video();
+        console.log(video);
+    }
+    
+    document.getElementById('mpToggleControls').onclick = () => {
+        mp.toggleControls();
+    }
+    
+    document.getElementById('mpShowToast').onclick = () => {
+        mp.showToast('消息提示！');
+    }
+    
+    document.getElementById('mpReloadUrl').onclick = () => {
+        // mp.reloadUrl('https://mpv.videocc.net/e785b2c81c/5/e785b2c81c9e018296671a1287e99615_2.mp4?pid=1572452188483X1227211');
+        mp.reloadUrl('https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/media/media.m3u8');
+    }
+    
+    document.getElementById('mpShowLoading').onclick = () => {
+        mp.showLoading();
+    }
+    
+    document.getElementById('mpHideLoading').onclick = () => {
+        mp.hideLoading();
+    }
+    
+    document.getElementById('mpOpenFullScreen').onclick = () => {
+        mp.openFullScreen();
+    }
+    
+    document.getElementById('mpDestroy').onclick = () => {
+        mp.destroy();
+    }
+    
+    document.getElementById('mpGetControlsRemove').onclick = () => {
+        var controls = mp.getControls();
+        controls[3].remove();
+    }
+
+
+
+    document.getElementById('playerTest').onclick = () => {
+    }
+}
+</script>
+
+</html>
