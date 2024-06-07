@@ -54,6 +54,15 @@ func Engine(addr string) *gin.Engine {
 	router.POST("/doRegister", api.RegisterApi)
 	router.POST("/doLogin", api.LoginApi)
 
+	search := router.Group("/search")
+	search.POST("/api/index", api.SearchIndex)
+	search.POST("/api/index/batch", api.SearchIndexBatch)
+	search.POST("/api/index/remove", api.SearchIndexRemove)
+	search.POST("/api/query", api.SearchQuery)
+	search.GET("/api/status", api.SearchStatus)
+	search.GET("/api/db/drop", api.SearchDbDrop)
+	search.GET("/api/word/cut", api.SearchWordCut)
+
 	auth := router.Group("", AuthSession())
 	auth.GET("/session", api.GetSession)
 	auth.GET("/account", api.Account)
