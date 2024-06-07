@@ -1,11 +1,15 @@
 package service
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
+	"github.com/wxw9868/video/initialize/httpclient"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
@@ -48,13 +52,14 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 	}
 	defer rows.Close()
 
+	var indexBatch []Index
 	var videos []Video
 	for rows.Next() {
 		var videoInfo VideoInfo
 		db.ScanRows(rows, &videoInfo)
 
 		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
-		videos = append(videos, Video{
+		video := Video{
 			ID:            videoInfo.ID,
 			Title:         videoInfo.Title,
 			Actress:       videoInfo.Actress,
@@ -71,9 +76,44 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 			Zan:           videoInfo.Zan,
 			Cai:           videoInfo.Cai,
 			Watch:         videoInfo.Watch,
+		}
+		videos = append(videos, video)
+
+		indexBatch = append(indexBatch, Index{
+			Id:       uint32(videoInfo.ID),
+			Text:     videoInfo.Title,
+			Document: video,
 		})
 	}
+
+	b, err := json.Marshal(&indexBatch)
+	if err != nil {
+		return nil, err
+	}
+	Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b))
+
 	return videos, nil
+}
+
+type Index struct {
+	Id       uint32      `json:"id" binding:"required"`
+	Text     string      `json:"text" binding:"required"`
+	Document interface{} `json:"document" binding:"required"`
+}
+
+func Post(url string, body io.Reader) error {
+	resp, err := httpclient.HttpClient().POST(url, "application/json", body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	robots, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(robots))
+	return nil
 }
 
 func (vs *VideoService) First(id string) (model.Video, error) {

@@ -8,10 +8,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
+	"github.com/wxw9868/video/initialize/httpclient"
 	"github.com/wxw9868/video/utils"
 )
 
-var client = utils.NewHttpClient("http://127.0.0.1:5678/api")
+var client = httpclient.HttpClient()
 
 type Index struct {
 	Id       uint32      `json:"id" binding:"required"`
@@ -31,7 +32,7 @@ func SearchIndex(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/index", "?", "database=default"), bytes.NewReader(b))
+	Post(c, utils.Join("/index", "?", "database=video"), bytes.NewReader(b))
 }
 
 func SearchIndexBatch(c *gin.Context) {
@@ -46,7 +47,7 @@ func SearchIndexBatch(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/index/batch", "?", "database=default"), bytes.NewReader(b))
+	Post(c, utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b))
 }
 
 type IndexRemove struct {
@@ -65,7 +66,7 @@ func SearchIndexRemove(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/index/remove", "?", "database=default"), bytes.NewReader(b))
+	Post(c, utils.Join("/index/remove", "?", "database=video"), bytes.NewReader(b))
 }
 
 type Query struct {
@@ -89,7 +90,7 @@ func SearchQuery(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/query", "?", "database=default"), bytes.NewReader(b))
+	Post(c, utils.Join("/query", "?", "database=video"), bytes.NewReader(b))
 }
 
 func SearchStatus(c *gin.Context) {

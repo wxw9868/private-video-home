@@ -2,3 +2,5 @@
 assets/video
 *.DS_Store
 tmp
+bin
+database

@@ -35,6 +35,7 @@ sqlite3 -version
 * 编译
 > 直接下载 [可执行文件](https://github.com/newpanjing/gofound/releases) 可以不用编译，省去这一步。
 ```sh
+git clone https://github.com/sea-team/gofound.git
 go get && go build 
 ```
 * 启动
