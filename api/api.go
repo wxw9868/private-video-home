@@ -45,6 +45,20 @@ func VideoList(c *gin.Context) {
 	})
 }
 
+func VideoActress(c *gin.Context) {
+	actresss, err := as.Find()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	actressBytes, _ := json.Marshal(actresss)
+
+	c.HTML(http.StatusOK, "video-actress.html", gin.H{
+		"title":       "演员列表",
+		"actressList": string(actressBytes),
+	})
+}
+
 type Play struct {
 	ID     string `form:"id" binding:"required"`
 	Player string `form:"player" binding:"required,oneof=ckplayer xgplayer player"`
@@ -105,20 +119,6 @@ func VideoPlay(c *gin.Context) {
 		"CollectID":     collectID,
 		"IsCollect":     isCollect,
 		"Avatar":        userAvatar,
-	})
-}
-
-func VideoActress(c *gin.Context) {
-	actresss, err := as.Find()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	actressBytes, _ := json.Marshal(actresss)
-
-	c.HTML(http.StatusOK, "video-actress.html", gin.H{
-		"title":       "演员列表",
-		"actressList": string(actressBytes),
 	})
 }
 

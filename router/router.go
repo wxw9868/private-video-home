@@ -1,13 +1,11 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/video/api"
+	"github.com/wxw9868/video/middleware"
 )
 
 func Engine(addr string) *gin.Engine {
@@ -33,7 +31,7 @@ func Engine(addr string) *gin.Engine {
 	// router.Use(cors.Default())
 
 	//
-	router.NoRoute(NoRoute())
+	router.NoRoute(middleware.NoRoute())
 
 	//
 	router.GET("/ping", func(c *gin.Context) {
@@ -48,26 +46,38 @@ func Engine(addr string) *gin.Engine {
 	router.Static("/assets", "./assets")
 	router.LoadHTMLGlob("template/*")
 
-	router.Use(InitSession())
+	router.Use(middleware.InitSession())
 	router.GET("/register", api.Register)
 	router.GET("/login", api.Login)
 	router.POST("/doRegister", api.RegisterApi)
 	router.POST("/doLogin", api.LoginApi)
 
-	auth := router.Group("", AuthSession())
-	auth.GET("/logout", api.LogoutApi)
+	search := router.Group("/search")
+	search.POST("/api/index", api.SearchIndex)
+	search.POST("/api/index/batch", api.SearchIndexBatch)
+	search.POST("/api/index/remove", api.SearchIndexRemove)
+	search.POST("/api/query", api.SearchQuery)
+	search.GET("/api/status", api.SearchStatus)
+	search.GET("/api/db/drop", api.SearchDbDrop)
+	search.GET("/api/word/cut", api.SearchWordCut)
+
+	auth := router.Group("", middleware.AuthSession())
 	auth.GET("/session", api.GetSession)
 	auth.GET("/account", api.Account)
 
+	auth.GET("/logout", api.LogoutApi)
+
 	auth.GET("/", api.VideoIndex)
+
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
-	auth.POST("/collect", api.VideoCollectApi)
+
 	auth.GET("/browse", api.VideoBrowseApi)
+	auth.POST("/collect", api.VideoCollectApi)
+	auth.GET("/commentList", api.VideoCommentListApi)
 	auth.POST("/comment", api.VideoCommentApi)
 	auth.POST("/reply", api.VideoReplyApi)
-	auth.GET("/commentList", api.VideoCommentListApi)
 	auth.POST("/zan", api.CommentZanApi)
 	auth.POST("/cai", api.CommentCaiApi)
 
@@ -78,7 +88,7 @@ func Engine(addr string) *gin.Engine {
 	v1 := router.Group("/v1")
 	{
 		auth := v1.Group("")
-		auth.Use(AuthSession())
+		auth.Use(middleware.AuthSession())
 		auth.GET("/cache/list", api.CacheVideoList)
 		auth.GET("/cache/actress", api.CacheVideoActress)
 		auth.GET("/cache/play", api.CacheVideoPlay)
@@ -86,32 +96,4 @@ func Engine(addr string) *gin.Engine {
 	}
 
 	return router
-}
-
-func NoRoute() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, "404.html", nil)
-		c.Abort()
-	}
-}
-
-func InitSession() gin.HandlerFunc {
-	store := cookie.NewStore([]byte("secret_20240109"))
-	return sessions.Sessions("stock_session", store)
-}
-
-func AuthSession() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-
-		userid, ok := session.Get("userID").(uint)
-		fmt.Println("user: ", userid, ok)
-		if !ok {
-			fmt.Println("user out: ", userid, ok)
-			c.Redirect(http.StatusMovedPermanently, "/login")
-			c.AbortWithStatus(http.StatusUnauthorized)
-			return
-		}
-		c.Next()
-	}
 }

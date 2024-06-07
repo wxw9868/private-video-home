@@ -241,3 +241,11 @@ func VideoInfo(inFileName string) (map[string]interface{}, error) {
 
 	return data, nil
 }
+
+func Join(s ...string) string {
+	var b bytes.Buffer
+	for i := 0; i < len(s); i++ {
+		b.WriteString(s[i])
+	}
+	return b.String()
+}

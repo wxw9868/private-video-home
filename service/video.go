@@ -289,8 +289,6 @@ func (vs *VideoService) Zan(commentID, userID uint, zan int) error {
 		expr = "support - 1"
 	}
 
-	fmt.Println(support, expr)
-
 	if err := tx.Where(model.UserCommentLog{UserID: userID, VideoID: comment.VideoId, CommentID: commentID}).Assign(model.UserCommentLog{Support: &support}).FirstOrCreate(&model.UserCommentLog{}).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("创建失败: %s", err)
@@ -362,9 +360,10 @@ func tree(list []VideoComment) []*CommentTree {
 	}
 
 	trees := recursiveSort(data, childrens, dataSort, childrensSort)
-	fmt.Println(len(dataSort), len(trees))
-	fmt.Printf("%+v\n", trees)
-	fmt.Printf("%+v\n", dataSort)
+
+	// fmt.Println(len(dataSort), len(trees))
+	// fmt.Printf("%+v\n", trees)
+	// fmt.Printf("%+v\n", dataSort)
 	result := make([]*CommentTree, len(trees))
 	for k, v := range dataSort {
 		result[k] = trees[v]
