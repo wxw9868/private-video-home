@@ -116,7 +116,7 @@
 
 	<script>
 		let videoUrl = '{{ .videoUrl }}';
-		//videoUrl = 'assets/video/lc.mp4';
+		// videoUrl = 'assets/video/lc.mp4';
 
 		loadPlayer();
 		function loadPlayer(playerType) {
@@ -864,8 +864,8 @@
 							<p class="my-2 comment-text">`+data.content+`</p>
 							<!-- Like, Dislike, Reply, Report Buttons -->
 							<div class="comment-button">
-								<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+element.ID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
-								<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+element.ID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0 comment-zan" data-comment-id="`+data.commentID+`" onclick="commentZan(this)"><i class="bi bi-hand-thumbs-up"></i> <span>0</span></button>
+								<button class="btn btn-sm border-0 comment-cai" data-comment-id="`+data.commentID+`" onclick="commentCai(this)"><i class="bi bi-hand-thumbs-down"></i> <span>0</span></button>
 								<button class="btn btn-sm border-0" onclick="toggleReplyForm(this)">回复</button>
 								<button class="btn btn-sm border-0">举报</button>
 							</div>

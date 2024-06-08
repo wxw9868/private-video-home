@@ -86,6 +86,8 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 		})
 	}
 
+	fmt.Printf("%+v\n", videos)
+
 	b, err := json.Marshal(&indexBatch)
 	if err != nil {
 		return nil, err
@@ -145,7 +147,7 @@ type VideoInfo struct {
 
 func (vs *VideoService) Info(id uint) (VideoInfo, error) {
 	var videoInfo VideoInfo
-	if err := db.Table("video_Video as v").Select("*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog l on l.video_id = v.id").Where("v.id = ?", id).Scan(&videoInfo).Error; err != nil {
+	if err := db.Table("video_Video as v").Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog as l on l.video_id = v.id").Where("v.id = ?", id).Scan(&videoInfo).Error; err != nil {
 		return VideoInfo{}, err
 	}
 	return videoInfo, nil
@@ -219,9 +221,14 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 		tx.Rollback()
 		return fmt.Errorf("创建失败: %s", err)
 	}
-	if err := tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("browse", gorm.Expr("browse + 1")).Error; err != nil {
+	var videoLog model.VideoLog
+	if err := tx.Where(model.VideoLog{VideoID: videoID}).FirstOrInit(&videoLog).Error; err != nil {
 		tx.Rollback()
-		return fmt.Errorf("更新失败: %s", err)
+		return err
+	}
+	if err := tx.Where(model.VideoLog{VideoID: videoID}).Assign(model.VideoLog{Browse: videoLog.Browse + 1}).FirstOrCreate(&model.VideoLog{}).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("创建失败: %s", err)
 	}
 
 	tx.Commit()

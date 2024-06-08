@@ -35,14 +35,15 @@
         }
     }
 
-    if (document.cookie != "") {
+    if (document.cookie) {
         document.getElementById("login").style.display = "none";
     } else {
         document.getElementById("settings").style.display = "none";
     }
 
-    function login() {
-        window.location.href = "/login";
+        console.log(document.cookie)
+    function clearCookie(cookieName) {
+        document.cookie = cookieName + "=; expires=" + new Date(0).toUTCString() + "; path=/";
     }
 
     let body = document.getElementsByTagName('body')[0];
@@ -100,6 +101,8 @@
         .then(function (response) {
             // console.log(response);
             if (response.data) {
+                storage.clear();
+                clearCookie('stock_session');
                 window.location.reload();
             }
         }).catch(function (error) {
@@ -123,37 +126,40 @@
         }); 
     }
 
-    axios.get('/session')
-    .then(function (response) {
-        console.log(response.data.data);
-        let data = response.data.data;
-        if (data) {
-            storage.setItem("userID", data.id);
-            storage.setItem("userAvatar", data.avatar);
-            storage.setItem("userUsername", data.username);
-            storage.setItem("userNickname", data.nickname);
-            storage.setItem("userEmail", data.email);
-            storage.setItem("userMobile", data.mobile);
-            document.getElementById('userAvatar').setAttribute('src',data.avatar);
-        }
-    }).catch(function (error) {
-        if (error.response) {
-            // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-            
-        } else if (error.request) {
-            // 请求已经成功发起，但没有收到响应
-            // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-            // 而在node.js中是 http.ClientRequest 的实例
-            console.log(error.request);
-        } else {
-            // 发送请求时出了点问题
-            console.log('Error', error.message);
-        }
-        console.log(error.config);
-        console.log(error); 
-    }); 
+    if (document.cookie) {
+        axios.get('/session')
+        .then(function (response) {
+            console.log(response);
+            let data = response.data.data;
+            console.log(data);
+            if (data) {
+                storage.setItem("userID", data.id);
+                storage.setItem("userAvatar", data.avatar);
+                storage.setItem("userUsername", data.username);
+                storage.setItem("userNickname", data.nickname);
+                storage.setItem("userEmail", data.email);
+                storage.setItem("userMobile", data.mobile);
+                document.getElementById('userAvatar').setAttribute('src',data.avatar);
+            }
+        }).catch(function (error) {
+            if (error.response) {
+                // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+                
+            } else if (error.request) {
+                // 请求已经成功发起，但没有收到响应
+                // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+                // 而在node.js中是 http.ClientRequest 的实例
+                console.log(error.request);
+            } else {
+                // 发送请求时出了点问题
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+            console.log(error); 
+        }); 
+    }
 </script>
 {{ end }}

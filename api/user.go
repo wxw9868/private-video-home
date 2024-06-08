@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -54,33 +53,38 @@ func RegisterApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("注册成功", nil))
 }
 
+type LoginReq struct {
+	Email    string `form:"email" json:"email" binding:"required,email"`
+	Password string `form:"password" json:"password" binding:"required"`
+}
+
 func LoginApi(c *gin.Context) {
-	email := c.PostForm("email")
-	password := c.PostForm("password")
-
-	if email != "" && password != "" {
-		user, err := us.Login(email, password)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-			return
-		}
-		fmt.Printf("%+v\n", user)
-
-		session := sessions.Default(c)
-		session.Set("userID", user.ID)
-		session.Set("userAvatar", user.Avatar)
-		session.Set("userUsername", user.Username)
-		session.Set("userNickname", user.Nickname)
-		session.Set("userEmail", user.Email)
-		session.Set("userMobile", user.Mobile)
-		if err = session.Save(); err != nil {
-			c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
-			return
-		}
-
-		c.Redirect(http.StatusMovedPermanently, "/")
+	var bind LoginReq
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
+
+	user, err := us.Login(bind.Email, bind.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
+	session := sessions.Default(c)
+	session.Set("userID", user.ID)
+	session.Set("userAvatar", user.Avatar)
+	session.Set("userUsername", user.Username)
+	session.Set("userNickname", user.Nickname)
+	session.Set("userEmail", user.Email)
+	session.Set("userMobile", user.Mobile)
+	if err = session.Save(); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
+		return
+	}
+
+	// c.Redirect(http.StatusMovedPermanently, "/account")
+	c.JSON(http.StatusOK, util.Success("登录成功", nil))
 }
 
 func LogoutApi(c *gin.Context) {

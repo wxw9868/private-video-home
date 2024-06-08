@@ -233,12 +233,14 @@
     {{ template "common-footer" }}
 
     <script>
-        // storage.getItem("userID");
-        document.getElementById('username').value = storage.getItem("userUsername");
-        document.getElementById('nickname').value =  storage.getItem("userNickname");
-        document.getElementById('avatar').setAttribute('src',storage.getItem("userAvatar"));
-        document.getElementById('email').value = storage.getItem("userEmail");
-        document.getElementById('mobile').value = storage.getItem("userMobile");
+        if (document.cookie) {
+            // storage.getItem("userID");
+            document.getElementById('username').value = storage.getItem("userUsername");
+            document.getElementById('nickname').value =  storage.getItem("userNickname");
+            document.getElementById('avatar').setAttribute('src',storage.getItem("userAvatar"));
+            document.getElementById('email').value = storage.getItem("userEmail");
+            document.getElementById('mobile').value = storage.getItem("userMobile");
+        }
 
         // Example starter JavaScript for disabling form submissions if there are invalid fields
         (() => {

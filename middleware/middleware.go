@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/wxw9868/util"
 )
 
 func NoRoute() gin.HandlerFunc {
@@ -24,13 +25,12 @@ func InitSession() gin.HandlerFunc {
 func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
-
+		fmt.Println("AuthSession")
 		userid, ok := session.Get("userID").(uint)
-		fmt.Println("user: ", userid, ok)
+		fmt.Println("AuthSession: ", userid, ok)
 		if !ok {
 			fmt.Println("user out: ", userid, ok)
-			c.Redirect(http.StatusMovedPermanently, "/login")
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, util.Fail("没有访问权限"))
 			return
 		}
 		c.Next()

@@ -82,7 +82,7 @@ func VideoPlay(c *gin.Context) {
 
 	vi, err := vs.Info(cast.ToUint(play.ID))
 	if err != nil {
-		log.Printf("%s\n", err)
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 	}
 
 	var collectID uint = 0

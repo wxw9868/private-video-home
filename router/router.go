@@ -47,6 +47,7 @@ func Engine(addr string) *gin.Engine {
 	router.LoadHTMLGlob("template/*")
 
 	router.Use(middleware.InitSession())
+	router.GET("/", api.VideoIndex)
 	router.GET("/register", api.Register)
 	router.GET("/login", api.Login)
 	router.POST("/doRegister", api.RegisterApi)
@@ -62,12 +63,9 @@ func Engine(addr string) *gin.Engine {
 	search.GET("/api/word/cut", api.SearchWordCut)
 
 	auth := router.Group("", middleware.AuthSession())
-	auth.GET("/session", api.GetSession)
 	auth.GET("/account", api.Account)
-
+	auth.GET("/session", api.GetSession)
 	auth.GET("/logout", api.LogoutApi)
-
-	auth.GET("/", api.VideoIndex)
 
 	auth.GET("/list", api.VideoList)
 	auth.GET("/actress", api.VideoActress)
