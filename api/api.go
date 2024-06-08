@@ -1,7 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -29,6 +31,43 @@ func VideoIndex(c *gin.Context) {
 	})
 }
 
+type Search struct {
+	Query     string      `json:"query" binding:"required"`
+	Page      int         `json:"page"`
+	Limit     int         `json:"limit"`
+	Order     string      `json:"order"`
+	Highlight interface{} `json:"highlight"`
+	ScoreExp  string      `json:"scoreExp"`
+}
+
+func VideoSearch(c *gin.Context) {
+	query := c.Query("query")
+
+	b, err := json.Marshal(&Search{Query: query, Page: 1, Limit: 240, Order: "desc"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
+	resp, err := client.POST(utils.Join("/query", "?", "database=video"), "application/json", bytes.NewReader(b))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	defer resp.Body.Close()
+
+	robots, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
+	c.HTML(http.StatusOK, "search.html", gin.H{
+		"title": "视频列表",
+		"data":  string(robots),
+	})
+}
+
 func VideoList(c *gin.Context) {
 	actressID := c.Query("actress_id")
 	videos, err := vs.Find(actressID)
@@ -38,10 +77,8 @@ func VideoList(c *gin.Context) {
 	videosBytes, _ := json.Marshal(videos)
 
 	c.HTML(http.StatusOK, "video-list.html", gin.H{
-		"title":       "视频列表",
-		"data":        string(videosBytes),
-		"actressList": actressListSort,
-		"actressID":   -1,
+		"title": "视频列表",
+		"data":  string(videosBytes),
 	})
 }
 

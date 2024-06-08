@@ -68,6 +68,7 @@ func Engine(addr string) *gin.Engine {
 	auth.GET("/logout", api.LogoutApi)
 
 	auth.GET("/list", api.VideoList)
+	auth.GET("/search", api.VideoSearch)
 	auth.GET("/actress", api.VideoActress)
 	auth.GET("/play", api.VideoPlay)
 

@@ -1,8 +1,6 @@
 package service
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -52,7 +50,7 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 	}
 	defer rows.Close()
 
-	var indexBatch []Index
+	// var indexBatch []Index
 	var videos []Video
 	for rows.Next() {
 		var videoInfo VideoInfo
@@ -79,20 +77,19 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 		}
 		videos = append(videos, video)
 
-		indexBatch = append(indexBatch, Index{
-			Id:       uint32(videoInfo.ID),
-			Text:     videoInfo.Title,
-			Document: video,
-		})
+		// indexBatch = append(indexBatch, Index{
+		// 	Id:       uint32(videoInfo.ID),
+		// 	Text:     videoInfo.Title,
+		// 	Document: video,
+		// })
 	}
 
-	fmt.Printf("%+v\n", videos)
-
-	b, err := json.Marshal(&indexBatch)
-	if err != nil {
-		return nil, err
-	}
-	Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b))
+	// fmt.Printf("%+v\n", videos)
+	// b, err := json.Marshal(&indexBatch)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b))
 
 	return videos, nil
 }

@@ -17,10 +17,19 @@
         storage = window.localStorage;
     }
 
+    function getParams(url) {
+        const params = new URLSearchParams(url.split('?')[1]);
+        const paramObj = {};
+        for (const [key, value] of params) {
+            paramObj[key] = value;
+        }
+        return paramObj;
+    }
+    
     if (window.location.pathname) {
         let navs = document.getElementById('navbarNav').querySelectorAll('a');
         let pathname = window.location.pathname
-        switch(pathname) {
+        switch (pathname) {
             case "/list":
                 navs[1].classList.add('active');
                 break;
@@ -33,6 +42,9 @@
             default:
                 navs[0].classList.add('active');
         }
+
+        let search = getParams(window.location.search)
+        document.getElementById('search').value = (search.query)?search.query:'';
     }
 
     if (document.cookie) {
@@ -41,19 +53,19 @@
         document.getElementById("settings").style.display = "none";
     }
 
-        console.log(document.cookie)
     function clearCookie(cookieName) {
         document.cookie = cookieName + "=; expires=" + new Date(0).toUTCString() + "; path=/";
     }
 
     let body = document.getElementsByTagName('body')[0];
     let cards = document.getElementsByClassName('card');
+    let search = document.getElementById('search');
 
     loadBackground()
     function loadBackground() {
         if (storage.getItem("backgroundColor") == "dark") {
             setBgDark()
-            document.getElementById('setBackgroundColor').setAttribute('src','assets/image/icon/moon-stars-fill.svg')
+            document.getElementById('setBackgroundColor').setAttribute('src', 'assets/image/icon/moon-stars-fill.svg')
         } else {
             setBgLight()
         }
@@ -61,34 +73,36 @@
     function setBackground(img) {
         if (storage.getItem("backgroundColor") == "dark") {
             setBgLight()
-            img.setAttribute('src','assets/image/icon/sun-fill.svg'); 
+            img.setAttribute('src', 'assets/image/icon/sun-fill.svg');
         } else {
             setBgDark()
-            img.setAttribute('src','assets/image/icon/moon-stars-fill.svg')  
+            img.setAttribute('src', 'assets/image/icon/moon-stars-fill.svg')
         }
     }
-    
+
     function setBgDark() {
         body.classList.remove('bg-light')
-        body.classList.add('bg-dark','text-secondary')
+        body.classList.add('bg-dark', 'text-secondary')
+        search.classList.add('form-control-dark', 'text-bg-dark')
 
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
-            element.classList.remove('text-light')   
+            element.classList.remove('text-light')
             element.classList.add('text-secondary')
         }
-        
+
         storage.setItem("backgroundColor", "dark");
     }
     function setBgLight() {
-        body.classList.remove('bg-dark','text-secondary')
+        body.classList.remove('bg-dark', 'text-secondary')
         body.classList.add('bg-light')
+        search.classList.remove('form-control-dark', 'text-bg-dark')
 
         let cards = document.getElementsByClassName('card')
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
             element.classList.remove('text-secondary')
-            element.classList.add('text-light')            
+            element.classList.add('text-light')
         }
 
         storage.setItem("backgroundColor", "light");
@@ -98,68 +112,112 @@
 <script>
     function logout() {
         axios.get('/logout')
-        .then(function (response) {
-            // console.log(response);
-            if (response.data) {
-                storage.clear();
-                clearCookie('stock_session');
-                window.location.reload();
-            }
-        }).catch(function (error) {
-            if (error.response) {
-                // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-                
-            } else if (error.request) {
-                // 请求已经成功发起，但没有收到响应
-                // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-                // 而在node.js中是 http.ClientRequest 的实例
-                console.log(error.request);
-            } else {
-                // 发送请求时出了点问题
-                console.log('Error', error.message);
-            }
-            console.log(error.config);
-            console.log(error); 
-        }); 
+            .then(function (response) {
+                // console.log(response);
+                if (response.data) {
+                    storage.clear();
+                    clearCookie('stock_session');
+                    window.location.reload();
+                }
+            }).catch(function (error) {
+                if (error.response) {
+                    // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+
+                } else if (error.request) {
+                    // 请求已经成功发起，但没有收到响应
+                    // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+                    // 而在node.js中是 http.ClientRequest 的实例
+                    console.log(error.request);
+                } else {
+                    // 发送请求时出了点问题
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+                console.log(error);
+            });
     }
 
     if (document.cookie) {
         axios.get('/session')
-        .then(function (response) {
-            console.log(response);
-            let data = response.data.data;
-            console.log(data);
-            if (data) {
-                storage.setItem("userID", data.id);
-                storage.setItem("userAvatar", data.avatar);
-                storage.setItem("userUsername", data.username);
-                storage.setItem("userNickname", data.nickname);
-                storage.setItem("userEmail", data.email);
-                storage.setItem("userMobile", data.mobile);
-                document.getElementById('userAvatar').setAttribute('src',data.avatar);
-            }
-        }).catch(function (error) {
-            if (error.response) {
-                // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-                
-            } else if (error.request) {
-                // 请求已经成功发起，但没有收到响应
-                // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-                // 而在node.js中是 http.ClientRequest 的实例
-                console.log(error.request);
-            } else {
-                // 发送请求时出了点问题
-                console.log('Error', error.message);
-            }
-            console.log(error.config);
-            console.log(error); 
-        }); 
+            .then(function (response) {
+                // console.log(response);
+                let data = response.data.data;
+                // console.log(data);
+                if (data) {
+                    storage.setItem("userID", data.id);
+                    storage.setItem("userAvatar", data.avatar);
+                    storage.setItem("userUsername", data.username);
+                    storage.setItem("userNickname", data.nickname);
+                    storage.setItem("userEmail", data.email);
+                    storage.setItem("userMobile", data.mobile);
+                    document.getElementById('userAvatar').setAttribute('src', data.avatar);
+                }
+            }).catch(function (error) {
+                if (error.response) {
+                    // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+
+                } else if (error.request) {
+                    // 请求已经成功发起，但没有收到响应
+                    // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+                    // 而在node.js中是 http.ClientRequest 的实例
+                    console.log(error.request);
+                } else {
+                    // 发送请求时出了点问题
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+                console.log(error);
+            });
     }
+
+    // document.getElementById('search-context').addEventListener('click', function() {
+    //     var form = document.getElementById('searchForm');
+    //     // form.submit();
+
+    //     // 处理表单数据的代码
+    //     const formData = {};
+    //     for (let element of form.elements) {
+    //         if (element.tagName === "INPUT" && element.type !== "submit") {
+    //             formData[element.name] = element.value;
+    //         }
+    //     }
+    //     formData['page'] = 1,
+    //     formData['limit'] = 10,
+    //     formData['order'] = "desc",
+
+    //     console.log(formData)
+    //     axios.post('/search/api/query', formData, { headers: { 'content-type': 'application/json' } })
+    //         .then(function (response) {
+    //             console.log(response);
+    //             if (response) {
+    //                 //3秒钟之后跳转到指定的页面 
+    //                 setTimeout(window.location.href = '/', 3);
+    //             }
+    //         })
+    //         .catch(function (error) {
+    //             if (error.response) {
+    //                 // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+    //                 console.log(error.response.data);
+    //                 console.log(error.response.status);
+    //                 console.log(error.response.headers);
+    //             } else if (error.request) {
+    //                 // 请求已经成功发起，但没有收到响应
+    //                 // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+    //                 // 而在node.js中是 http.ClientRequest 的实例
+    //                 console.log(error.request);
+    //             } else {
+    //                 // 发送请求时出了点问题
+    //                 console.log('Error', error.message);
+    //             }
+    //             console.log(error.config);
+    //             console.log(error);
+    //         });
+    // });
 </script>
 {{ end }}

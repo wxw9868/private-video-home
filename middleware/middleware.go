@@ -25,11 +25,11 @@ func InitSession() gin.HandlerFunc {
 func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
-		fmt.Println("AuthSession")
+		// fmt.Println("AuthSession")
 		userid, ok := session.Get("userID").(uint)
 		fmt.Println("AuthSession: ", userid, ok)
 		if !ok {
-			fmt.Println("user out: ", userid, ok)
+			// fmt.Println("user out: ", userid, ok)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, util.Fail("没有访问权限"))
 			return
 		}

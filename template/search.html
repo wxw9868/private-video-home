@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.108.0">
+    <title>{{.title}}</title>
+
+    <link href="assets/image/favicon/favicon.ico" rel="shortcut icon">
+    <link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+    <link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+    <style>
+        /* 悬停效果 */
+        .col:hover {
+            transform: scale(1.03);
+            /* 放大效果 */
+            color: #d2578d;
+            font-weight: bold;
+            cursor: pointer;
+            /* 设定鼠标样式 */
+        }
+
+        .card {
+            border: none;
+        }
+
+        .bg-black-semi-transparent {
+            background-color: rgba(0, 0, 0, 0.3);
+            /* 黑色半透明 */
+        }
+
+        a {
+            color: unset;
+            /* 设置为浏览器默认的颜色 */
+            text-decoration: none;
+            /* 移除超链接下划线 */
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <div class="container">
+            {{ template "common-header" }}
+        </div>
+
+        <div class="py-5">
+            <div class="container">
+                <div id="videoContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 0px;
+            margin-top: 20px;
+            border-top-width: 0px;
+            border-bottom-width: 0px;
+            margin-bottom: 20px;
+            padding-bottom: 0px;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: none;
+            background-color: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+    <div class="pagination">
+        <button id="first-page" disabled>首页</button>
+        <button id="prev-page" disabled>上一页</button>
+        <span id="page-numbers"></span>
+        <button id="next-page">下一页</button>
+        <button id="last-page">尾页</button>
+    </div>
+
+    <script src="assets/app/js/preloadjs-1.0.1.min.js"></script>
+    <script>
+        // 假设这是从服务器或其他地方获取的视频列表数据
+        const jsonString = '{{ .data }}';
+        const jsonObject = JSON.parse(jsonString);
+        let videoList = jsonObject.data.documents;
+        // json去重
+        function uniqueBy(list, key) {
+            const seen = new Set();
+            return list.filter((item) => {
+                const k = key(item);
+                return seen.has(k) ? false : seen.add(k);
+            });
+        }
+        // 根据id属性去重
+        videoList = uniqueBy(videoList, (item) => item.id);
+    
+        let totalCount = videoList.length;
+        let totalPages;
+        let currentPage = 1;
+        let numberPerPage = (totalCount < 12) ? totalCount : 12;
+
+        // 预加载
+        let queue = new createjs.LoadQueue(true);
+        // 监听进度事件
+        queue.on("progress", function (e) {
+            var proNum = Math.ceil(e.progress * 100);
+            var progressHTML = `
+            <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="`+ proNum + `" aria-valuemin="0" aria-valuemax="100" style="width:100%;height: 20px">
+                <div class="progress-bar progress-bar-striped bg-success" style="width: `+ proNum + `%">` + proNum + `%</div>
+            </div>`;
+            document.getElementById('videoContainer').innerHTML = progressHTML
+        });
+        let imgSrcs = [];
+        videoList.forEach((item, index) => {
+            // console.log(item.document.poster)
+            // console.log(index)
+            imgSrcs.push({ id: 'img' + index, src: item.document.poster });
+        });
+        // 加载多个文件    
+        queue.loadManifest(imgSrcs);
+
+        // 渲染视频列表
+        function renderVideoList(start, end) {
+            let videoItem = '';
+            let subArray = videoList.slice(start, end);
+            subArray.forEach((item, index) => {
+                item = item.document
+                videoItem += 
+                `<div class="col">
+                    <a href="/play?player=player&id=`+ (item.id) + `"target="_blank">
+                        <div class="card rounded-4">
+                            <ul class="card-img-overlay d-flex mt-auto justify-content-end">
+                                <li class="d-flex align-items-end">
+                                    <div class="bg-black-semi-transparent rounded-start">
+                                        <i class="me-1"></i>
+                                        <i class="bi bi-heart"></i>
+                                        <small class="me-1">`+item.collect+`</small>
+                                    </div>
+                                </li>
+                                <li class="d-flex align-items-end">
+                                    <div class="bg-black-semi-transparent">
+                                        <i class="me-1"></i>
+                                        <i class="bi bi-eye"></i>
+                                        <small class="me-1">`+item.browse+`</small>
+                                    </div>   
+                                </li>
+                                <li class="d-flex align-items-end">
+                                    <div class="bg-black-semi-transparent rounded-end">
+                                        <i class="me-1"></i>
+                                        <i class="bi bi-clock"></i>
+                                        <small class="me-1">`+ item.duration + `</small>
+                                    </div>
+                                </li>
+                            </ul>   
+                        </div>
+                        <div class="card-body mt-2">
+                            <p class="card-title text-truncate">`+ item.title + `</p>
+                        </div>
+                    </a>
+                </div>`;
+            });
+
+            document.getElementById('videoContainer').innerHTML = videoItem
+
+            for (let index = 0; index < subArray.length; index++) {
+                let img = document.getElementsByClassName('card')[index].appendChild(queue.getResult('img' + (start+index)))
+                img.setAttribute('width','100%')
+                img.setAttribute('height','225')
+                img.setAttribute('class','img-fluid card-img rounded-4')
+            }
+
+            // 加载主题背景
+            loadBackground()
+
+            // 更新分页控件
+            updatePagination();
+        }
+
+        // 更新分页控件
+        function updatePagination() {
+            const pageNumbers = document.querySelector('#page-numbers');
+            pageNumbers.innerHTML = '';
+
+            const startPage = Math.max(currentPage - 5, 1);
+            const endPage = Math.min(currentPage + 5, totalPages);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = document.createElement('button');
+
+                btn.textContent = i;
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderVideoList((i - 1) * numberPerPage, i * numberPerPage);
+                });
+
+                if (i === currentPage) {
+                    btn.classList.add('active');
+                }
+                pageNumbers.appendChild(btn);
+            }
+
+            // 启用/禁用“首页”按钮
+            const firstPageBtn = document.querySelector('#first-page');
+            firstPageBtn.disabled = currentPage === 1;
+
+            // 启用/禁用“尾页”按钮
+            const lastPageBtn = document.querySelector('#last-page');
+            lastPageBtn.disabled = currentPage === totalPages;
+
+            // 启用/禁用“上一页”按钮
+            const prevPageBtn = document.querySelector('#prev-page');
+            prevPageBtn.disabled = currentPage === 1;
+
+            // 启用/禁用“下一页”按钮
+            const nextPageBtn = document.querySelector('#next-page');
+            nextPageBtn.disabled = currentPage === totalPages;
+
+            if (currentPage == 1) {
+                firstPageBtn.classList.add('disabled');
+                prevPageBtn.classList.add('disabled');
+            } else {
+                firstPageBtn.classList.remove('disabled');
+                prevPageBtn.classList.remove('disabled');
+            }
+            if (currentPage == totalPages) {
+                nextPageBtn.classList.add('disabled');
+                lastPageBtn.classList.add('disabled');
+            } else {
+                nextPageBtn.classList.remove('disabled');
+                lastPageBtn.classList.remove('disabled');
+            }
+        }
+
+        // 计算总页数并初始化
+        totalPages = Math.ceil(videoList.length / numberPerPage);
+        // 监听完成事件
+        queue.on("complete", function () {
+            renderVideoList(0, numberPerPage);
+        });
+
+        // 事件监听器
+        document.querySelector('#prev-page').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
+            }
+        });
+
+        document.querySelector('#next-page').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
+            }
+        });
+
+        document.querySelector('#first-page').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage = 1;
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
+            }
+        });
+
+        document.querySelector('#last-page').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage = totalPages;
+                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
+            }
+        });
+    </script>
+
+    {{ template "common-footer" }}
+
+</body>
+
+</html>
