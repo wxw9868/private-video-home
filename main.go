@@ -16,8 +16,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ip = "127.0.0.1"
-	port := 8081
+	// ip = "127.0.0.1"
+	// port := 8081
+	port := 80
 
 	addr := fmt.Sprintf("%s:%d", ip, port)
 

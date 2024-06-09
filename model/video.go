@@ -8,7 +8,7 @@ import (
 
 type Video struct {
 	gorm.Model
-	Title         string    `gorm:"column:title;type:varchar(255);comment:标题"`
+	Title         string    `gorm:"column:title;type:varchar(255);uniqueIndex;comment:标题"`
 	Actress       string    `gorm:"column:actress;type:varchar(100);comment:演员"`
 	Size          int64     `gorm:"column:size;type:bigint;comment:大小"`
 	Duration      float64   `gorm:"column:duration;type:float;default:0;comment:时长"`
@@ -22,7 +22,7 @@ type Video struct {
 
 type Actress struct {
 	gorm.Model
-	Actress string `gorm:"column:actress;type:varchar(100);comment:演员"`
+	Actress string `gorm:"column:actress;type:varchar(100);uniqueIndex;comment:演员"`
 	Avatar  string `gorm:"column:avatar;type:varchar(255);comment:头像"`
 }
 

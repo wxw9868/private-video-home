@@ -9,9 +9,9 @@
     <meta name="generator" content="Hugo 0.108.0">
     <title>{{.title}}</title>
 
-    <link href="assets/image/favicon/favicon.ico" rel="shortcut icon">
-    <link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
-    <link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+    <link href="/assets/image/favicon/favicon.ico" rel="shortcut icon">
+    <link href="/assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+    <link href="/assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
     <style>
         /* 悬停效果 */
         .col:hover {
@@ -87,7 +87,7 @@
 
     {{ template "common-footer" }}
 
-    <script src="assets/app/js/preloadjs-1.0.1.min.js"></script>
+    <script src="/assets/app/js/preloadjs-1.0.1.min.js"></script>
     <script>
         // 假设这是从服务器或其他地方获取的视频列表数据
         let jsonStr = '{{ .actressList }}';
@@ -111,7 +111,7 @@
         });
         let imgSrcs = [];
         actressList.forEach((item, index) => {
-            imgSrcs.push({ id: 'img' + index, src: item.avatar });
+            imgSrcs.push({ id: 'img' + index, src: window.location.origin+item.avatar });
         });
         // 加载多个文件     
         queue.loadManifest(imgSrcs);
@@ -125,7 +125,7 @@
                     colHTML += `
                     <div class="col">
                         <div class="d-flex position-relative">
-                            <a href="/list?actress_id=`+ (item.id) + `" target="_blank" rel="noopener noreferrer"></a>
+                            <a href="/video/list?actress_id=`+ (item.id) + `" target="_blank" rel="noopener noreferrer"></a>
                             <div>
                                 <p class="mt-2 lh-1">`+ item.actress + `</p>
                                 <p class="lh-1 text-secondary">`+ item.count + ` 部影片</p>

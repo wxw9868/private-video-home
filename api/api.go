@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -292,7 +293,10 @@ func VideoCommentListApi(c *gin.Context) {
 }
 
 func VideoImport(c *gin.Context) {
-	service.VideoImport()
+	if err := service.VideoImport(); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "SUCCESS",
 	})
@@ -351,19 +355,41 @@ func CommentCaiApi(c *gin.Context) {
 }
 
 func VideoRename(c *gin.Context) {
-	var videoDir = "C:/Users/wxw9868/Downloads/Telegram Desktop"
+	var nameMap = map[string]string{
+		"(1)":  "052524_001_肉便器育成所 ~ 社長専用性処理ペット ~_櫻木梨乃",
+		"(2)":  "042024_001_もぞもぞ布団の中で_櫻木梨乃",
+		"(3)":  "030924_001_ときめき 〜櫻木梨乃のプライベートエッチ〜_櫻木梨乃",
+		"(4)":  "Heyzo_3257_夫には言えない背徳妻の卑猥な秘密Vol 16_櫻木梨乃",
+		"(5)":  "021724_001_家事代行のドデカいピタパン尻に辛抱できませんでした！2_櫻木梨乃",
+		"(6)":  "011324_001_小悪魔ナースの中出し誘発_櫻木梨乃",
+		"(7)":  "122323_001_W囁き回春チャイナエステ_双葉みお_櫻木梨乃",
+		"(8)":  "122123_001_PtoMセックス_櫻木梨乃",
+		"(9)":  "111723_001_2人のファビュラス痴女先輩 ～深夜残業中にめちゃくちゃされました～_双葉みお_櫻木梨乃",
+		"(10)": "Heyzo_3173_性意を込めて謝罪いたします～家賃滞納の代償～_櫻木梨乃",
+	}
+	var videoDir = "D:/GoLang/tg"
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, file := range files {
 		filename := file.Name()
+
+		n, ok := nameMap[filename]
+		if ok {
+			fmt.Println(n)
+			return
+		}
+
 		oldpath := videoDir + "/" + filename
-		filename = strings.Replace(filename, "_tg关注_@AVWUMAYUANPIAN", "", -1)
-		filename = strings.Replace(filename, "无码频道_每天更新_", "", -1)
+
+		filename = strings.Replace(filename, "无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "", -1)
+		filename = strings.Replace(filename, "无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 ", "", -1)
+
 		newpath := videoDir + "/" + filename
 		os.Rename(oldpath, newpath)
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "SUCCESS",
 	})

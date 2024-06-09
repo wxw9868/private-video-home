@@ -8,9 +8,9 @@
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.108.0">
 	<title>{{.title}}</title>
-	<link href="assets/image/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
-	<link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
-	<link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+	<link href="/assets/image/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
+	<link href="/assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+	<link href="/assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
 	<style>
 		.card {
 			border: none;
@@ -73,11 +73,11 @@
 							</p>
 							<p class="card-text d-flex justify-content-start">
 								<span class="fs-3"><small class="text-muted">切换播放器：</small></span>
-								<img onclick="loadPlayer('xgplayer')" src="assets/image/player/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
-								<img onclick="loadPlayer('ckplayer')" src="assets/image/player/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
-								<img onclick="loadPlayer('artplayer')" src="assets/image/player/artplayer.png" alt="artplayer" width="40" height="40" class="rounded-circle me-2">
-								<img onclick="loadPlayer('dplayer')" src="assets/image/player/dplayer.png" alt="dplayer" width="40" height="40" class="rounded-circle me-2">
-								<img onclick="loadPlayer('muiplayer')" src="assets/image/player/muiplayer.png" alt="muiplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('xgplayer')" src="/assets/image/player/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('ckplayer')" src="/assets/image/player/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('artplayer')" src="/assets/image/player/artplayer.png" alt="artplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('dplayer')" src="/assets/image/player/dplayer.png" alt="dplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('muiplayer')" src="/assets/image/player/muiplayer.png" alt="muiplayer" width="40" height="40" class="rounded-circle me-2">
 							</p>
 						</div>	
 					</div>
@@ -87,7 +87,7 @@
 						<div class="card-body">
 							<div class="row">
 								<div class="col-auto">
-									<img src="{{ .Avatar }}" width="40" height="40" class="rounded-circle">
+									<img src="/{{ .Avatar }}" width="40" height="40" class="rounded-circle">
 								</div>
 								<div class="col">
 									<form>
@@ -115,7 +115,7 @@
 	{{ template "common-footer" }}
 
 	<script>
-		let videoUrl = '{{ .videoUrl }}';
+		let videoUrl = '/{{ .videoUrl }}';
 		// videoUrl = 'assets/video/lc.mp4';
 
 		loadPlayer();
@@ -136,25 +136,25 @@
 
 			switch(playerType) {
 				case 'ckplayer':
-					loadCSS("assets/player/ckplayer-x3/css/ckplayer.css");
-					loadJavaScript("assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
+					loadCSS("/assets/player/ckplayer-x3/css/ckplayer.css");
+					loadJavaScript("/assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
 					break;
 				case 'xgplayer':
-					loadCSS("assets/player/xgplayer-3.0.10/index.min.css");
-					loadJavaScript("assets/player/xgplayer-3.0.10/index.min.js", loadXgplayer);
+					loadCSS("/assets/player/xgplayer-3.0.10/index.min.css");
+					loadJavaScript("/assets/player/xgplayer-3.0.10/index.min.js", loadXgplayer);
 					break;
 				case 'dplayer':
-					loadJavaScript("assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
+					loadJavaScript("/assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
 					break;
 				case 'muiplayer':
-					loadCSS("assets/player/mui-player/dist/mui-player.min.css");
+					loadCSS("/assets/player/mui-player/dist/mui-player.min.css");
 					loadAllScriptsAndExecute();
 					break;
 				case 'artplayer':
-					loadJavaScript("assets/player/artplayer/dist/artplayer.js", loadArtplayer);
+					loadJavaScript("/assets/player/artplayer/dist/artplayer.js", loadArtplayer);
 					break;
 				default:
-					loadJavaScript("assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
+					loadJavaScript("/assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
 			} 
 		}
 		function remove() {
@@ -227,8 +227,8 @@
 			try {
 				// 创建一个Promise数组来保存所有加载脚本的Promise
 				const scriptPromises = [
-					loadScript('assets/player/mui-player/dist/mui-player-desktop-plugin.min.js'),
-					loadScript('assets/player/mui-player/dist/mui-player.min.js'),
+					loadScript('/assets/player/mui-player/dist/mui-player-desktop-plugin.min.js'),
+					loadScript('/assets/player/mui-player/dist/mui-player.min.js'),
 					// ... 添加更多脚本的加载Promise
 				];
 
@@ -585,7 +585,7 @@
     		formData['video_id'] = parseInt(videoID)
 			formData['collect'] = num
             
-            axios.post('/collect',formData,{headers: {'content-type': 'application/json'}})
+            axios.post('/video/collect',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
                 console.log(response);
                 if (response) {
@@ -621,7 +621,7 @@
 			let children = document.getElementById('statistics-browse').children 
 			let count = children[1].textContent  
 			
-			axios.get('/browse', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
+			axios.get('/video/browse', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response.data);
 				if (response.data) {
@@ -697,7 +697,7 @@
 
 		// 获取评论数据
 		function loadCommentList() {
-			axios.get('/commentList', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
+			axios.get('/comment/list', {params: {video_id: parseInt(videoID)}},{headers: {'content-type': 'application/x-www-form-urlencoded'}})
 			.then(function (response) {
 				// console.log(response);
 				// console.log(response.data.data);
@@ -717,7 +717,7 @@
 						`<div class="row mt-4">
 							<div class="col-auto">
 								<!-- User Avatar -->
-								<img src="`+element.Avatar+`" width="40" height="40" class="rounded-circle">
+								<img src="/`+element.Avatar+`" width="40" height="40" class="rounded-circle">
 							</div>
 							<div class="col text-dark">
 								<!-- User Name and Location -->
@@ -756,7 +756,7 @@
 										`<div class="row mt-3">
 											<div class="col-auto">
 												<!-- Reply User Avatar -->
-												<img src="`+element.Avatar+`" width="24" height="24" class="rounded-circle">
+												<img src="/`+element.Avatar+`" width="24" height="24" class="rounded-circle">
 											</div>
 											<div class="col">
 												<!-- Reply User Name and Location -->
@@ -842,7 +842,7 @@
 			}
 			// console.log(formData)
 			
-			axios.post('/comment',formData,{headers: {'content-type': 'application/json'}})
+			axios.post('/comment/comment',formData,{headers: {'content-type': 'application/json'}})
 			.then(function (response) {
 				// console.log(response);
 				let data = response.data.data
@@ -851,7 +851,7 @@
 					`<div class="row mt-4">
 						<div class="col-auto">
 							<!-- User Avatar -->
-							<img src="`+data.userAvatar+`" width="40" height="40" class="rounded-circle">
+							<img src="/`+data.userAvatar+`" width="40" height="40" class="rounded-circle">
 						</div>
 						<div class="col">
 							<!-- User Name and Location -->
@@ -928,7 +928,7 @@
 			}
 			// console.log(formData)
 	
-			axios.post('/reply',formData,{headers: {'content-type': 'application/json'}})
+			axios.post('/comment/reply',formData,{headers: {'content-type': 'application/json'}})
 			.then(function (response) {
 				// console.log(response);
 				let data = response.data.data
@@ -937,7 +937,7 @@
 					`<div class="row mt-3">
 						<div class="col-auto">
 							<!-- Reply User Avatar -->
-							<img src="`+data.userAvatar+`" width="24" height="24" class="rounded-circle">
+							<img src="/`+data.userAvatar+`" width="24" height="24" class="rounded-circle">
 						</div>
 						<div class="col">
 							<!-- Reply User Name and Location -->
@@ -1045,7 +1045,7 @@
 			// console.log(formData)
 			// return
             
-            axios.post('/zan',formData,{headers: {'content-type': 'application/json'}})
+            axios.post('/comment/zan',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
                 // console.log(response);
                 if (response) {
@@ -1095,7 +1095,7 @@
     		formData['comment_id'] = parseInt(button.getAttribute('data-comment-id'))
 			formData['cai'] = num
 
-			axios.post('/cai',formData,{headers: {'content-type': 'application/json'}})
+			axios.post('/comment/cai',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
                 // console.log(response);
                 if (response) {

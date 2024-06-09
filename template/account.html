@@ -8,9 +8,9 @@
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.108.0">
     <title>账户设置</title>
-    <link href="assets/image/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
-    <link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
-    <link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+    <link href="/assets/image/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+    <link href="/assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
     <style>
         a {
             color: unset;
@@ -238,7 +238,7 @@
             // storage.getItem("userID");
             document.getElementById('username').value = storage.getItem("userUsername");
             document.getElementById('nickname').value =  storage.getItem("userNickname");
-            document.getElementById('avatar').setAttribute('src',storage.getItem("userAvatar"));
+            document.getElementById('avatar').setAttribute('src','/'+storage.getItem("userAvatar"));
             document.getElementById('email').value = storage.getItem("userEmail");
             document.getElementById('mobile').value = storage.getItem("userMobile");
         }

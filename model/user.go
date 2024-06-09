@@ -7,7 +7,7 @@ import (
 // User 用户
 type User struct {
 	gorm.Model
-	Username string `gorm:"column:username;type:varchar(100);comment:账户名"`
+	Username string `gorm:"column:username;type:varchar(100);uniqueIndex;comment:账户名"`
 	Password string `gorm:"column:password;type:varchar(100);comment:账户密码"`
 	Nickname string `gorm:"column:nickname;type:varchar(30);comment:昵称"`
 	Sex      uint8  `gorm:"column:sex;type:uint;default:0;comment:性别 0保密 1男 2女"`
