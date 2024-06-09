@@ -8,10 +8,9 @@
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.108.0">
     <title>{{.title}}</title>
-
-    <link href="assets/image/favicon/favicon.ico" rel="shortcut icon">
-    <link href="assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
-    <link href="assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+    <link href="/assets/image/favicon/favicon.ico" rel="shortcut icon">
+    <link href="/assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+    <link href="/assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
     <style>
         /* 悬停效果 */
         .col:hover {
@@ -91,9 +90,9 @@
         <button id="last-page">尾页</button>
     </div>
 
-    <script src="assets/app/js/preloadjs-1.0.1.min.js"></script>
+    <script src="/assets/app/js/preloadjs-1.0.1.min.js"></script>
     <script>
-        // 假设这是从服务器或其他地方获取的视频列表数据
+        // 从服务器获取的视频列表数据
         const jsonString = '{{ .data }}';
         const jsonObject = JSON.parse(jsonString);
         let videoList = jsonObject.data.documents;
@@ -128,7 +127,7 @@
         videoList.forEach((item, index) => {
             // console.log(item.document.poster)
             // console.log(index)
-            imgSrcs.push({ id: 'img' + index, src: item.document.poster });
+            imgSrcs.push({ id: 'img' + index, src: '/'+item.document.poster });
         });
         // 加载多个文件    
         queue.loadManifest(imgSrcs);

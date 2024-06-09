@@ -111,7 +111,7 @@
         });
         let imgSrcs = [];
         actressList.forEach((item, index) => {
-            imgSrcs.push({ id: 'img' + index, src: window.location.origin+item.avatar });
+            imgSrcs.push({ id: 'img' + index, src: '/'+item.avatar });
         });
         // 加载多个文件     
         queue.loadManifest(imgSrcs);

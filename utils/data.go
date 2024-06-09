@@ -27,6 +27,7 @@ func Format() {
 	// "2006-01-02 15:04:05"
 }
 
+// GenerateAvatar 生成头衔
 func GenerateAvatar(name, path string) error {
 	palette := palette.Plan9
 	var bgColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
@@ -191,8 +192,8 @@ func ReadFrameAsJpeg(inFileName, outFileName, ss string) error {
 	if err != nil {
 		return err
 	}
-	err = imaging.Save(img, outFileName)
-	if err != nil {
+
+	if err = imaging.Save(img, outFileName); err != nil {
 		return err
 	}
 
@@ -243,6 +244,7 @@ func VideoInfo(inFileName string) (map[string]interface{}, error) {
 	return data, nil
 }
 
+// Join 字符串拼接
 func Join(s ...string) string {
 	var b bytes.Buffer
 	for i := 0; i < len(s); i++ {
@@ -251,7 +253,7 @@ func Join(s ...string) string {
 	return b.String()
 }
 
-func VideoRename() {
+func VideoRename(videoDir string) {
 	var nameMap = map[string]string{
 		"(1)":  "052524_001_肉便器育成所 ~ 社長専用性処理ペット ~_櫻木梨乃",
 		"(2)":  "042024_001_もぞもぞ布団の中で_櫻木梨乃",
@@ -264,26 +266,26 @@ func VideoRename() {
 		"(9)":  "111723_001_2人のファビュラス痴女先輩 ～深夜残業中にめちゃくちゃされました～_双葉みお_櫻木梨乃",
 		"(10)": "Heyzo_3173_性意を込めて謝罪いたします～家賃滞納の代償～_櫻木梨乃",
 	}
-	var videoDir = "D:/GoLang/tg"
+
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, file := range files {
 		filename := file.Name()
-		oldpath := videoDir + "/" + filename
+		oldPath := videoDir + "/" + filename
 
-		name := strings.Split(filename, ".")[0]
-		s, ok := nameMap[name]
+		oldName := strings.Split(filename, ".")[0]
+		newName, ok := nameMap[oldName]
 		if ok {
-			filename = strings.Replace(filename, name, s, -1)
+			filename = strings.Replace(filename, oldName, newName, -1)
 		} else {
 			filename = strings.Replace(filename, "无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "", -1)
-			filename = strings.Replace(filename, "无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 ", "", -1)
+			filename = strings.Replace(filename, "_tg关注_@AVWUMAYUANPIAN", "", -1)
 		}
 
-		newpath := videoDir + "/" + filename
-		os.Rename(oldpath, newpath)
+		newPath := videoDir + "/" + filename
+		os.Rename(oldPath, newPath)
 	}
 
 	fmt.Println("SUCCESS")

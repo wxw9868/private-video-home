@@ -96,6 +96,7 @@
         // 假设这是从服务器或其他地方获取的视频列表数据
         let jsonStr = '{{ .data }}';
         let videoList = eval(jsonStr);
+        // console.log(videoList)
 
         let totalCount = videoList.length;
         let totalPages;

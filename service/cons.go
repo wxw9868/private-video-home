@@ -17,123 +17,76 @@ import (
 )
 
 var db = sqlite.DB()
-
 var videoDir = "./assets/video"
 var posterDir = "./assets/image/poster"
 var avatarDir = "./assets/image/avatar"
+var mutex = new(sync.Mutex)
 
-var list []string
-var videos []model.Video
-var actresss []model.Actress
-var actressList = make(map[string][]int)
-var actressListSort []string
-var mux = new(sync.Mutex)
-var once = new(sync.Once)
-
-func VideoImport() error {
-	var videoDir = "D:/GoLang/ta"
+func VideoImport(videoDir string) error {
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	list = make([]string, len(files))
-	videos = make([]model.Video, len(files))
+	var actressList = make(map[string]struct{})
+	var videoSql = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
+	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
 
-	// INSERT OR IGNORE INTO
-	// INSERT OR REPLACE INTO
-	var videoSql, actressSql string
-	videoSql = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
-	actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-
-	for k, file := range files {
+	for _, file := range files {
 		filename := file.Name()
 		ext := filepath.Ext(filename)
 		if ext == ".mp4" {
-			strs := strings.Split(filename, ".")
-			title := strs[0]
-			arrs := strings.Split(strs[0], "_")
-			actress := arrs[len(arrs)-1]
-			mux.Lock()
+			title := strings.Split(filename, ".")[0]
+			arr := strings.Split(title, "_")
+			actress := arr[len(arr)-1]
+
+			mutex.Lock()
 			if _, ok := actressList[actress]; !ok {
-				actressListSort = append(actressListSort, actress)
+				actressList[actress] = struct{}{}
 			}
-			actressList[actress] = append(actressList[actress], k)
-			mux.Unlock()
+			mutex.Unlock()
 
 			filePath := videoDir + "/" + filename
 			posterPath := posterDir + "/" + title + ".jpg"
 			_, err = os.Stat(posterPath)
 			if os.IsNotExist(err) {
-				_ = utils.ReadFrameAsJpeg(filePath, posterPath, "00:02:00")
+				if err = utils.ReadFrameAsJpeg(filePath, posterPath, "00:1:58"); err != nil {
+					return err
+				}
 			}
-			videoInfo, _ := utils.VideoInfo(filePath)
+			videoInfo, err := utils.VideoInfo(filePath)
+			if err != nil {
+				return err
+			}
 
 			//snapshotPath := snapshotDir + "/" + title + ".gif"
 			//_ = CutVideoForGif(filePath, posterPath)
-
-			videoSql += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ",
-				title,
-				actress,
-				videoInfo["size"].(int64),
-				videoInfo["duration"].(float64),
-				posterPath,
-				videoInfo["width"].(int64),
-				videoInfo["height"].(int64),
-				fmt.Sprintf("%s,%s",
-					videoInfo["codec_name0"].(string),
-					videoInfo["codec_name1"].(string)),
-				videoInfo["channel_layout"].(string),
-				videoInfo["creation_time"].(time.Time),
-				time.Now().Local(),
-				time.Now().Local(),
-			)
-
 			// list[k] = filename
-			// videos[k] = model.Video{
-			// 	Title:         title,
-			// 	Actress:       actress,
-			// 	Size:          videoInfo["size"].(int64),
-			// 	Duration:      videoInfo["duration"].(float64),
-			// 	Poster:        posterPath,
-			// 	Width:         int(videoInfo["width"].(int64)),
-			// 	Height:        int(videoInfo["height"].(int64)),
-			// 	CodecName:     fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string)),
-			// 	ChannelLayout: videoInfo["channel_layout"].(string),
-			// 	CreationTime:  videoInfo["creation_time"].(time.Time),
-			// }
+
+			videoSql += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ", title, actress, videoInfo["size"].(int64), videoInfo["duration"].(float64), posterPath, videoInfo["width"].(int64), videoInfo["height"].(int64), fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string)), videoInfo["channel_layout"].(string), videoInfo["creation_time"].(time.Time), time.Now().Local(), time.Now().Local())
 		}
 	}
 
-	actresss = make([]model.Actress, len(actressListSort))
-	if len(actressListSort) > 0 {
-		for _, name := range actressListSort {
-			nameSlice := []rune(name)
-			avatarPath := avatarDir + "/" + name + ".png"
+	if len(actressList) > 0 {
+		for actress, _ := range actressList {
+			avatarPath := avatarDir + "/" + actress + ".png"
 
 			_, err := os.Stat(avatarPath)
 			if os.IsNotExist(err) {
+				nameSlice := []rune(actress)
 				if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
 					log.Fatal(err)
 				}
 			}
 
-			actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", name, avatarPath, time.Now().Local(), time.Now().Local())
-			// actresss[index] = model.Actress{
-			// 	Actress: name,
-			// 	Avatar:  avatarPath,
-			// }
+			actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
 		}
 	}
 
-	// fmt.Println(videoSql)
-	// fmt.Println(actressSql)
 	videoSqlBytes := []byte(videoSql)
 	actressSqlBytes := []byte(actressSql)
 	videoSql = string(videoSqlBytes[:len(videoSqlBytes)-2])
 	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
-	// fmt.Println(string(videoSqlBytes[:len(videoSqlBytes)-2]))
-	// fmt.Println(string(actressSqlBytes[:len(actressSqlBytes)-2]))
 
 	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Exec(videoSql).Error; err != nil {
@@ -142,13 +95,6 @@ func VideoImport() error {
 		if err := tx.Exec(actressSql).Error; err != nil {
 			return err
 		}
-
-		// if err := tx.CreateInBatches(videos, 30).Error; err != nil {
-		// 	return err
-		// }
-		// if err := tx.CreateInBatches(actresss, 30).Error; err != nil {
-		// 	return err
-		// }
 		return nil
 	})
 	return err

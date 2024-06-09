@@ -110,4 +110,17 @@ DELETE FROM video_UserCommentLog;
 UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'video_UserCommentLog';
 ```
 
-1 Heyzo-2754 熟女ソープ嬢がネットリご奉仕いたします Vol.5  #上原ゆあ   042624_001 高級ソープへようこそ  #上原ゆあ
+```go
+var nameMap = map[string]string{
+		"(1)":  "",
+		"(2)":  "",
+		"(3)":  "",
+		"(4)":  "",
+		"(5)":  "",
+		"(6)":  "",
+		"(7)":  "",
+		"(8)":  "",
+		"(9)":  "",
+		"(10)": "",
+	}
+```

@@ -83,7 +83,6 @@ func LoginApi(c *gin.Context) {
 		return
 	}
 
-	// c.Redirect(http.StatusMovedPermanently, "/account")
 	c.JSON(http.StatusOK, util.Success("登录成功", nil))
 }
 
@@ -92,6 +91,7 @@ func LogoutApi(c *gin.Context) {
 	session.Clear()
 	if err := session.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
 	}
 	c.JSON(http.StatusOK, util.Success("登出成功", nil))
 }

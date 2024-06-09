@@ -3,9 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -73,7 +71,8 @@ func VideoList(c *gin.Context) {
 	actressID := c.Query("actress_id")
 	videos, err := vs.Find(actressID)
 	if err != nil {
-		log.Println(err)
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
 	}
 	videosBytes, _ := json.Marshal(videos)
 
@@ -86,7 +85,8 @@ func VideoList(c *gin.Context) {
 func VideoActress(c *gin.Context) {
 	actresss, err := as.Find()
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
 	}
 
 	actressBytes, _ := json.Marshal(actresss)
@@ -121,6 +121,7 @@ func VideoPlay(c *gin.Context) {
 	vi, err := vs.Info(cast.ToUint(play.ID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
 	}
 
 	var collectID uint = 0
@@ -177,6 +178,7 @@ func VideoCollectApi(c *gin.Context) {
 
 	if err := vs.Collect(bind.VideoID, bind.Collect, userID); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
 	}
 
 	msg := "收藏成功"
@@ -292,16 +294,6 @@ func VideoCommentListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("评论列表", list))
 }
 
-func VideoImport(c *gin.Context) {
-	if err := service.VideoImport(); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "SUCCESS",
-	})
-}
-
 type CommentZan struct {
 	CommentID uint `form:"comment_id" json:"comment_id" binding:"required"`
 	Zan       int  `form:"zan" json:"zan" binding:"required,oneof=1 -1"`
@@ -319,6 +311,7 @@ func CommentZanApi(c *gin.Context) {
 
 	if err := vs.Zan(bind.CommentID, userID, bind.Zan); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
 	}
 
 	msg := "点赞成功"
@@ -345,6 +338,7 @@ func CommentCaiApi(c *gin.Context) {
 
 	if err := vs.Cai(bind.CommentID, userID, bind.Cai); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
 	}
 
 	msg := "点踩成功"
@@ -355,42 +349,63 @@ func CommentCaiApi(c *gin.Context) {
 }
 
 func VideoRename(c *gin.Context) {
+	var videoDir = c.Query("dir")
 	var nameMap = map[string]string{
-		"(1)":  "052524_001_肉便器育成所 ~ 社長専用性処理ペット ~_櫻木梨乃",
-		"(2)":  "042024_001_もぞもぞ布団の中で_櫻木梨乃",
-		"(3)":  "030924_001_ときめき 〜櫻木梨乃のプライベートエッチ〜_櫻木梨乃",
-		"(4)":  "Heyzo_3257_夫には言えない背徳妻の卑猥な秘密Vol 16_櫻木梨乃",
-		"(5)":  "021724_001_家事代行のドデカいピタパン尻に辛抱できませんでした！2_櫻木梨乃",
-		"(6)":  "011324_001_小悪魔ナースの中出し誘発_櫻木梨乃",
-		"(7)":  "122323_001_W囁き回春チャイナエステ_双葉みお_櫻木梨乃",
-		"(8)":  "122123_001_PtoMセックス_櫻木梨乃",
-		"(9)":  "111723_001_2人のファビュラス痴女先輩 ～深夜残業中にめちゃくちゃされました～_双葉みお_櫻木梨乃",
-		"(10)": "Heyzo_3173_性意を込めて謝罪いたします～家賃滞納の代償～_櫻木梨乃",
+		"(1)":  "042724_001_過激な命令を連発！ハーレム王様ゲームでハメを外す巨乳団地妻！_小川桃果_露梨あやせ_小衣くるみ_紗霧ひなた",
+		"(2)":  "Heyzo_3296_爆乳家政婦・ひなたさん～オッパイが大きすぎて欲情してしまいました～_紗霧ひなた",
+		"(3)":  "021624_001_面接セックスを世に出しちゃおう！ ～前の男はエッチしてくれなかったんです～_紗霧ひなた",
+		"(4)":  "121523_001_新入社員のお仕事 Vol27 ～入社初日の挨拶セックス～_紗霧ひなた",
+		"(5)":  "120923_001_欲求不満な100センチHカップ爆乳美女_紗霧ひなた",
+		"(6)":  "062323_001_Jカップでバブバブ授乳プレイ ～早く赤ちゃんほしいな～_紗霧ひなた",
+		"(7)":  "090123_001_洗練された大人のいやし亭 ～練乳まみれフルーツ女体盛りオプション～_紗霧ひなた",
+		"(8)":  "Heyzo_3101_カノジョの姉とヤッちゃった件Vol3_紗霧ひなた",
+		"(9)":  "",
+		"(10)": "",
 	}
-	var videoDir = "D:/GoLang/tg"
+	// var nameMap = map[string]string{
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":     "042724_001_過激な命令を連発！ハーレム王様ゲームでハメを外す巨乳団地妻！_小川桃果_露梨あやせ_小衣くるみ_紗霧ひなた",
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)": "Heyzo_3296_爆乳家政婦・ひなたさん～オッパイが大きすぎて欲情してしまいました～_紗霧ひなた",
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)": "021624_001_面接セックスを世に出しちゃおう！ ～前の男はエッチしてくれなかったんです～_紗霧ひなた",
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)": "121523_001_新入社員のお仕事 Vol27 ～入社初日の挨拶セックス～_紗霧ひなた",
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)": "120923_001_欲求不満な100センチHカップ爆乳美女_紗霧ひなた",
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)": "062323_001_Jカップでバブバブ授乳プレイ ～早く赤ちゃんほしいな～_紗霧ひなた",
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)": "090123_001_洗練された大人のいやし亭 ～練乳まみれフルーツ女体盛りオプション～_紗霧ひなた",
+	// 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)": "Heyzo_3101_カノジョの姉とヤッちゃった件Vol3_紗霧ひなた",
+	// 	"(9)":  "",
+	// 	"(10)": "",
+	// }
+
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
 	}
 	for _, file := range files {
 		filename := file.Name()
+		oldPath := videoDir + "/" + filename
 
-		n, ok := nameMap[filename]
+		oldName := strings.Split(filename, ".")[0]
+		newName, ok := nameMap[oldName]
 		if ok {
-			fmt.Println(n)
-			return
+			filename = strings.Replace(filename, oldName, newName, -1)
+		} else {
+			filename = strings.Replace(filename, "无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "", -1)
+			filename = strings.Replace(filename, "_tg关注_@AVWUMAYUANPIAN", "", -1)
 		}
 
-		oldpath := videoDir + "/" + filename
-
-		filename = strings.Replace(filename, "无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "", -1)
-		filename = strings.Replace(filename, "无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 ", "", -1)
-
-		newpath := videoDir + "/" + filename
-		os.Rename(oldpath, newpath)
+		newPath := videoDir + "/" + filename
+		os.Rename(oldPath, newPath)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "SUCCESS",
-	})
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
+
+func VideoImport(c *gin.Context) {
+	var videoDir = c.Query("dir")
+	if err := service.VideoImport(videoDir); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }

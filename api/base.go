@@ -26,23 +26,25 @@ type actress struct {
 	Avatar  string `json:"avatar"`
 }
 
-var videoDir = "./assets/video"
-var posterDir = "./assets/image/poster"
-var avatarDir = "./assets/image/avatar"
+const (
+	videoDir  = "./assets/video"
+	posterDir = "./assets/image/poster"
+	avatarDir = "./assets/image/avatar"
+)
 
-// var snapshotDir = "./assets/image/snapshot"
-var list []string
-var videos []video
-var actresss []actress
-var actressList = make(map[string][]int)
-var actressListSort []string
+var (
+	us = new(service.UserService)
+	vs = new(service.VideoService)
+	as = new(service.ActressService)
 
-var us = new(service.UserService)
-var vs = new(service.VideoService)
-var as = new(service.ActressService)
+	// snapshotDir = "./assets/image/snapshot"
+	list            []string
+	videos          []video
+	actresss        []actress
+	actressList     = make(map[string][]int)
+	actressListSort []string
+)
 
 func GetUserID(c *gin.Context) uint {
-	session := sessions.Default(c)
-	userID := session.Get("userID").(uint)
-	return userID
+	return sessions.Default(c).Get("userID").(uint)
 }
