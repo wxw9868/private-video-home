@@ -17,6 +17,12 @@
         storage = window.localStorage;
     }
 
+    function searchCollapse(span) {
+        // const collapseEl = span.nextElementSibling
+        const collapseEl = span.previousElementSibling
+        new bootstrap.Collapse(collapseEl)
+    }  
+
     function getParams(url) {
         const params = new URLSearchParams(url.split('?')[1]);
         const paramObj = {};
@@ -48,9 +54,9 @@
     }
 
     if (document.cookie) {
-        document.getElementById("login").style.display = "none";
+        document.getElementById("settings").classList.add('show');
     } else {
-        document.getElementById("settings").style.display = "none";
+        document.getElementById("login").classList.add('show');
     }
 
     function clearCookie(cookieName) {

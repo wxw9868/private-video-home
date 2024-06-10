@@ -71,6 +71,9 @@ air
 ```
 如欲修改配置信息，请参考 [air_example.toml](https://github.com/cosmtrek/air/blob/master/air_example.toml) 文件.
 
+## 待修复
+1. 修复全文搜索数据不同步问题
+
 ##  3. <a name='-1'></a>部署到安卓上教程
 ```sh
 adb version
@@ -109,34 +112,3 @@ DELETE FROM video_UserCommentLog;
 -- 重置主键
 UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'video_UserCommentLog';
 ```
-
-```go
-var nameMap = map[string]string{
-		"(1)":  "",
-		"(2)":  "",
-		"(3)":  "",
-		"(4)":  "",
-		"(5)":  "",
-		"(6)":  "",
-		"(7)":  "",
-		"(8)":  "",
-		"(9)":  "",
-		"(10)": "",
-	}
-```
-style="margin-bottom: 0px;"
-
-<li class="d-flex align-items-end">
-	<div class="bg-black-semi-transparent rounded-start">
-		<i class="me-1"></i>
-		<i class="bi bi-heart"></i>
-		<small class="me-1">`+item.collect+`</small>
-	</div>
-</li>
-<li class="d-flex align-items-end">
-	<div class="bg-black-semi-transparent">
-		<i class="me-1"></i>
-		<i class="bi bi-eye"></i>
-		<small class="me-1">`+item.browse+`</small>
-	</div>   
-</li>
