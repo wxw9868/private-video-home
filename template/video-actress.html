@@ -12,6 +12,7 @@
     <link href="/assets/image/favicon/favicon.ico" rel="shortcut icon">
     <link href="/assets/app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
     <link href="/assets/app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+    <link href="/assets/app/css/pagination.css" rel="stylesheet">
     <style>
         /* 悬停效果 */
         .col:hover {
@@ -39,53 +40,24 @@
             {{ template "common-header" }}
         </div>
 
-        <div class="py-5">
-            <div class="container">
-                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
+        <div class="container">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
 
-                </div>
+            </div>
+
+            <div class="pagination">
+                <button id="first-page" disabled>首页</button>
+                <!-- <button id="prev-page" disabled>上一页</button> -->
+                <span id="page-numbers"></span>
+                <!-- <button id="next-page">下一页</button> -->
+                <button id="last-page">尾页</button>
             </div>
         </div>
 
+        <div class="container">
+            {{ template "common-footer" }}
+        </div>
     </main>
-
-    <style>
-        /* 分页样式 */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding-top: 0px;
-            margin-top: 20px;
-            border-top-width: 0px;
-            border-bottom-width: 0px;
-            margin-bottom: 20px;
-            padding-bottom: 0px;
-
-        }
-
-        .pagination button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            border: none;
-            background-color: #f5f5f5;
-            cursor: pointer;
-        }
-
-        .pagination button.active {
-            background-color: #007bff;
-            color: white;
-        }
-    </style>
-    <div class="pagination">
-        <button id="first-page" disabled>首页</button>
-        <button id="prev-page" disabled>上一页</button>
-        <span id="page-numbers"></span>
-        <button id="next-page">下一页</button>
-        <button id="last-page">尾页</button>
-    </div>
-
-    {{ template "common-footer" }}
 
     <script src="/assets/app/js/preloadjs-1.0.1.min.js"></script>
     <script>
@@ -153,8 +125,8 @@
             const pageNumbers = document.querySelector('#page-numbers');
             pageNumbers.innerHTML = '';
 
-            const startPage = Math.max(currentPage - 5, 1);
-            const endPage = Math.min(currentPage + 5, totalPages);
+            const startPage = Math.max(currentPage - 2, 1);
+            const endPage = Math.min(startPage + 4, totalPages);
 
             for (let i = startPage; i <= endPage; i++) {
                 const btn = document.createElement('button');
@@ -180,12 +152,27 @@
             lastPageBtn.disabled = currentPage === totalPages;
 
             // 启用/禁用“上一页”按钮
-            const prevPageBtn = document.querySelector('#prev-page');
-            prevPageBtn.disabled = currentPage === 1;
+            // const prevPageBtn = document.querySelector('#prev-page');
+            // prevPageBtn.disabled = currentPage === 1;
 
             // 启用/禁用““下一页”按钮
-            const nextPageBtn = document.querySelector('#next-page');
-            nextPageBtn.disabled = currentPage === totalPages;
+            // const nextPageBtn = document.querySelector('#next-page');
+            // nextPageBtn.disabled = currentPage === totalPages;
+
+            if (currentPage == 1) {
+                firstPageBtn.classList.add('disabled');
+                // prevPageBtn.classList.add('disabled');
+            } else {
+                firstPageBtn.classList.remove('disabled');
+                // prevPageBtn.classList.remove('disabled');
+            }
+            if (currentPage == totalPages) {
+                // nextPageBtn.classList.add('disabled');
+                lastPageBtn.classList.add('disabled');
+            } else {
+                // nextPageBtn.classList.remove('disabled');
+                lastPageBtn.classList.remove('disabled');
+            }
         }
 
         // 计算总页数并初始化
@@ -196,19 +183,19 @@
         });
 
         // 事件监听器
-        document.querySelector('#prev-page').addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
-            }
-        });
+        // document.querySelector('#prev-page').addEventListener('click', () => {
+        //     if (currentPage > 1) {
+        //         currentPage--;
+        //         renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
+        //     }
+        // });
 
-        document.querySelector('#next-page').addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
-            }
-        });
+        // document.querySelector('#next-page').addEventListener('click', () => {
+        //     if (currentPage < totalPages) {
+        //         currentPage++;
+        //         renderVideoList((currentPage - 1) * numberPerPage, currentPage * numberPerPage);
+        //     }
+        // });
 
         document.querySelector('#first-page').addEventListener('click', () => {
             if (currentPage > 1) {

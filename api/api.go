@@ -98,8 +98,7 @@ func VideoActress(c *gin.Context) {
 }
 
 type Play struct {
-	ID     string `form:"id" binding:"required"`
-	Player string `form:"player" binding:"required,oneof=ckplayer xgplayer player"`
+	ID string `form:"id" binding:"required"`
 }
 
 func VideoPlay(c *gin.Context) {
@@ -107,15 +106,6 @@ func VideoPlay(c *gin.Context) {
 	if err := c.Bind(&play); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
-	}
-
-	var name string
-	if play.Player == "ckplayer" {
-		name = "video-ckplayer.html"
-	} else if play.Player == "xgplayer" {
-		name = "video-xgplayer.html"
-	} else {
-		name = "video-player.html"
 	}
 
 	vi, err := vs.Info(cast.ToUint(play.ID))
@@ -132,11 +122,8 @@ func VideoPlay(c *gin.Context) {
 		isCollect = true
 	}
 
-	session := sessions.Default(c)
-	userAvatar := session.Get("userAvatar").(string)
-
 	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
-	c.HTML(http.StatusOK, name, gin.H{
+	c.HTML(http.StatusOK, "video-player.html", gin.H{
 		"title":         "视频播放",
 		"videoID":       vi.ID,
 		"videoTitle":    vi.Title,
@@ -157,7 +144,7 @@ func VideoPlay(c *gin.Context) {
 		"Watch":         vi.Watch,
 		"CollectID":     collectID,
 		"IsCollect":     isCollect,
-		"Avatar":        userAvatar,
+		"Avatar":        sessions.Default(c).Get("userAvatar").(string),
 	})
 }
 

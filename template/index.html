@@ -46,7 +46,7 @@
             {{ template "common-header" }}
         </div>
 
-        <section class="py-5 text-center container">
+        <section class="container">
             <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" aria-label="Slide 1" aria-current="true" class="active"></button>
@@ -77,109 +77,42 @@
             </div>
         </section>
 
-        <div class="py-5">
-            <div class="container">
-                <div id="videoContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                    {{range $i,$v := .data}}
-                    <div class="col">
-                        <a href="javascript:void(0)">
-                            <div class="card rounded-4">
-                                <img src="{{$v}}" class="img-fluid card-img rounded-4" width="100%" height="225" alt="...">
-                                <ul class="card-img-overlay d-flex mt-auto justify-content-end">
-                                    <li class="d-flex align-items-end">
-                                        <div class="bg-black-semi-transparent rounded-start statistics_collect">
-                                            <i class="me-1"></i>
-                                            <i class="bi bi-heart"></i>
-                                            <small class="me-1">1000</small>
-                                        </div>
-                                    </li>
-                                    <li class="d-flex align-items-end">
-                                        <div class="bg-black-semi-transparent statistics_browse">
-                                            <i class="me-1"></i>
-                                            <i class="bi bi-eye"></i>
-                                            <small class="me-1">1000</small>
-                                        </div>
-                                    </li>
-                                    <li class="d-flex align-items-end">
-                                        <div class="bg-black-semi-transparent rounded-end">
-                                            <i class="me-1"></i>
-                                            <i class="bi bi-clock"></i>
-                                            <small class="me-1">1:02:56</small>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-body mt-2">
-                                <p class="card-title text-truncate">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            </div>
-                        </a>
-                    </div>
-                    {{end}}
-
-                    <!-- {{range $i,$v := .data}}
-                    <div class="col">
-                        <a href="javascript:void(0)">
-                            <div class="card rounded-4">
-                                <img src="{{$v}}" class="img-fluid card-img rounded-4" alt="..." width="100%" height="225">
-                                <div class="card-img-overlay">
-                                    <ul class="d-flex mt-auto justify-content-end">
-                                        <li class="d-flex align-items-end">
-                                            <div class="bg-black-semi-transparent rounded-start">
-                                                <i class="me-1"></i>
-                                                <i class="bi bi-heart"></i>
-                                                <small class="me-1">1000</small>
-                                            </div>
-                                        </li>
-                                        <li class="d-flex align-items-end">
-                                            <div class="bg-black-semi-transparent">
-                                                <i class="me-1"></i>
-                                                <i class="bi bi-eye"></i>
-                                                <small class="me-1">1000</small>
-                                            </div>
-                                        </li>
-                                        <li class="d-flex align-items-end">
-                                            <div class="bg-black-semi-transparent rounded-end">
-                                                <i class="me-1"></i>
-                                                <i class="bi bi-clock"></i>
-                                                <small class="me-1">1:02:56</small>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-body mt-2">
-                                <p class="card-title text-truncate">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            </div>
-                        </a>
-                    </div>
-                    {{end}}
-
-                    {{range $i,$v := .data}}
-                    <div class="col">
-                        <div class="card rounded-4 shadow-sm">
-                            <div class="bd-placeholder-img card-img-top" width="100%" height="225">
-                                <title>Placeholder {{$i}}</title>
-                                <img src="{{$v}}" alt="..." width="100%" height="225" class="img-fluid">
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text text-truncate">This is a wider card with supporting text below as a
-                                    natural lead-in to additional content. This content is a little bit longer.</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <a href="javascript:void(0)" class="btn btn-outline-primary">View</a>
+        <div class="container py-5">
+            <div id="videoContainer" class="row row-cols-2 row-cols-sm-2 row-cols-md-4">
+                {{range $i,$v := .data}}
+                <div class="col">
+                    <a href="javascript:void(0)">
+                        <div class="card rounded">
+                            <img src="{{$v}}" class="img-fluid card-img rounded-4" width="100%" height="225" alt="...">
+                            <ul class="card-img-overlay d-flex mt-auto justify-content-end" style="margin-bottom: 0px;">
+                                <li class="d-flex align-items-end">
+                                    <div class="bg-black-semi-transparent rounded">
+                                        <i class="me-1"></i>
+                                        <small class="me-1">02:12:01</small>
                                     </div>
-                                    <small class="text-muted">9 mins</small>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                         </div>
-                    </div>
-                    {{end}} -->
+                        <div class="card-body mt-2">
+                            <p class="card-title text-truncate">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            <p class="mt-1">
+                                <i class="bi bi-eye"></i>
+                                <small class="me-1">98 134 242</small>
+                                <i class="me-2"></i>
+                                <i class="bi bi-heart"></i>
+                                <small class="me-1">21790</small>
+                            </p>
+                        </div>
+                    </a>
                 </div>
+                {{end}}
             </div>
         </div>
-    </main>
 
-    {{ template "common-footer" }}
+        <div class="container">
+            {{ template "common-footer" }}
+        </div>
+    </main>
 </body>
 
 </html>

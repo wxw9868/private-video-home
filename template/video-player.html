@@ -49,6 +49,7 @@
 		<div class="container">
 			{{ template "common-header" }}
         </div>
+
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-12">
@@ -109,10 +110,12 @@
 			</div>
 		</div>
 
+		<div class="container">
+            {{ template "common-footer" }}
+        </div>
+
 		<div class="collapse" id="loadHTML"></div>
 	</main>
-
-	{{ template "common-footer" }}
 
 	<script>
 		let videoUrl = '/{{ .videoUrl }}';

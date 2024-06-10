@@ -124,3 +124,19 @@ var nameMap = map[string]string{
 		"(10)": "",
 	}
 ```
+style="margin-bottom: 0px;"
+
+<li class="d-flex align-items-end">
+	<div class="bg-black-semi-transparent rounded-start">
+		<i class="me-1"></i>
+		<i class="bi bi-heart"></i>
+		<small class="me-1">`+item.collect+`</small>
+	</div>
+</li>
+<li class="d-flex align-items-end">
+	<div class="bg-black-semi-transparent">
+		<i class="me-1"></i>
+		<i class="bi bi-eye"></i>
+		<small class="me-1">`+item.browse+`</small>
+	</div>   
+</li>
