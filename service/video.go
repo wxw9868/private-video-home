@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"strconv"
 	"time"
 
-	"github.com/wxw9868/video/initialize/httpclient"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
@@ -86,7 +84,6 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 		})
 	}
 
-	// fmt.Printf("%+v\n", videos)
 	b, err := json.Marshal(&indexBatch)
 	if err != nil {
 		return nil, err
@@ -100,21 +97,6 @@ type Index struct {
 	Id       uint32      `json:"id" binding:"required"`
 	Text     string      `json:"text" binding:"required"`
 	Document interface{} `json:"document" binding:"required"`
-}
-
-func Post(url string, body io.Reader) error {
-	resp, err := httpclient.HttpClient().POST(url, "application/json", body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	robots, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(robots))
-	return nil
 }
 
 func (vs *VideoService) First(id string) (model.Video, error) {

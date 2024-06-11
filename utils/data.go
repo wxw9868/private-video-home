@@ -166,14 +166,18 @@ func ResolveTime(seconds uint32) string {
 }
 
 // CutVideoForGif 将视频剪切为 GIF
-func CutVideoForGif(videoPath, snapshotPath string) error {
-	err := ffmpeg.Input(videoPath, ffmpeg.KwArgs{"ss": "35"}).
-		Output(snapshotPath, ffmpeg.KwArgs{"pix_fmt": "rgb24", "t": "5", "r": "30"}).
+// ss 开始时间  例子：00:00:15
+// t  持续时间  例子：00:00:06
+// r 设定帧速率，默认为25
+// s 设定画面的宽与高
+func CutVideoForGif(videoPath, snapshotPath, ss string) error {
+	err := ffmpeg.Input(videoPath, ffmpeg.KwArgs{"ss": ss}).
+		Output(snapshotPath, ffmpeg.KwArgs{"s": "320x240", "pix_fmt": "rgb24", "t": "00:00:10", "r": "30"}).
 		OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	return err
+	return nil
 }
 
 // ReadFrameAsJpeg 将视频剪切为 JPG

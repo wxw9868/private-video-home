@@ -9,6 +9,7 @@
 </footer>
 
 <script src="/assets/app/js/bootstrap-5.3.0.bundle.min.js"></script>
+<script src="/assets/app/js/multiavatar.min.js"></script>
 <script>
     var storage = Object;
     if (!window.localStorage) {
@@ -53,6 +54,7 @@
         document.getElementById('search').value = (search.query)?search.query:'';
     }
 
+    // console.log(document.cookie)
     if (document.cookie) {
         document.getElementById("settings").classList.add('show');
     } else {
@@ -123,7 +125,9 @@
                 if (response.data) {
                     storage.clear();
                     clearCookie('stock_session');
-                    window.location.reload();
+                    clearCookie('ckplayer-player-cookie');
+                    window.location.href = '/'
+                    // window.location.reload();
                 }
             }).catch(function (error) {
                 if (error.response) {
@@ -159,7 +163,12 @@
                     storage.setItem("userNickname", data.nickname);
                     storage.setItem("userEmail", data.email);
                     storage.setItem("userMobile", data.mobile);
-                    document.getElementById('userAvatar').setAttribute('src', '/'+data.avatar);
+
+                    // document.getElementById('userAvatar').setAttribute('src', '/'+data.avatar);
+                    
+                    let svgCode = multiavatar(data.username);
+                    document.getElementById('geneteAvatar').innerHTML = svgCode
+                    document.getElementById('geneteAvatar').querySelector('svg').setAttribute('width','32')
                 }
             }).catch(function (error) {
                 if (error.response) {
