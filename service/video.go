@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"strconv"
 	"time"
 
-	"github.com/wxw9868/video/initialize/httpclient"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
@@ -36,19 +34,27 @@ type Video struct {
 	Watch         uint    `json:"watch"`
 }
 
-func (as *VideoService) Find(actressID string) ([]Video, error) {
+func (as *VideoService) Find(actressID int, page, pageSize int) ([]Video, int64, error) {
 	dbVideo := db.Table("video_Video as v")
-	if actressID != "" {
+	if actressID != 0 {
 		var actress model.Actress
-		if err := db.Select("Actress").Where("id = ?", actressID).First(&actress).Error; err != nil {
-			return nil, err
+		if err := db.Select("actress").Where("id = ?", actressID).First(&actress).Error; err != nil {
+			return nil, 0, err
 		}
 		dbVideo = dbVideo.Where("v.actress = ?", actress.Actress)
 	}
 
-	rows, err := dbVideo.Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog l on l.video_id = v.id").Rows()
+	var count int64
+	if err := dbVideo.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	dbVideo = dbVideo.Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
+		Joins("left join video_VideoLog l on l.video_id = v.id")
+	// Scopes(Paginate(page, pageSize, int(count)))
+	rows, err := dbVideo.Rows()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -86,35 +92,19 @@ func (as *VideoService) Find(actressID string) ([]Video, error) {
 		})
 	}
 
-	// fmt.Printf("%+v\n", videos)
 	b, err := json.Marshal(&indexBatch)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b))
 
-	return videos, nil
+	return videos, count, nil
 }
 
 type Index struct {
 	Id       uint32      `json:"id" binding:"required"`
 	Text     string      `json:"text" binding:"required"`
 	Document interface{} `json:"document" binding:"required"`
-}
-
-func Post(url string, body io.Reader) error {
-	resp, err := httpclient.HttpClient().POST(url, "application/json", body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	robots, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(robots))
-	return nil
 }
 
 func (vs *VideoService) First(id string) (model.Video, error) {

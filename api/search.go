@@ -118,7 +118,16 @@ func Post(c *gin.Context, url string, body io.Reader) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, util.Success("SUCCESS", string(robots)))
+
+	// 对JSON字符串进行格式化（缩进）
+	// formattedJSONBytes, err := json.MarshalIndent(json.RawMessage(robots), "", "  ")
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+	// 	return
+	// }
+	// formattedJSONString := string(formattedJSONBytes)
+
+	_, err = c.Writer.Write(robots)
 }
 
 func Get(c *gin.Context, url string) {
@@ -134,5 +143,5 @@ func Get(c *gin.Context, url string) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, util.Success("SUCCESS", string(robots)))
+	_, err = c.Writer.Write(robots)
 }

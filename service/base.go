@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,16 +12,32 @@ import (
 	"time"
 
 	sqlite "github.com/wxw9868/video/initialize/db"
+	"github.com/wxw9868/video/initialize/httpclient"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
 )
 
 var db = sqlite.DB()
-var videoDir = "./assets/video"
-var posterDir = "./assets/image/poster"
-var avatarDir = "./assets/image/avatar"
 var mutex = new(sync.Mutex)
+
+func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if page <= 0 {
+			page = 1
+		}
+
+		switch {
+		case pageSize > count:
+			pageSize = count
+		case pageSize <= 0:
+			pageSize = 16
+		}
+
+		offset := (page - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
+}
 
 func VideoImport(videoDir string) error {
 	files, err := os.ReadDir(videoDir)
@@ -28,6 +45,8 @@ func VideoImport(videoDir string) error {
 		return err
 	}
 
+	var avatarDir = "./assets/image/avatar"
+	var posterDir = "./assets/image/poster"
 	var actressList = make(map[string]struct{})
 	var videoSql = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
@@ -59,10 +78,6 @@ func VideoImport(videoDir string) error {
 				return err
 			}
 
-			//snapshotPath := snapshotDir + "/" + title + ".gif"
-			//_ = CutVideoForGif(filePath, posterPath)
-			// list[k] = filename
-
 			videoSql += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ", title, actress, videoInfo["size"].(int64), videoInfo["duration"].(float64), posterPath, videoInfo["width"].(int64), videoInfo["height"].(int64), fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string)), videoInfo["channel_layout"].(string), videoInfo["creation_time"].(time.Time), time.Now().Local(), time.Now().Local())
 		}
 	}
@@ -75,7 +90,7 @@ func VideoImport(videoDir string) error {
 			if os.IsNotExist(err) {
 				nameSlice := []rune(actress)
 				if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
-					log.Fatal(err)
+					return err
 				}
 			}
 
@@ -101,6 +116,7 @@ func VideoImport(videoDir string) error {
 }
 
 func ImportActress() {
+	var avatarDir = "./assets/image/avatar"
 	var data []model.Actress
 	var actressMap = make(map[string]struct{})
 
@@ -141,6 +157,21 @@ func ImportActress() {
 
 	err = db.CreateInBatches(data, 30).Error
 	fmt.Printf("err: %+v\n", err)
+}
+
+func Post(url string, body io.Reader) error {
+	resp, err := httpclient.HttpClient().POST(url, "application/json", body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	robots, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(robots))
+	return nil
 }
 
 // 读取文件数据到 map

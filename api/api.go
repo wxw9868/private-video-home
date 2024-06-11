@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/wxw9868/util"
+	"github.com/wxw9868/util/pagination"
 	"github.com/wxw9868/video/service"
 	"github.com/wxw9868/video/utils"
 )
@@ -68,18 +69,53 @@ func VideoSearch(c *gin.Context) {
 }
 
 func VideoList(c *gin.Context) {
-	actressID := c.Query("actress_id")
-	videos, err := vs.Find(actressID)
+	actressID := cast.ToInt(c.Query("actress_id"))
+	page := cast.ToInt(c.Query("page"))
+	pageSize := cast.ToInt(c.Query("pagesize"))
+	c.HTML(http.StatusOK, "video-list.html", gin.H{
+		"title":     "视频列表",
+		"actressID": actressID,
+		"page":      page,
+		"pagesize":  pageSize,
+	})
+}
+
+type Video struct {
+	ActressID int `uri:"actress_id" form:"actress_id" json:"actress_id"`
+	Page      int `uri:"page" form:"page" json:"page"`
+	Size      int `uri:"size" form:"size" json:"size"`
+}
+
+func VideoListApi(c *gin.Context) {
+	var bind Video
+	if err := c.Bind(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	// fmt.Printf("%+v\n", bind)
+
+	videos, count, err := vs.Find(bind.ActressID, bind.Page, bind.Size)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	videosBytes, _ := json.Marshal(videos)
 
-	c.HTML(http.StatusOK, "video-list.html", gin.H{
-		"title": "视频列表",
-		"data":  string(videosBytes),
-	})
+	if bind.Size <= 0 {
+		bind.Size = 16
+	}
+	pages := pagination.NewPaginator(int(count), bind.Size)
+	pages.SetCurrentPage(bind.Page)
+
+	c.JSON(http.StatusOK, util.Success("视频列表", map[string]interface{}{
+		"list": videos,
+		"page": map[string]interface{}{
+			"totalPage":   pages.TotalPage(),
+			"prePage":     pages.PrePage(),
+			"currentPage": pages.CurrentPage(),
+			"nextPage":    pages.NextPage(),
+			"pages":       pages.Pages(),
+		},
+	}))
 }
 
 func VideoActress(c *gin.Context) {

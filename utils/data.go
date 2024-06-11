@@ -7,7 +7,6 @@ import (
 	"image/color"
 	"image/color/palette"
 	"io"
-	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -166,14 +165,18 @@ func ResolveTime(seconds uint32) string {
 }
 
 // CutVideoForGif 将视频剪切为 GIF
-func CutVideoForGif(videoPath, snapshotPath string) error {
-	err := ffmpeg.Input(videoPath, ffmpeg.KwArgs{"ss": "35"}).
-		Output(snapshotPath, ffmpeg.KwArgs{"pix_fmt": "rgb24", "t": "5", "r": "30"}).
+// ss 开始时间  例子：00:00:15
+// t  持续时间  例子：00:00:06
+// r 设定帧速率，默认为25
+// s 设定画面的宽与高
+func CutVideoForGif(videoPath, snapshotPath, ss string) error {
+	err := ffmpeg.Input(videoPath, ffmpeg.KwArgs{"ss": ss}).
+		Output(snapshotPath, ffmpeg.KwArgs{"pix_fmt": "rgb24", "t": "00:00:15", "r": "30"}).
 		OverWriteOutput().ErrorToStdOut().Run()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	return err
+	return nil
 }
 
 // ReadFrameAsJpeg 将视频剪切为 JPG
@@ -253,7 +256,7 @@ func Join(s ...string) string {
 	return b.String()
 }
 
-func VideoRename(videoDir string, nameMap map[string]string) error {
+func VideoRename(videoDir string, nameMap map[string]string, nameSlice []string) error {
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
 		return err
@@ -268,10 +271,9 @@ func VideoRename(videoDir string, nameMap map[string]string) error {
 		if ok {
 			filename = strings.Replace(filename, oldName, newName, -1)
 		} else {
-			filename = strings.Replace(filename, "无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "", -1)
-			filename = strings.Replace(filename, "_tg关注_@AVWUMAYUANPIAN", "", -1)
-			filename = strings.Replace(filename, "_#Heyzo_无码AV", "", -1)
-			filename = strings.Replace(filename, "#", "", -1)
+			for _, v := range nameSlice {
+				filename = strings.Replace(filename, v, "", -1)
+			}
 		}
 		// strings.Contains(filename, name)
 

@@ -71,9 +71,6 @@ air
 ```
 如欲修改配置信息，请参考 [air_example.toml](https://github.com/cosmtrek/air/blob/master/air_example.toml) 文件.
 
-## 待修复
-1. 修复全文搜索数据不同步问题
-
 ##  3. <a name='-1'></a>部署到安卓上教程
 ```sh
 adb version

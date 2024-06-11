@@ -45,6 +45,7 @@ func Engine(addr string) *gin.Engine {
 	video.GET("/search", api.VideoSearch)
 	video.GET("/actress", api.VideoActress)
 	video.GET("/play", api.VideoPlay)
+	video.GET("/getList", api.VideoListApi)
 	video.GET("/browse", api.VideoBrowseApi)
 	video.POST("/collect", api.VideoCollectApi)
 	video.GET("/rename", api.VideoRename)

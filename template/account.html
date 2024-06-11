@@ -28,7 +28,7 @@
         </div>
 
         <div class="container"> 
-            <div class="text-center">
+            <div class="text-center" id="avatar">
                 <img class="d-block mx-auto mb-4 rounded-circle" id="avatar" src="" alt="" width="72" height="72">
             </div>
 
@@ -240,9 +240,13 @@
             // storage.getItem("userID");
             document.getElementById('username').value = storage.getItem("userUsername");
             document.getElementById('nickname').value =  storage.getItem("userNickname");
-            document.getElementById('avatar').setAttribute('src','/'+storage.getItem("userAvatar"));
             document.getElementById('email').value = storage.getItem("userEmail");
             document.getElementById('mobile').value = storage.getItem("userMobile");
+            // document.getElementById('avatar').setAttribute('src','/'+storage.getItem("userAvatar"));
+
+            let svgCode = multiavatar(storage.getItem("userUsername"));
+            document.getElementById('avatar').innerHTML = svgCode
+            document.getElementById('avatar').querySelector('svg').setAttribute('width','72')
         }
 
         // Example starter JavaScript for disabling form submissions if there are invalid fields
