@@ -12,16 +12,19 @@ import (
 func main() {
 	db.RegisterTables()
 
+	dev := false
+
 	ip, err := utils.GetLocalIP()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// ip = "127.0.0.1"
-	// port := 8081
 	port := 80
+	if dev {
+		ip = "127.0.0.1"
+		port = 8081
+	}
 
 	addr := fmt.Sprintf("%s:%d", ip, port)
-
 	router := router.Engine(addr)
 
 	if err := router.Run(addr); err != nil {

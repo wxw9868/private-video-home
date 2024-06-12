@@ -118,8 +118,12 @@
 	</main>
 
 	<script>
+		let logo = '';
 		let videoUrl = '/{{ .videoUrl }}';
-		// videoUrl = 'assets/video/lc.mp4';
+		let poster = '/{{ .Poster }}'
+		let title = '{{ .videoTitle }}'
+		// videoUrl = '/assets/video/lc.mp4';
+		poster = '';
 
 		loadPlayer();
 		function loadPlayer(playerType) {
@@ -255,6 +259,7 @@
 					volume: 0.6, // 默认音量, 取值范围0 ~ 1
 					loop: true, // 是否循环播放
 					url: videoUrl,
+					poster: poster,
 					lang: 'zh-cn', // 播放器初始显示语言
 					startTime: storage.getItem(videoUrl), // 初始起播时间，仅点播
 					fitVideoSize: 'auto', // 初始起播时间，仅点播
@@ -270,20 +275,17 @@
 					width: 'auto',
 					hight: 'auto',
 					mini: true, //开启小窗插件
-					// isScrollSwitch: true,
-					// scrollTop: true,
-					// poster: '',
 				});
 				const Events = window.Player.Events;
 				player.on(Events.TIME_UPDATE, (data) => {
 					storage.setItem(videoUrl, data.currentTime);
 				});
 				player.on(Events.MINI_STATE_CHANGE, (isMini) => {
-				if (isMini) {
-					console.log('enter miniScreen')
-				} else {
-					console.log('exit miniScreen')
-				}
+					if (isMini) {
+						console.log('enter miniScreen')
+					} else {
+						console.log('exit miniScreen')
+					}
 				})
 			}
 		}
@@ -300,15 +302,15 @@
 				webFull: true, // 是否启用页面全屏按钮，默认不启用
 				screenshot: true, // 截图功能是否开启
 				crossOrigin:'Anonymous',//发送跨域字符
-				title: '{{ .videoActress }}',// 视频标题
+				title: title,// 视频标题
 				playbackrateOpen: true, // 是否开启控制栏倍速选项
 				playbackrate: 1, // 默认倍速
 				playbackrateList: [0.75, 1, 1.25, 1.5, 2, 4], // 倍速配置值 
 				controls: true,//是否显示自带控制栏
 				rightBar: true,//是否开启右边控制栏
 				menu: [], // 右键菜单
-				// poster: 'assets/ckplayer-x3/video/poster.png',// 封面图片
-				// logo: 'assets/image/favicon/video/favicon-32x32.png',
+				poster: poster,// 封面图片
+				logo: logo,
 			};
 			var player = new ckplayer(videoObject)//调用播放器并赋值给变量player
 			player.screenshot()//截图并返回图片地址
@@ -319,9 +321,9 @@
 			var art = new Artplayer({
 				container: '#videoPlayer',
 				url: videoUrl,
-				// poster: '/assets/sample/poster.jpg',
+				poster: poster,
 				volume: 0.5,
-				muted: false, // 是否默认静音
+				muted: true, // 是否默认静音
 				autoplay: false, // 是否自动播放
 				pip: true,
 				autoSize: true,
@@ -346,18 +348,7 @@
 				moreVideoAttr: {
 					crossOrigin: 'anonymous',
 				},
-				contextmenu: [
-					{
-						html: '',
-					},
-				],
-				quality: [
-					{
-						default: true,
-						html: 'HD 1080P',
-						url: videoUrl,
-					},
-				],
+				contextmenu: [],
 			});
 		}
 		// 加载DPlayer
@@ -374,22 +365,16 @@
 				airplay: true,
 				chromecast: true,
 				preload: 'auto',
-				// logo: 'logo.png',
+				logo: logo,
 				volume: 0.7,
 				playbackSpeed: [0.5, 0.75, 1, 1.25, 1.5, 2],
 				mutex: false,
 				video: {
-					quality: [
-						{
-							name: 'HD',
-							url: videoUrl,
-							type: 'normal',
-						},
-					],
-					// url: videoUrl,
-					// pic: 'dplayer.png',
-					defaultQuality: 0,
+					url: videoUrl,
+					pic: poster,
+					type: 'auto',
 				},
+				contextmenu: [],
 			});
 		}
 		// 加载MuiPlayer
@@ -426,7 +411,7 @@
 			// 初始化 MuiPlayer 插件，MuiPlayer 方法传递一个对象，该对象包括所有插件的配置
 			mp = new MuiPlayer({
 				container:'#videoPlayer',
-				title: '{{.videoTitle}}',
+				title: title,
 				src: videoUrl,
 				autoplay: true,
 				loop: true,
@@ -437,7 +422,7 @@
 				volume: 0.7,
 				autoFit: true, // 播放器容器是否自适应视频高度
 				dragSpotShape: 'circula',
-				poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg',
+				poster: poster,
 				videoAttribute:[
 					{attrKey:'webkit-playsinline',attrValue:'webkit-playsinline'},
 					{attrKey:'playsinline',attrValue:'playsinline'},
@@ -562,8 +547,7 @@
 				break;
 			}
 			selected();
-		}
-		
+		}	
 	</script>	
     <script>
 		var videoID = '{{ .videoID }}' 
@@ -590,7 +574,7 @@
             
             axios.post('/video/collect',formData,{headers: {'content-type': 'application/json'}})
             .then(function (response) {
-                console.log(response);
+                // console.log(response);
                 if (response) {
                     console.log(response.data);
                 }

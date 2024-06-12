@@ -275,7 +275,6 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice []string)
 				filename = strings.Replace(filename, v, "", -1)
 			}
 		}
-		// strings.Contains(filename, name)
 
 		newPath := videoDir + "/" + filename
 		if err = os.Rename(oldPath, newPath); err != nil {

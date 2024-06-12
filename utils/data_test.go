@@ -8,8 +8,10 @@ import (
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "Heyzo_1695_おっぱいをいっぱい責めながら濃密性交_ゆうき美羽",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
+		"2":     "123014_001 爆乳激震！超絶潮吹きオマンコに連続中出し  #赤井美月  #折原ほのか",
+		"2 (2)": "090122_001 性欲が満たされない人妻と隣人の禁断関係  #折原ほのか ",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "041324-001 かり美びあんず ～レンタルルームで貝合わせ巨乳カップル～   #折原ほのか  #小衣くるみ",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "092623-001 恍惚 ～ひとたび挿入されたら離れられない～  #折原ほのか  ",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
