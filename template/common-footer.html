@@ -67,16 +67,17 @@
     }
 
     let body = document.getElementsByTagName('body')[0];
+    let navbar = document.getElementsByClassName('navbar')[0];
     let cards = document.getElementsByClassName('card');
     let search = document.getElementById('search');
 
     loadBackground()
     function loadBackground() {
         if (storage.getItem("backgroundColor") == "dark") {
-            setBgDark()
-            document.getElementById('setBackgroundColor').setAttribute('src', '/assets/image/icon/moon-stars-fill.svg')
+            setBgDark();
+            document.getElementById('setBackgroundColor').setAttribute('src', '/assets/image/icon/moon-stars-fill.svg');        
         } else {
-            setBgLight()
+            setBgLight();
         }
     }
     function setBackground(img) {
@@ -94,6 +95,11 @@
         body.classList.add('bg-dark', 'text-secondary')
         search.classList.add('form-control-dark', 'text-bg-dark')
 
+        navbar.classList.remove('bg-body-tertiary');
+        navbar.classList.add('navbar-dark', 'bg-dark');
+        navbar.children[1].classList.add('text-bg-dark');
+        navbar.children[1].children[0].children[0].classList.add('btn-close-white');
+
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
             element.classList.remove('text-light')
@@ -107,7 +113,11 @@
         body.classList.add('bg-light')
         search.classList.remove('form-control-dark', 'text-bg-dark')
 
-        let cards = document.getElementsByClassName('card')
+        navbar.classList.add('bg-body-tertiary');
+        navbar.classList.remove('navbar-dark', 'bg-dark');
+        navbar.children[1].classList.remove('text-bg-dark');
+        navbar.children[1].children[0].children[0].classList.remove('btn-close-white');
+
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
             element.classList.remove('text-secondary')
@@ -127,7 +137,6 @@
                     clearCookie('stock_session');
                     clearCookie('ckplayer-player-cookie');
                     window.location.href = '/'
-                    // window.location.reload();
                 }
             }).catch(function (error) {
                 if (error.response) {
@@ -153,9 +162,7 @@
     if (document.cookie) {
         axios.get('/user/session')
             .then(function (response) {
-                // console.log(response);
                 let data = response.data.data;
-                // console.log(data);
                 if (data) {
                     storage.setItem("userID", data.id);
                     storage.setItem("userAvatar", data.avatar);
