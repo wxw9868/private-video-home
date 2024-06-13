@@ -102,7 +102,7 @@
 
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
-            element.classList.remove('text-light')
+            element.classList.remove('text-dark')
             element.classList.add('bg-dark','text-secondary')
         }
 
@@ -121,7 +121,7 @@
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
             element.classList.remove('bg-dark','text-secondary')
-            element.classList.add('text-light')
+            element.classList.add('text-dark')
         }
 
         storage.setItem("backgroundColor", "light");

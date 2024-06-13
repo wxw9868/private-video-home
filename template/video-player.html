@@ -56,9 +56,9 @@
 					<div class="card">
 						<div id="videoContainer" class="card-img-top"></div>
 						<div class="card-body">
-							<h5 class="card-title text-dark">{{.videoTitle}}</h5>
-							<p class="card-text text-dark">{{ .videoActress }}</p>
-							<p class="card-text text-dark d-flex justify-content-start" style="font-size: 1.5rem;">
+							<h5 class="card-title">{{.videoTitle}}</h5>
+							<p class="card-text">{{ .videoActress }}</p>
+							<p class="card-text d-flex justify-content-start" style="font-size: 1.5rem;">
 								<span class="d-flex align-items-end" onclick="statisticsCollect(this)">
 									<i class="bi {{if .IsCollect}}bi-heart-fill{{else}}bi-heart{{end}}"></i> 
 									<span class="ms-1">{{ .Collect }}</span>
