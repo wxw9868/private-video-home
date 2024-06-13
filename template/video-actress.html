@@ -68,7 +68,7 @@
         let totalCount = actressList.length;
         let totalPages;
         let currentPage = 1;
-        let numberPerPage = (totalCount < 100) ? totalCount : 100;
+        let numberPerPage = (totalCount < 48) ? totalCount : 48;
         
         // 预加载
         let queue = new createjs.LoadQueue(true);
@@ -86,36 +86,40 @@
             // console.log(item, index)
             imgSrcs.push({ id: 'img' + index, src: '/'+item.avatar });
         });
-        console.log(imgSrcs)
+        // console.log(imgSrcs)
         // 加载多个文件     
         queue.loadManifest(imgSrcs);
+        // 计算总页数并初始化
+        totalPages = Math.ceil(totalCount / numberPerPage);
+        // 监听完成事件
+        queue.on("complete", function () {
+            renderVideoList(0, numberPerPage);
+        });
 
         // 渲染视频列表
         function renderVideoList(start, end) {
             let colHTML = '';
-            try {
-                let subArray = actressList.slice(start, end);
-                subArray.forEach(item => {
-                    colHTML += `
-                    <div class="col">
-                        <div class="d-flex position-relative">
-                            <a href="/video/list?actress_id=`+ (item.id) + `" rel="noopener noreferrer"></a>
-                            <div>
-                                <p class="mt-2 lh-1">`+ item.actress + `</p>
-                                <p class="lh-1 text-secondary">`+ item.count + ` 部影片</p>
-                            </div>
+            let subArray = actressList.slice(start, end);
+            subArray.forEach(item => {
+                colHTML += `
+                <div class="col">
+                    <div class="d-flex position-relative">
+                        <a href="/video/list?actress_id=`+ (item.id) + `" rel="noopener noreferrer"></a>
+                        <div>
+                            <p class="mt-2 lh-1">`+ item.actress + `</p>
+                            <p class="lh-1 text-secondary">`+ item.count + ` 部影片</p>
                         </div>
-                    </div>`;
-                });
-            } catch (error) { }
+                    </div>
+                </div>`;
+            });
 
             document.getElementsByClassName('row')[0].innerHTML = colHTML;
 
-            for (let index = start; index < end; index++) {
-                console.log(index)
-                console.log(document.getElementsByClassName('col')[index].querySelector('a'))
-                console.log(queue.getResult('img0'))
-                let img = document.getElementsByClassName('col')[index].querySelector('a').appendChild(queue.getResult('img' + index))
+            for (let index = 0; index < subArray.length; index++) {
+                // console.log(index)
+                // console.log(document.getElementsByClassName('col')[index].querySelector('a'))
+                // console.log(queue.getResult('img0'))
+                let img = document.getElementsByClassName('col')[index].querySelector('a').appendChild(queue.getResult('img' + (start + index)))
                 img.setAttribute('width','70')
                 img.setAttribute('height','70')
                 img.setAttribute('class','img-fluid rounded-circle me-2')
@@ -179,13 +183,6 @@
                 lastPageBtn.classList.remove('disabled');
             }
         }
-
-        // 计算总页数并初始化
-        totalPages = Math.ceil(totalCount / numberPerPage);
-        // 监听完成事件
-        queue.on("complete", function () {
-            renderVideoList(0, numberPerPage);
-        });
 
         // 事件监听器
         // document.querySelector('#prev-page').addEventListener('click', () => {
