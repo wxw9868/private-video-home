@@ -13,6 +13,7 @@ func main() {
 	db.RegisterTables()
 
 	dev := false
+	// dev = true
 
 	ip, err := utils.GetLocalIP()
 	if err != nil {
@@ -28,6 +29,6 @@ func main() {
 	router := router.Engine(addr)
 
 	if err := router.Run(addr); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }

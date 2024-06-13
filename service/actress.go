@@ -15,7 +15,7 @@ type Actress struct {
 
 func (as *ActressService) Find() ([]Actress, error) {
 	var actresss []Actress
-	if err := db.Raw("SELECT a.id, a.actress, a.avatar, count(v.id) as count FROM video_Actress a left join video_Video v on a.actress = v.actress group by 1,2,3").Scan(&actresss).Error; err != nil {
+	if err := db.Raw("SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id group by 1,2,3").Scan(&actresss).Error; err != nil {
 		return nil, err
 	}
 	return actresss, nil

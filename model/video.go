@@ -55,3 +55,9 @@ type VideoComment struct {
 	IsShow      uint8  `gorm:"column:is_show;type:uint;not null;default:1;comment:是否显示 0不显示 1显示"`
 	// Status      string `gorm:"column:status;type:enum('VERIFYING','APPROVED','REJECT','DELETED');default:'VERIFYING';comment:评论的状态"`
 }
+
+type VideoActress struct {
+	gorm.Model
+	VideoId   uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
+	ActressId uint `gorm:"column:actress_id;type:uint;not null;default:0;comment:演员ID"`
+}

@@ -67,7 +67,7 @@ func DB() *gorm.DB {
 func RegisterTables() {
 	if err := db.AutoMigrate(
 		&model.User{}, &model.UserCollectLog{}, &model.UserBrowseLog{}, &model.UserCommentLog{},
-		&model.Video{}, &model.Actress{}, &model.VideoLog{}, &model.VideoComment{},
+		&model.Video{}, &model.Actress{}, &model.VideoLog{}, &model.VideoComment{}, model.VideoActress{},
 	); err != nil {
 		panic(err)
 	}

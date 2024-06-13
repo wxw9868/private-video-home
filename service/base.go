@@ -1,10 +1,8 @@
 package service
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -115,48 +113,32 @@ func VideoImport(videoDir string) error {
 	return err
 }
 
-func ImportActress() {
+func ImportActress() error {
 	var avatarDir = "./assets/image/avatar"
-	var data []model.Actress
 	var actressMap = make(map[string]struct{})
 
-	ReadFileToMap("actress.json", &actressMap)
-	fmt.Printf("map: %+v\n", actressMap)
+	utils.ReadFileToMap("actress.json", &actressMap)
+	// fmt.Printf("map: %+v\n", actressMap)
 
-	rows, err := db.Model(&model.Actress{}).Rows()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var modelActress model.Actress
-		db.ScanRows(rows, &modelActress)
-		if _, ok := actressMap[modelActress.Actress]; ok {
-			delete(actressMap, modelActress.Actress)
-		}
-	}
-
-	fmt.Printf("map: %+v\n", actressMap)
-	for k, _ := range actressMap {
-		nameSlice := []rune(k)
-		avatarPath := avatarDir + "/" + k + ".png"
-
+	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	for actress, _ := range actressMap {
+		avatarPath := avatarDir + "/" + actress + ".png"
 		_, err := os.Stat(avatarPath)
 		if os.IsNotExist(err) {
+			nameSlice := []rune(actress)
 			if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
-				log.Fatal(err)
+				return err
 			}
 		}
-		data = append(data, model.Actress{
-			Actress: k,
-			Avatar:  avatarPath,
-		})
+		actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
 	}
-	fmt.Printf("data: %+v\n", data)
+	actressSqlBytes := []byte(actressSql)
+	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
 
-	err = db.CreateInBatches(data, 30).Error
-	fmt.Printf("err: %+v\n", err)
+	if err := db.Exec(actressSql).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func Post(url string, body io.Reader) error {
@@ -174,13 +156,51 @@ func Post(url string, body io.Reader) error {
 	return nil
 }
 
-// 读取文件数据到 map
-func ReadFileToMap(name string, v any) error {
-	bytes, err := os.ReadFile(name)
+type VideoActressData struct {
+	VideoID   uint   `json:"video_id" gorm:"column:video_id"`
+	Actress   string `json:"actress" gorm:"column:actress"`
+	ActressID uint   `json:"actress_id" gorm:"column:actress_id"`
+}
+
+// 使用联合索引解决问题
+func VideoActress() error {
+	var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
+	var actressData []model.Actress
+	var videos []model.Video
+	var actressWhere []string
+
+	dbVideo := db.Table("video_Video as v")
+	dbVideo = dbVideo.Select("v.id as video_id, v.actress, a.id as actress_id").Joins("left join video_Actress a on a.actress = v.actress")
+	rows, err := dbVideo.Rows()
 	if err != nil {
 		return err
 	}
-	if err = json.Unmarshal(bytes, &v); err != nil {
+	defer rows.Close()
+
+	for rows.Next() {
+		var data VideoActressData
+		db.ScanRows(rows, &data)
+
+		sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", data.VideoID, data.ActressID, time.Now().Local(), time.Now().Local())
+		actressWhere = append(actressWhere, data.Actress)
+	}
+
+	db.Where("actress NOT IN ?", actressWhere).Find(&actressData)
+	// fmt.Printf("%+v\n", actressData)
+	if len(actressData) > 0 {
+		for _, actress := range actressData {
+			db.Where("title LIKE ?", "%"+actress.Actress+"%").Find(&videos)
+			if len(videos) > 0 {
+				for _, video := range videos {
+					sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
+				}
+			}
+		}
+	}
+
+	sqlBytes := []byte(sql)
+	sql = string(sqlBytes[:len(sqlBytes)-2])
+	if err := db.Exec(sql).Error; err != nil {
 		return err
 	}
 	return nil

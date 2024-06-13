@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -92,7 +93,6 @@ func VideoListApi(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
-	// fmt.Printf("%+v\n", bind)
 
 	videos, count, err := vs.Find(bind.ActressID, bind.Page, bind.Size)
 	if err != nil {
@@ -125,6 +125,15 @@ func VideoActress(c *gin.Context) {
 		return
 	}
 
+	var data = make(map[string]struct{})
+	for _, v := range actresss {
+		data[v.Actress] = struct{}{}
+	}
+	fmt.Printf("%d\n", len(data))
+	utils.WriteMapToFile("data.json", &data)
+
+	// fmt.Printf("%+v\n", actresss)
+
 	actressBytes, _ := json.Marshal(actresss)
 
 	c.HTML(http.StatusOK, "video-actress.html", gin.H{
@@ -150,6 +159,8 @@ func VideoPlay(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("%+v\n", vi)
+
 	var collectID uint = 0
 	var isCollect = false
 	usc, err := us.CollectLog(GetUserID(c), vi.ID)
@@ -163,7 +174,7 @@ func VideoPlay(c *gin.Context) {
 		"title":         "视频播放",
 		"videoID":       vi.ID,
 		"videoTitle":    vi.Title,
-		"videoActress":  vi.Actress,
+		"videoActress":  vi.ActressStr,
 		"videoUrl":      videoDir + "/" + vi.Title + ".mp4",
 		"Size":          size / 1024 / 1024,
 		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
@@ -424,6 +435,15 @@ func VideoRename(c *gin.Context) {
 func VideoImport(c *gin.Context) {
 	var videoDir = c.Query("dir")
 	if err := service.VideoImport(videoDir); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
+
+func ImportVideoActress(c *gin.Context) {
+	if err := service.VideoActress(); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return
 	}

@@ -36,12 +36,17 @@ type Video struct {
 
 func (as *VideoService) Find(actressID int, page, pageSize int) ([]Video, int64, error) {
 	dbVideo := db.Table("video_Video as v")
+
 	if actressID != 0 {
-		var actress model.Actress
-		if err := db.Select("actress").Where("id = ?", actressID).First(&actress).Error; err != nil {
+		var list []model.VideoActress
+		if err := db.Select("video_id").Where("actress_id = ?", actressID).Find(&list).Error; err != nil {
 			return nil, 0, err
 		}
-		dbVideo = dbVideo.Where("v.actress = ?", actress.Actress)
+		var ids []uint
+		for _, v := range list {
+			ids = append(ids, v.VideoId)
+		}
+		dbVideo = dbVideo.Where("v.id in ?", ids)
 	}
 
 	var count int64
@@ -132,11 +137,18 @@ type VideoInfo struct {
 	Zan           uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
 	Cai           uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
 	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
+	ActressStr    string    `json:"actress_str" gorm:"column:actress_str;type:varchar(255);comment:演员"`
 }
 
 func (vs *VideoService) Info(id uint) (VideoInfo, error) {
 	var videoInfo VideoInfo
-	if err := db.Table("video_Video as v").Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog as l on l.video_id = v.id").Where("v.id = ?", id).Scan(&videoInfo).Error; err != nil {
+	if err := db.Table("video_Video as v").Select("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch, group_concat(a.actress,',') as actress_str").
+		Joins("left join video_VideoLog as l on l.video_id = v.id").
+		Joins("left join video_VideoActress as va on va.video_id = v.id").
+		Joins("left join video_Actress as a on a.id = va.actress_id").
+		Where("v.id = ?", id).
+		Group("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch").
+		Scan(&videoInfo).Error; err != nil {
 		return VideoInfo{}, err
 	}
 	return videoInfo, nil

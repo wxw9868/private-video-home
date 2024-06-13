@@ -3,10 +3,12 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"image/color"
 	"image/color/palette"
 	"io"
+	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -33,7 +35,7 @@ func GenerateAvatar(name, path string) error {
 	var frontColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
 	bgColor = palette[randint(len(palette))]
 	frontColor = palette[randint(len(palette))]
-	ab := avatarbuilder.NewAvatarBuilder("assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
+	ab := avatarbuilder.NewAvatarBuilder("D:/GoLang/video/assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
 	ab.SetBackgroundColor(bgColor)
 	ab.SetFrontgroundColor(frontColor)
 	ab.SetFontSize(300)
@@ -256,6 +258,31 @@ func Join(s ...string) string {
 	return b.String()
 }
 
+// 读取文件数据到 map
+func ReadFileToMap(name string, v any) error {
+	bytes, err := os.ReadFile(name)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(bytes, &v); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 读取 map 数据到文件
+func WriteMapToFile(name string, v any) error {
+	bytes, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(name, bytes, 0666)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func VideoRename(videoDir string, nameMap map[string]string, nameSlice []string) error {
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
@@ -283,4 +310,29 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice []string)
 	}
 
 	return nil
+}
+
+func GeneteSQL() string {
+	var data = make(map[string]struct{})
+	ReadFileToMap("data.json", &data)
+	var avatarDir = "./assets/image/avatar"
+	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	var root = "/Users/v_weixiongwei/go/src/video"
+	root = "D:/GoLang/video"
+	for actress, _ := range data {
+		avatarPath := avatarDir + "/" + actress + ".png"
+		rootPath := root + "/assets/image/avatar" + "/" + actress + ".png"
+		_, err := os.Stat(rootPath)
+		if os.IsNotExist(err) {
+			nameSlice := []rune(actress)
+			if err := GenerateAvatar(string(nameSlice[0]), rootPath); err != nil {
+				log.Fatal(err)
+			}
+		}
+		actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
+	}
+	actressSqlBytes := []byte(actressSql)
+	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
+
+	return actressSql
 }

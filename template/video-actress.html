@@ -68,7 +68,7 @@
         let totalCount = actressList.length;
         let totalPages;
         let currentPage = 1;
-        let numberPerPage = (totalCount < 50) ? totalCount : 50;
+        let numberPerPage = (totalCount < 100) ? totalCount : 100;
         
         // 预加载
         let queue = new createjs.LoadQueue(true);
@@ -83,8 +83,10 @@
         });
         let imgSrcs = [];
         actressList.forEach((item, index) => {
+            // console.log(item, index)
             imgSrcs.push({ id: 'img' + index, src: '/'+item.avatar });
         });
+        console.log(imgSrcs)
         // 加载多个文件     
         queue.loadManifest(imgSrcs);
 
@@ -110,6 +112,9 @@
             document.getElementsByClassName('row')[0].innerHTML = colHTML;
 
             for (let index = start; index < end; index++) {
+                console.log(index)
+                console.log(document.getElementsByClassName('col')[index].querySelector('a'))
+                console.log(queue.getResult('img0'))
                 let img = document.getElementsByClassName('col')[index].querySelector('a').appendChild(queue.getResult('img' + index))
                 img.setAttribute('width','70')
                 img.setAttribute('height','70')
