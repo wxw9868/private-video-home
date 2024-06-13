@@ -12,7 +12,8 @@ import (
 func main() {
 	db.RegisterTables()
 
-	dev := true
+	dev := false
+	dev = true
 
 	ip, err := utils.GetLocalIP()
 	if err != nil {

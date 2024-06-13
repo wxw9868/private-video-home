@@ -38,13 +38,13 @@
         let navs = document.getElementById('navbarNav').querySelectorAll('a');
         let pathname = window.location.pathname
         switch (pathname) {
-            case "/list":
+            case "/video/list":
                 navs[1].classList.add('active');
                 break;
-            case "/actress":
+            case "/video/actress":
                 navs[2].classList.add('active');
                 break;
-            case "/play":
+            case "/video/play":
                 navs[3].classList.add('active');
                 break;
             default:
@@ -98,12 +98,12 @@
         navbar.classList.remove('bg-body-tertiary');
         navbar.classList.add('navbar-dark', 'bg-dark');
         navbar.children[1].classList.add('text-bg-dark');
-        navbar.children[1].children[0].children[0].classList.add('btn-close-white');
+        navbar.children[1].children[0].children[0].classList.add('text-secondary');
 
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
             element.classList.remove('text-light')
-            element.classList.add('text-secondary')
+            element.classList.add('bg-dark','text-secondary')
         }
 
         storage.setItem("backgroundColor", "dark");
@@ -116,11 +116,11 @@
         navbar.classList.add('bg-body-tertiary');
         navbar.classList.remove('navbar-dark', 'bg-dark');
         navbar.children[1].classList.remove('text-bg-dark');
-        navbar.children[1].children[0].children[0].classList.remove('btn-close-white');
+        navbar.children[1].children[0].children[0].classList.remove('text-secondary');
 
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
-            element.classList.remove('text-secondary')
+            element.classList.remove('bg-dark','text-secondary')
             element.classList.add('text-light')
         }
 

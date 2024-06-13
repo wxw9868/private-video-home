@@ -430,3 +430,12 @@ func VideoImport(c *gin.Context) {
 
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
+
+func ImportVideoActress(c *gin.Context) {
+	if err := service.VideoActress(); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
