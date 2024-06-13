@@ -28,6 +28,6 @@ func main() {
 	router := router.Engine(addr)
 
 	if err := router.Run(addr); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
