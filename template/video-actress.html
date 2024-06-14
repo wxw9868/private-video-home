@@ -41,6 +41,23 @@
         </div>
 
         <div class="container">
+            <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link active" href="#">Active</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link disabled">Disabled</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="container">
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
 
             </div>
@@ -83,10 +100,8 @@
         });
         let imgSrcs = [];
         actressList.forEach((item, index) => {
-            // console.log(item, index)
             imgSrcs.push({ id: 'img' + index, src: '/'+item.avatar });
         });
-        // console.log(imgSrcs)
         // 加载多个文件     
         queue.loadManifest(imgSrcs);
         // 计算总页数并初始化
@@ -116,9 +131,6 @@
             document.getElementsByClassName('row')[0].innerHTML = colHTML;
 
             for (let index = 0; index < subArray.length; index++) {
-                // console.log(index)
-                // console.log(document.getElementsByClassName('col')[index].querySelector('a'))
-                // console.log(queue.getResult('img0'))
                 let img = document.getElementsByClassName('col')[index].querySelector('a').appendChild(queue.getResult('img' + (start + index)))
                 img.setAttribute('width','70')
                 img.setAttribute('height','70')

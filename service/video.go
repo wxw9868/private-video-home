@@ -34,7 +34,7 @@ type Video struct {
 	Watch         uint    `json:"watch"`
 }
 
-func (as *VideoService) Find(actressID int, page, pageSize int) ([]Video, int64, error) {
+func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, int64, error) {
 	dbVideo := db.Table("video_Video as v")
 
 	if actressID != 0 {
@@ -56,6 +56,9 @@ func (as *VideoService) Find(actressID int, page, pageSize int) ([]Video, int64,
 
 	dbVideo = dbVideo.Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
 		Joins("left join video_VideoLog l on l.video_id = v.id")
+	if action != "" && sort != "" {
+		dbVideo = dbVideo.Order(action + " " + sort)
+	}
 	// Scopes(Paginate(page, pageSize, int(count)))
 	rows, err := dbVideo.Rows()
 	if err != nil {

@@ -49,7 +49,24 @@
         </div>
 
         <div class="container">
-            <div id="videoContainer" class="row row-cols-2 row-cols-sm-2 row-cols-md-4 g-3">
+            <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link active" href="#">Active</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link disabled">Disabled</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="container">
+            <div id="videoContainer" class="row row-cols-2 row-cols-sm-4 row-cols-md-5">
 
             </div>
 
@@ -102,24 +119,28 @@
         });
         let imgSrcs = [];
         videoList.forEach((item, index) => {
-            // console.log(item.document.poster)
-            // console.log(index)
             imgSrcs.push({ id: 'img' + index, src: '/'+item.document.poster });
         });
         // 加载多个文件    
         queue.loadManifest(imgSrcs);
+        // 计算总页数并初始化
+        totalPages = Math.ceil(videoList.length / numberPerPage);
+        // 监听完成事件
+        queue.on("complete", function () {
+            renderVideoList(0, numberPerPage);
+        });
 
         // 渲染视频列表
         function renderVideoList(start, end) {
-            let videoItem = '';
+            let colHTML = '';
             let subArray = videoList.slice(start, end);
             subArray.forEach((item, index) => {
                 item = item.document
-                videoItem += 
-                `<div class="col" style="padding-left: 10px;padding-right: 10px;">
+                colHTML += 
+                `<div class="col" style="padding-left: 8px;padding-right: 8px;">
                     <a href="/video/play?id=`+(item.id)+ `"target="_blank">
                         <div class="card rounded">
-                            <ul class="card-img-overlay d-flex mt-auto justify-content-end" style="margin-bottom: 0px;">
+                            <ul class="card-img-overlay d-flex mt-auto justify-content-end text-light" style="margin-bottom: 0px;">
                                 <li class="d-flex align-items-end">
                                     <div class="bg-black-semi-transparent rounded">
                                         <i class="me-1"></i>
@@ -142,20 +163,20 @@
                 </div>`;
             });
 
-            document.getElementById('videoContainer').innerHTML = videoItem
+            document.getElementById('videoContainer').innerHTML = colHTML
 
             for (let index = 0; index < subArray.length; index++) {
                 let img = document.getElementsByClassName('card')[index].appendChild(queue.getResult('img' + (start+index)))
                 img.setAttribute('width','100%')
                 img.setAttribute('height','225')
-                img.setAttribute('class','img-fluid card-img rounded-4')
+                img.setAttribute('class','img-fluid card-img rounded-1')
             }
-
-            // 加载主题背景
-            loadBackground()
 
             // 更新分页控件
             updatePagination();
+
+            // 加载主题背景
+            loadBackground()
         }
 
         // 更新分页控件
@@ -212,13 +233,6 @@
                 lastPageBtn.classList.remove('disabled');
             }
         }
-
-        // 计算总页数并初始化
-        totalPages = Math.ceil(videoList.length / numberPerPage);
-        // 监听完成事件
-        queue.on("complete", function () {
-            renderVideoList(0, numberPerPage);
-        });
 
         // 事件监听器
         // document.querySelector('#prev-page').addEventListener('click', () => {

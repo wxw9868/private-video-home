@@ -82,9 +82,11 @@ func VideoList(c *gin.Context) {
 }
 
 type Video struct {
-	ActressID int `uri:"actress_id" form:"actress_id" json:"actress_id"`
-	Page      int `uri:"page" form:"page" json:"page"`
-	Size      int `uri:"size" form:"size" json:"size"`
+	ActressID int    `uri:"actress_id" form:"actress_id" json:"actress_id"`
+	Page      int    `uri:"page" form:"page" json:"page"`
+	Size      int    `uri:"size" form:"size" json:"size"`
+	Action    string `uri:"action" form:"action" json:"action"`
+	Sort      string `uri:"sort" form:"sort" json:"sort"`
 }
 
 func VideoListApi(c *gin.Context) {
@@ -94,7 +96,7 @@ func VideoListApi(c *gin.Context) {
 		return
 	}
 
-	videos, count, err := vs.Find(bind.ActressID, bind.Page, bind.Size)
+	videos, count, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
