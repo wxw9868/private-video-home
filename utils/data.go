@@ -315,6 +315,8 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice []string)
 func GeneteSQL() string {
 	var data = make(map[string]struct{})
 	ReadFileToMap("data.json", &data)
+	fmt.Println(len(data))
+	return ""
 	var avatarDir = "./assets/image/avatar"
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
 	var root = "/Users/v_weixiongwei/go/src/video"

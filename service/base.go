@@ -165,30 +165,15 @@ type VideoActressData struct {
 // 使用联合索引解决问题
 func VideoActress() error {
 	var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
-	var actressData []model.Actress
+	var actresss []model.Actress
 	var videos []model.Video
-	var actressWhere []string
 
-	dbVideo := db.Table("video_Video as v")
-	dbVideo = dbVideo.Select("v.id as video_id, v.actress, a.id as actress_id").Joins("left join video_Actress a on a.actress = v.actress")
-	rows, err := dbVideo.Rows()
-	if err != nil {
+	if err := db.Find(&actresss).Error; err != nil {
 		return err
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var data VideoActressData
-		db.ScanRows(rows, &data)
-
-		sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", data.VideoID, data.ActressID, time.Now().Local(), time.Now().Local())
-		actressWhere = append(actressWhere, data.Actress)
-	}
-
-	db.Where("actress NOT IN ?", actressWhere).Find(&actressData)
 	// fmt.Printf("%+v\n", actressData)
-	if len(actressData) > 0 {
-		for _, actress := range actressData {
+	if len(actresss) > 0 {
+		for _, actress := range actresss {
 			db.Where("title LIKE ?", "%"+actress.Actress+"%").Find(&videos)
 			if len(videos) > 0 {
 				for _, video := range videos {
@@ -200,8 +185,20 @@ func VideoActress() error {
 
 	sqlBytes := []byte(sql)
 	sql = string(sqlBytes[:len(sqlBytes)-2])
-	if err := db.Exec(sql).Error; err != nil {
-		return err
-	}
-	return nil
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// 删除数据
+		if err := tx.Exec("DELETE FROM video_VideoActress").Error; err != nil {
+			return err
+		}
+		// 重置主键
+		if err := tx.Exec("UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'video_VideoActress'").Error; err != nil {
+			return err
+		}
+		if err := tx.Exec(sql).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
 }

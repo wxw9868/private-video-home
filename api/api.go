@@ -81,10 +81,18 @@ func VideoList(c *gin.Context) {
 	})
 }
 
+func VideoActress(c *gin.Context) {
+	c.HTML(http.StatusOK, "video-actress.html", gin.H{
+		"title": "演员列表",
+	})
+}
+
 type Video struct {
-	ActressID int `uri:"actress_id" form:"actress_id" json:"actress_id"`
-	Page      int `uri:"page" form:"page" json:"page"`
-	Size      int `uri:"size" form:"size" json:"size"`
+	ActressID int    `uri:"actress_id" form:"actress_id" json:"actress_id"`
+	Page      int    `uri:"page" form:"page" json:"page"`
+	Size      int    `uri:"size" form:"size" json:"size"`
+	Action    string `uri:"action" form:"action" json:"action"`
+	Sort      string `uri:"sort" form:"sort" json:"sort"`
 }
 
 func VideoListApi(c *gin.Context) {
@@ -94,7 +102,7 @@ func VideoListApi(c *gin.Context) {
 		return
 	}
 
-	videos, count, err := vs.Find(bind.ActressID, bind.Page, bind.Size)
+	videos, count, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -118,28 +126,38 @@ func VideoListApi(c *gin.Context) {
 	}))
 }
 
-func VideoActress(c *gin.Context) {
-	actresss, err := as.Find()
+type Actress struct {
+	Page   int    `uri:"page" form:"page" json:"page"`
+	Size   int    `uri:"size" form:"size" json:"size"`
+	Action string `uri:"action" form:"action" json:"action"`
+	Sort   string `uri:"sort" form:"sort" json:"sort"`
+}
+
+func VideoActressApi(c *gin.Context) {
+	var bind Video
+	if err := c.Bind(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	actresss, err := as.Find(bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
-	var data = make(map[string]struct{})
-	for _, v := range actresss {
-		data[v.Actress] = struct{}{}
-	}
-	fmt.Printf("%d\n", len(data))
-	utils.WriteMapToFile("data.json", &data)
-
+	// var data = make(map[string]struct{})
+	// for _, v := range actresss {
+	// 	data[v.Actress] = struct{}{}
+	// }
+	// fmt.Printf("%d\n", len(data))
+	// utils.WriteMapToFile("data.json", &data)
 	// fmt.Printf("%+v\n", actresss)
+	// fmt.Printf("%d\n", len(actresss))
 
-	actressBytes, _ := json.Marshal(actresss)
-
-	c.HTML(http.StatusOK, "video-actress.html", gin.H{
-		"title":       "演员列表",
-		"actressList": string(actressBytes),
-	})
+	c.JSON(http.StatusOK, util.Success("视频列表", map[string]interface{}{
+		"list": actresss,
+	}))
 }
 
 type Play struct {

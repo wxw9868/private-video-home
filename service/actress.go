@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/wxw9868/video/model"
+	"github.com/wxw9868/video/utils"
 )
 
 type ActressService struct{}
@@ -13,9 +14,13 @@ type Actress struct {
 	Count   uint32 `gorm:"column:count" json:"count"`
 }
 
-func (as *ActressService) Find() ([]Actress, error) {
+func (as *ActressService) Find(page, pageSize int, action, sort string) ([]Actress, error) {
 	var actresss []Actress
-	if err := db.Raw("SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id group by 1,2,3").Scan(&actresss).Error; err != nil {
+	sql := "SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id group by 1,2,3"
+	if action != "" && sort != "" {
+		sql += utils.Join(" order by ", action, " ", sort)
+	}
+	if err := db.Raw(sql).Scan(&actresss).Error; err != nil {
 		return nil, err
 	}
 	return actresss, nil
