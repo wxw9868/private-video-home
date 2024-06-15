@@ -141,11 +141,13 @@ type VideoInfo struct {
 	Cai           uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
 	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
 	ActressStr    string    `json:"actress_str" gorm:"column:actress_str;type:varchar(255);comment:演员"`
+	ActressIds    string    `json:"actress_ids" gorm:"column:actress_ids;type:varchar(255);comment:演员"`
 }
 
 func (vs *VideoService) Info(id uint) (VideoInfo, error) {
 	var videoInfo VideoInfo
-	if err := db.Table("video_Video as v").Select("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch, group_concat(a.actress,',') as actress_str").
+	if err := db.Table("video_Video as v").
+		Select("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch, group_concat(a.id,',') as actress_ids, group_concat(a.actress,',') as actress_str").
 		Joins("left join video_VideoLog as l on l.video_id = v.id").
 		Joins("left join video_VideoActress as va on va.video_id = v.id").
 		Joins("left join video_Actress as a on a.id = va.actress_id").

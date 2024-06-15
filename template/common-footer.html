@@ -66,27 +66,28 @@
         document.cookie = cookieName + "=; expires=" + new Date(0).toUTCString() + "; path=/";
     }
 
-    let body = document.getElementsByTagName('body')[0];
-    let navbar = document.getElementsByClassName('navbar')[0];
-    let cards = document.getElementsByClassName('card');
-    let search = document.getElementById('search');
+    const body = document.getElementsByTagName('body')[0];
+    const navbar = document.getElementsByClassName('navbar')[0];
+    const cards = document.getElementsByClassName('card');
+    const search = document.getElementById('search');
 
     loadBackground()
-    function loadBackground() {
+    function loadBackground(img) {
         if (storage.getItem("backgroundColor") == "dark") {
-            setBgDark();
-            document.getElementById('setBackgroundColor').setAttribute('src', '/assets/image/icon/moon-stars-fill.svg');        
+            if (img) {
+                setBgLight();
+                img.setAttribute('src', '/assets/image/icon/sun-fill.svg');
+            } else {
+                setBgDark();
+                document.getElementById('setBackgroundColor').setAttribute('src', '/assets/image/icon/moon-stars-fill.svg');    
+            }
         } else {
-            setBgLight();
-        }
-    }
-    function setBackground(img) {
-        if (storage.getItem("backgroundColor") == "dark") {
-            setBgLight()
-            img.setAttribute('src', '/assets/image/icon/sun-fill.svg');
-        } else {
-            setBgDark()
-            img.setAttribute('src', '/assets/image/icon/moon-stars-fill.svg')
+            if (img) {
+                setBgDark();
+                img.setAttribute('src', '/assets/image/icon/moon-stars-fill.svg');
+            } else {
+                setBgLight();
+            }
         }
     }
 
@@ -99,6 +100,16 @@
         navbar.classList.add('navbar-dark', 'bg-dark');
         navbar.children[1].classList.add('text-bg-dark');
         navbar.children[1].children[0].children[0].classList.add('text-secondary');
+
+        const navs = document.getElementsByClassName('nav')[0];
+        if (navs) {
+            const navlinks = navs.querySelectorAll('a');
+            for (let index = 0; index < navlinks.length; index++) {
+                const element = navlinks[index];
+                element.classList.remove('link-dark');
+                element.classList.add('link-secondary');
+            }
+        }
 
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];
@@ -117,6 +128,16 @@
         navbar.classList.remove('navbar-dark', 'bg-dark');
         navbar.children[1].classList.remove('text-bg-dark');
         navbar.children[1].children[0].children[0].classList.remove('text-secondary');
+
+        const navs = document.getElementsByClassName('nav')[0];
+        if (navs) {
+            const navlinks = navs.querySelectorAll('a');
+            for (let index = 0; index < navlinks.length; index++) {
+                const element = navlinks[index];
+                element.classList.remove('link-light');
+                element.classList.add('link-dark');
+            }
+        }
 
         for (let index = 0; index < cards.length; index++) {
             const element = cards[index];

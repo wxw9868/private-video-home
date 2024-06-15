@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -177,8 +176,17 @@ func VideoPlay(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("%+v\n", vi)
-
+	// fmt.Printf("%+v\n", vi)
+	actressArr := strings.Split(vi.ActressStr, ",")
+	idsArr := strings.Split(vi.ActressIds, ",")
+	actressHtml := ""
+	for i := 0; i < len(actressArr); i++ {
+		if i == 0 {
+			actressHtml += `<a href="/video/list?actress_id=` + idsArr[i] + `">` + actressArr[i] + `</a>`
+		} else {
+			actressHtml += `<a class="ms-2" href="/video/list?actress_id=` + idsArr[i] + `">` + actressArr[i] + `</a>`
+		}
+	}
 	var collectID uint = 0
 	var isCollect = false
 	usc, err := us.CollectLog(GetUserID(c), vi.ID)
@@ -192,7 +200,7 @@ func VideoPlay(c *gin.Context) {
 		"title":         "视频播放",
 		"videoID":       vi.ID,
 		"videoTitle":    vi.Title,
-		"videoActress":  vi.ActressStr,
+		"videoActress":  actressHtml,
 		"videoUrl":      videoDir + "/" + vi.Title + ".mp4",
 		"Size":          size / 1024 / 1024,
 		"Duration":      utils.ResolveTime(uint32(vi.Duration)),

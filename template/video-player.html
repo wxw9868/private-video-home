@@ -57,7 +57,7 @@
 						<div id="videoContainer" class="card-img-top"></div>
 						<div class="card-body">
 							<h5 class="card-title">{{.videoTitle}}</h5>
-							<p class="card-text">{{ .videoActress }}</p>
+							<p class="card-text text-warning-emphasis"></p>
 							<p class="card-text d-flex justify-content-start" style="font-size: 1.5rem;">
 								<span class="d-flex align-items-end" onclick="statisticsCollect(this)">
 									<i class="bi {{if .IsCollect}}bi-heart-fill{{else}}bi-heart{{end}}"></i> 
@@ -73,7 +73,7 @@
 								</span>
 							</p>
 							<p class="card-text d-flex justify-content-start">
-								<span class="fs-3"><small class="text-muted">切换播放器：</small></span>
+								<span class="fs-3"><small>切换播放器：</small></span>
 								<img onclick="loadPlayer('xgplayer')" src="/assets/image/player/xgplayer.jpg" alt="xgplayer" width="40" height="40" class="rounded-circle me-2">
 								<img onclick="loadPlayer('ckplayer')" src="/assets/image/player/ckplayer.png" alt="ckplayer" width="40" height="40" class="rounded-circle me-2">
 								<img onclick="loadPlayer('artplayer')" src="/assets/image/player/artplayer.png" alt="artplayer" width="40" height="40" class="rounded-circle me-2">
@@ -118,6 +118,7 @@
 	</main>
 
 	<script>
+		document.getElementsByClassName('card-text')[0].innerHTML = '{{ .videoActress }}';
 		let logo = '';
 		let videoUrl = '/{{ .videoUrl }}';
 		let poster = '/{{ .Poster }}';
@@ -143,7 +144,7 @@
 
 			switch(playerType) {
 				case 'ckplayer':
-					loadCSS("/assets/player/ckplayer-x3/css/ckplayer.css");
+					loadCSS("/assets/player/ckplayer-x3/css/ckplayer.red.css");
 					loadJavaScript("/assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
 					break;
 				case 'xgplayer':
@@ -300,14 +301,17 @@
 				cookie: 'video', // cookie名称,请在同一域中保持唯一
 				video: videoUrl, // 视频地址
 				webFull: true, // 是否启用页面全屏按钮，默认不启用
+				theatre: true,//是否启用剧场模式按钮，默认不启用
 				screenshot: true, // 截图功能是否开启
 				crossOrigin:'Anonymous',//发送跨域字符
-				title: title,// 视频标题
+				title: title, // 视频标题
 				playbackrateOpen: true, // 是否开启控制栏倍速选项
 				playbackrate: 1, // 默认倍速
-				playbackrateList: [0.75, 1, 1.25, 1.5, 2, 4], // 倍速配置值 
-				controls: true,//是否显示自带控制栏
+				playbackrateList: [0.75, 1, 1.25, 1.5, 2], // 倍速配置值 
+				controls: false,//是否显示自带控制栏
 				rightBar: true,//是否开启右边控制栏
+				smallWindows: true,//是否启用小窗口模式
+				smallWindowsDrag:true,//小窗口开启时是否可以拖动
 				menu: [], // 右键菜单
 				poster: poster,// 封面图片
 				logo: logo,
