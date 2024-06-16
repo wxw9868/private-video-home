@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>mui-player 自定义扩展控件示例</title>
+	<link href="../image/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
+	<link href="../app/css/bootstrap-5.3.0.min.css" rel="stylesheet">
+	<link href="../app/css/bootstrap-icons-1.11.3.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+	<style>
+		#videoContainer {
+			margin: 50px auto;
+			max-width: 500px;
+		}
+		.card {
+			margin: 50px auto;
+			max-width: 500px;
+			
+			border: none;
+			/* 这里的0.5 是透明度值，可以根据需要调整 */
+			background-color: rgba(255, 255, 255, 0.1);
+		}
+
+		.reply-collapse {
+            color: #A3A7AD; /* 这里可以改成你想要的颜色 */
+        }
+        .reply-collapse:hover {
+            color: #606266;  /* 这里可以改成你想要的颜色 */ 
+        }
+
+		.comment-title {
+			font-size: small;
+		}
+		.comment-text {
+			font-size:0.94rem;
+		}
+		.comment-button {
+			font-size:0.833rem;
+		}
+
+		a {
+            color: unset;
+            /* 设置为浏览器默认的颜色 */
+            text-decoration: none;
+            /* 移除超链接下划线 */
+        }
+	</style>
+</head>
+
+<body>
+
+	<div class="container">
+		<!-- <video id="videoContainer"></video> -->
+		<!-- <div id="videoContainer" class="card-img-top"></div> -->
+		<div class="row justify-content-center">
+			<div class="col-12">
+				<div class="card">
+					<div id="videoContainer" class="card-img-top">
+						<div class="container">
+							<video controls crossorigin playsinline poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg">
+								 <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" type="video/mp4" size="576">
+									<source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4" type="video/mp4" size="720">
+									<source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4" type="video/mp4" size="1080">
+						
+									<!-- Caption files -->
+									<!-- <track kind="captions" label="English" srclang="en" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt" default> -->
+									<!-- <track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt"> -->
+									<!-- Fallback for browsers that don't support the <video> element -->
+									<a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download>Download</a>
+							</video>
+						</div>
+						<!-- Plyr resources and browser polyfills are specified in the pen settings -->
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+	<script>
+		// Change the second argument to your options:
+		// https://github.com/sampotts/plyr/#options
+		const player = new Plyr('video', {captions: {active: true}});
+
+		player.source = {
+			type: 'video',
+			title: 'Example title',
+			sources: [
+				{
+					src: 'http://192.168.0.4/assets/video/010120_951 高級ソープへようこそ_HITOMI.mp4',
+					type: 'video/mp4',
+					size: 1080,
+				},
+				// {
+				// 	src: '/path/to/movie.webm',
+				// 	type: 'video/webm',
+				// 	size: 1080,
+				// },
+			],
+			// poster: '/path/to/poster.jpg',
+			// previewThumbnails: {
+			// 	src: '/path/to/thumbnails.vtt',
+			// },
+			// tracks: [
+			// 	{
+			// 		kind: 'captions',
+			// 		label: 'English',
+			// 		srclang: 'en',
+			// 		src: '/path/to/captions.en.vtt',
+			// 		default: true,
+			// 	},
+			// 	{
+			// 		kind: 'captions',
+			// 		label: 'French',
+			// 		srclang: 'fr',
+			// 		src: '/path/to/captions.fr.vtt',
+			// 	},
+			// ],
+		};
+
+		// Expose player so it can be used from the console
+		window.player = player;
+	</script>
+
+</body>
+
+</html>

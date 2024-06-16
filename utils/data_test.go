@@ -21,7 +21,7 @@ var nameMap = map[string]string{
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "Heyzo_3330_内定の為なら咥えます！～オナニーだってしちゃいます！～_樫乃りな",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",

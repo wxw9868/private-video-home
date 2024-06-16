@@ -79,6 +79,7 @@
 								<img onclick="loadPlayer('artplayer')" src="/assets/image/player/artplayer.png" alt="artplayer" width="40" height="40" class="rounded-circle me-2">
 								<img onclick="loadPlayer('dplayer')" src="/assets/image/player/dplayer.png" alt="dplayer" width="40" height="40" class="rounded-circle me-2">
 								<img onclick="loadPlayer('muiplayer')" src="/assets/image/player/muiplayer.png" alt="muiplayer" width="40" height="40" class="rounded-circle me-2">
+								<img onclick="loadPlayer('plyr')" src="/assets/image/player/player.png" alt="muiplayer" width="40" height="40" class="rounded-circle me-2">
 							</p>
 						</div>	
 					</div>
@@ -133,17 +134,19 @@
 			playerType = (playerType)? playerType : storage.getItem("playerType"); 
 			storage.setItem("playerType", playerType);
 			
-			var div = document.createElement("div");
-			div.setAttribute("id", "videoPlayer");
-			var classList = ["img-fluid"];
-			if (playerType == "ckplayer") {
-				classList.push("ratio", "ratio-16x9");
+			let div = '';
+			if (playerType == 'plyr') {
+				div = document.createElement("video");
+			} else {
+				div = document.createElement("div");
 			}
-			div.classList.add(...classList);
-			document.getElementById("videoContainer").appendChild(div);
+			div.setAttribute("id", "videoPlayer");
+			let classList = ["img-fluid"];
 
 			switch(playerType) {
 				case 'ckplayer':
+					classList.push("ratio", "ratio-16x9");
+
 					loadCSS("/assets/player/ckplayer-x3/css/ckplayer.red.css");
 					loadJavaScript("/assets/player/ckplayer-x3/js/ckplayer.js", loadCkplayer);
 					break;
@@ -161,11 +164,24 @@
 				case 'artplayer':
 					loadJavaScript("/assets/player/artplayer/dist/artplayer.js", loadArtplayer);
 					break;
+				case 'plyr':
+					loadCSS("/assets/player/plyr/plyr.css");
+					loadJavaScript("/assets/player/plyr/plyr.js", loadPlyr);
+					break;
 				default:
-					loadJavaScript("/assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
+					// loadJavaScript("/assets/player/dplayer/dist/DPlayer.min.js", loadDPlayer);
+					loadCSS("/assets/player/plyr/plyr.css");
+					loadJavaScript("/assets/player/plyr/plyr.js", loadPlyr);
 			} 
+
+			div.classList.add(...classList);
+			document.getElementById("videoContainer").appendChild(div);
 		}
 		function remove() {
+			let videoTag = document.getElementsByTagName('video')[0];
+			if (videoTag) {
+				document.getElementById("videoContainer").innerHTML = '';
+			}
 			var videoPlayer = document.getElementById("videoPlayer");
 			if (videoPlayer) {
 				document.getElementById("videoContainer").removeChild(videoPlayer);
@@ -200,7 +216,9 @@
 			}
 		}
 		// 动态加载CSS文件
-		function loadCSS(href) {
+		function 
+		
+		loadCSS(href) {
 			var link = document.createElement("link");
 			link.rel = "stylesheet";
 			link.type = "text/css";
@@ -552,6 +570,50 @@
 			}
 			selected();
 		}	
+	
+		function loadPlyr() {
+			const player = new Plyr('#videoPlayer', {
+				captions: {
+					active: true,
+				},
+				controls: [
+					'play-large', // The large play button in the center
+					// 'restart', // Restart playback
+					'rewind', // Rewind by the seek time (default 10 seconds)
+					'play', // Play/pause playback
+					'fast-forward', // Fast forward by the seek time (default 10 seconds)
+					'progress', // The progress bar and scrubber for playback and buffering
+					'current-time', // The current time of playback
+					'duration', // The full duration of the media
+					// 'mute', // Toggle mute
+					// 'volume', // Volume control
+					'captions', // Toggle captions
+					'settings', // Settings menu
+					'pip', // Picture-in-picture (currently Safari only)
+					'airplay', // Airplay (currently Safari only)
+					// 'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+					'fullscreen', // Toggle fullscreen
+				],
+				settings: ['captions', 'quality', 'speed', 'loop'],
+				volume: 1,
+			});
+
+			player.source = {
+				type: 'video',
+				title: 'Example title',
+				sources: [
+					{
+						src: videoUrl,
+						type: 'video/mp4',
+						size: 1080,
+					},
+				],
+				poster: poster,
+			};
+
+			// Expose player so it can be used from the console
+			window.player = player;
+		}
 	</script>	
     <script>
 		var videoID = '{{ .videoID }}' 
