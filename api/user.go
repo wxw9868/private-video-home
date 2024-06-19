@@ -60,7 +60,7 @@ type LoginReq struct {
 
 func LoginApi(c *gin.Context) {
 	var bind LoginReq
-	if err := c.ShouldBindJSON(&bind); err != nil {
+	if err := c.ShouldBind(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
