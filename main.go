@@ -13,7 +13,7 @@ func main() {
 	db.RegisterTables()
 
 	dev := false
-	// dev = true
+	dev = true
 
 	ip, err := utils.GetLocalIP()
 	if err != nil {
@@ -31,4 +31,7 @@ func main() {
 	if err := router.Run(addr); err != nil {
 		log.Fatal(err)
 	}
+	// if err := router.RunTLS(addr, "cert/server.pem", "cert/server.key"); err != nil {
+	// 	log.Fatal(err)
+	// }
 }

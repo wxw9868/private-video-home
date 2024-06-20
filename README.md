@@ -109,3 +109,5 @@ DELETE FROM video_UserCommentLog;
 -- 重置主键
 UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'video_UserCommentLog';
 ```
+
+[go-gin简单实现tls https服务](https://www.cnblogs.com/davis12/p/16918591.html)

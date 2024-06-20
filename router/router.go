@@ -3,7 +3,6 @@ package router
 import (
 	"net/http"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/video/api"
 	"github.com/wxw9868/video/middleware"
@@ -13,7 +12,9 @@ func Engine(addr string) *gin.Engine {
 	router := gin.Default()
 
 	// 允许跨域
-	router.Use(cors.Default())
+	// router.Use(cors.Default())
+	router.Use(middleware.Cors())
+
 	// 性能监控
 	// pprof.Register(router)
 
