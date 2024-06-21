@@ -221,6 +221,62 @@ func VideoPlay(c *gin.Context) {
 	})
 }
 
+func VideoPlayApi(c *gin.Context) {
+	var play Play
+	if err := c.Bind(&play); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+
+	vi, err := vs.Info(cast.ToUint(play.ID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
+	actressArr := strings.Split(vi.ActressStr, ",")
+	idsArr := strings.Split(vi.ActressIds, ",")
+	actressHtml := ""
+	for i := 0; i < len(actressArr); i++ {
+		if i == 0 {
+			actressHtml += `<a href="/video/list?actress_id=` + idsArr[i] + `">` + actressArr[i] + `</a>`
+		} else {
+			actressHtml += `<a class="ms-2" href="/video/list?actress_id=` + idsArr[i] + `">` + actressArr[i] + `</a>`
+		}
+	}
+	var collectID uint = 0
+	var isCollect = false
+	usc, err := us.CollectLog(GetUserID(c), vi.ID)
+	if err == nil {
+		collectID = usc.ID
+		isCollect = true
+	}
+
+	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
+	c.JSON(http.StatusOK, gin.H{
+		"videoID":       vi.ID,
+		"videoTitle":    vi.Title,
+		"videoActress":  actressHtml,
+		"videoUrl":      videoDir + "/" + vi.Title + ".mp4",
+		"Size":          size / 1024 / 1024,
+		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
+		"ModTime":       vi.CreationTime.Format("2006-01-02 15:04:05"),
+		"Poster":        vi.Poster,
+		"Width":         vi.Width,
+		"Height":        vi.Height,
+		"CodecName":     vi.CodecName,
+		"ChannelLayout": vi.ChannelLayout,
+		"Collect":       vi.Collect,
+		"Browse":        vi.Browse,
+		"Zan":           vi.Zan,
+		"Cai":           vi.Cai,
+		"Watch":         vi.Watch,
+		"CollectID":     collectID,
+		"IsCollect":     isCollect,
+		"Avatar":        sessions.Default(c).Get("userAvatar").(string),
+	})
+}
+
 type VideoCollect struct {
 	VideoID uint `form:"video_id" json:"video_id" binding:"required"`
 	Collect int  `form:"collect" json:"collect" binding:"required,oneof=1 -1"`
