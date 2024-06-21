@@ -72,14 +72,14 @@ func LoginApi(c *gin.Context) {
 	}
 
 	session := sessions.Default(c)
-	session.Options(sessions.Options{
-		Path:     "/",
-		Domain:   "",
-		MaxAge:   3600 * 24,
-		Secure:   false,
-		HttpOnly: false,
-		SameSite: http.SameSiteNoneMode,
-	})
+	// session.Options(sessions.Options{
+	// 	Path:     "/",
+	// 	Domain:   "",
+	// 	MaxAge:   3600 * 24,
+	// 	Secure:   false,
+	// 	HttpOnly: false,
+	// 	SameSite: http.SameSiteNoneMode,
+	// })
 	session.Set("userID", user.ID)
 	session.Set("userAvatar", user.Avatar)
 	session.Set("userUsername", user.Username)
