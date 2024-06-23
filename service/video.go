@@ -59,8 +59,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	if action != "" && sort != "" {
 		dbVideo = dbVideo.Order(action + " " + sort)
 	}
-	// Scopes(Paginate(page, pageSize, int(count)))
-	rows, err := dbVideo.Rows()
+	rows, err := dbVideo.Scopes(Paginate(page, pageSize, int(count))).Rows()
 	if err != nil {
 		return nil, 0, err
 	}

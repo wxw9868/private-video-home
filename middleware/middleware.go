@@ -41,7 +41,7 @@ func AuthSession() gin.HandlerFunc {
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//这是允许访问所有域
-		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Header("Access-Control-Allow-Origin", "http://192.168.0.3:3000")
 		//跨域请求是否需要带cookie信息，默认设置为true
 		c.Header("Access-Control-Allow-Credentials", "true")
 		//header的类型

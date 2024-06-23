@@ -29,7 +29,7 @@ func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 		case pageSize > count:
 			pageSize = count
 		case pageSize <= 0:
-			pageSize = 16
+			pageSize = 1000
 		}
 
 		offset := (page - 1) * pageSize

@@ -20,7 +20,13 @@ func (as *ActressService) Find(page, pageSize int, action, sort string) ([]Actre
 	if action != "" && sort != "" {
 		sql += utils.Join(" order by ", action, " ", sort)
 	}
-	if err := db.Raw(sql).Scan(&actresss).Error; err != nil {
+
+	var count int64
+	if err := db.Table("video_Actress a").Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	if err := db.Raw(sql).Scopes(Paginate(page, pageSize, int(count))).Scan(&actresss).Error; err != nil {
 		return nil, err
 	}
 	return actresss, nil
