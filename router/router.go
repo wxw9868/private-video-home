@@ -9,11 +9,14 @@ import (
 )
 
 func Engine(addr string) *gin.Engine {
+	// 强制日志颜色化
+	gin.ForceConsoleColor()
+
 	router := gin.Default()
 
 	// 允许跨域
-	// router.Use(cors.Default())
-	router.Use(middleware.Cors())
+	router.Use(middleware.GinCors())
+	// router.Use(middleware.Cors())
 
 	// 性能监控
 	// pprof.Register(router)

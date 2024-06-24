@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,15 @@ func AuthSession() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+// GinCors 跨域
+func GinCors() gin.HandlerFunc {
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = false
+	config.AllowCredentials = true
+	config.AllowOrigins = []string{"http://192.168.0.3:3000", "http://192.168.0.4:3000", "http://127.0.0.1:3000"}
+	return cors.New(config)
 }
 
 // Cors 跨域
