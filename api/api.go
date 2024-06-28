@@ -86,6 +86,35 @@ func VideoActress(c *gin.Context) {
 	})
 }
 
+func VideoSearchApi(c *gin.Context) {
+	query := c.Query("query")
+
+	b, err := json.Marshal(&Search{Query: query, Page: 1, Limit: 1000, Order: "desc"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
+	resp, err := client.POST(utils.Join("/query", "?", "database=video"), "application/json", bytes.NewReader(b))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	defer resp.Body.Close()
+
+	robots, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
+	_, err = c.Writer.Write(robots)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+}
+
 type Video struct {
 	ActressID int    `uri:"actress_id" form:"actress_id" json:"actress_id"`
 	Page      int    `uri:"page" form:"page" json:"page"`
