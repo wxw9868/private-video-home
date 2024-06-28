@@ -21,8 +21,8 @@ var nameMap = map[string]string{
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "123123_001_蝶が如く ～ピンク通りの二輪車ソープランド23～_白川麻衣_石川さとみ",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "082223_001_ボクを狂わせる家庭教師のおねえさん ～胸に触れた瞬間に何かが崩壊しました～_白川麻衣",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
