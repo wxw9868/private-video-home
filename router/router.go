@@ -9,11 +9,14 @@ import (
 )
 
 func Engine(addr string) *gin.Engine {
+	// 强制日志颜色化
+	gin.ForceConsoleColor()
+
 	router := gin.Default()
 
 	// 允许跨域
-	// router.Use(cors.Default())
-	router.Use(middleware.Cors())
+	router.Use(middleware.GinCors())
+	// router.Use(middleware.Cors())
 
 	// 性能监控
 	// pprof.Register(router)
@@ -47,9 +50,10 @@ func Engine(addr string) *gin.Engine {
 	video.GET("/search", api.VideoSearch)
 	video.GET("/actress", api.VideoActress)
 	video.GET("/play", api.VideoPlay)
-	video.GET("/getPlay", api.VideoPlayApi)
+	video.GET("/getSearch", api.VideoSearchApi)
 	video.GET("/getList", api.VideoListApi)
 	video.GET("/getActress", api.VideoActressApi)
+	video.GET("/getPlay", api.VideoPlayApi)
 	video.GET("/browse", api.VideoBrowseApi)
 	video.POST("/collect", api.VideoCollectApi)
 	video.GET("/rename", api.VideoRename)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -37,14 +38,20 @@ func AuthSession() gin.HandlerFunc {
 	}
 }
 
+// GinCors 跨域
+func GinCors() gin.HandlerFunc {
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = false
+	config.AllowCredentials = true
+	config.AllowOrigins = []string{"http://127.0.0.1:3000", "http://192.168.0.2:3000", "http://192.168.0.3:3000", "http://192.168.0.4:3000", "http://192.168.0.5:3000"}
+	return cors.New(config)
+}
+
 // Cors 跨域
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//这是允许访问所有域
-		c.Header("Access-Control-Allow-Origin", "http://192.168.0.5:3000")
-		// c.Header("Access-Control-Allow-Origin", "http://192.168.0.4:3000")
-		// c.Header("Access-Control-Allow-Origin", "http://192.168.0.2:3000")
-		// c.Header("Access-Control-Allow-Origin", "http://192.168.0.3:3000")
+		c.Header("Access-Control-Allow-Origin", "http://127.0.0.1:3000")
 		//跨域请求是否需要带cookie信息，默认设置为true
 		c.Header("Access-Control-Allow-Credentials", "true")
 		//header的类型
