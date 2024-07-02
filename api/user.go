@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
+	"github.com/wxw9868/video/model"
 )
 
 func Register(c *gin.Context) {
@@ -107,4 +108,39 @@ func GetSession(c *gin.Context) {
 		"mobile":   session.Get("userMobile").(string),
 	}
 	c.JSON(http.StatusOK, util.Success("获取成功", data))
+}
+
+type UserUpdate struct {
+	Nickname    string `form:"nickname" json:"nickname" binding:"required"`
+	Username    string `form:"username" json:"username" binding:"required"`
+	Email       string `form:"email" json:"email" binding:"required,email"`
+	Mobile      string `form:"mobile" json:"mobile" binding:"required"`
+	Designation string `form:"designation" json:"designation"`
+	Address     string `form:"address" json:"address"`
+	Note        string `form:"note" json:"note"`
+}
+
+func UserUpdateApi(c *gin.Context) {
+	var bind UserUpdate
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	session := sessions.Default(c)
+	user := model.User{
+		Username:    bind.Username,
+		Nickname:    bind.Nickname,
+		Mobile:      bind.Mobile,
+		Email:       bind.Email,
+		Designation: bind.Designation,
+		Address:     bind.Address,
+		Note:        bind.Note,
+	}
+	err := us.Updates(session.Get("userID").(uint), user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
 }

@@ -52,6 +52,22 @@ func (us *UserService) Login(email, password string) (*model.User, error) {
 	return &user, nil
 }
 
+func (us *UserService) Updates(id uint, updateUser model.User) error {
+	var user model.User
+
+	tx := db.Begin()
+	if err := tx.First(&user, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := tx.Model(&user).Updates(updateUser).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
+}
+
 func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollectLog, error) {
 	var data model.UserCollectLog
 	result := db.Where("user_id = ? and video_id = ?", userID, videoID).First(&data)
