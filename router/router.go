@@ -41,9 +41,12 @@ func Engine(addr string) *gin.Engine {
 
 	auth := router.Group("", middleware.AuthSession())
 	user = auth.Group("/user")
+	user.GET("/logout", api.LogoutApi)
 	user.GET("/account", api.Account)
 	user.GET("/session", api.GetSession)
-	user.GET("/logout", api.LogoutApi)
+	user.GET("/info", api.UserInfoApi)
+	user.POST("/update", api.UserUpdateApi)
+	user.POST("/changePassword", api.ChangePasswordApi)
 
 	video := auth.Group("/video")
 	video.GET("/list", api.VideoList)
