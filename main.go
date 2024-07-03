@@ -13,7 +13,7 @@ func main() {
 	db.RegisterTables()
 
 	dev := false
-	// dev = true
+	dev = true
 
 	ip, err := utils.GetLocalIP()
 	if err != nil {

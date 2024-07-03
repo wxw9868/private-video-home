@@ -79,6 +79,7 @@ func LoginApi(c *gin.Context) {
 	session.Set("userNickname", user.Nickname)
 	session.Set("userEmail", user.Email)
 	session.Set("userMobile", user.Mobile)
+	session.Set("userDesignation", user.Designation)
 	if err = session.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail("登录失败"))
 		return
@@ -100,14 +101,24 @@ func LogoutApi(c *gin.Context) {
 func GetSession(c *gin.Context) {
 	session := sessions.Default(c)
 	data := map[string]interface{}{
-		"id":       session.Get("userID").(uint),
-		"avatar":   session.Get("userAvatar").(string),
-		"username": session.Get("userUsername").(string),
-		"nickname": session.Get("userNickname").(string),
-		"email":    session.Get("userEmail").(string),
-		"mobile":   session.Get("userMobile").(string),
+		"id":          session.Get("userID").(uint),
+		"avatar":      session.Get("userAvatar").(string),
+		"username":    session.Get("userUsername").(string),
+		"nickname":    session.Get("userNickname").(string),
+		"email":       session.Get("userEmail").(string),
+		"mobile":      session.Get("userMobile").(string),
+		"designation": session.Get("userDesignation").(string),
 	}
 	c.JSON(http.StatusOK, util.Success("获取成功", data))
+}
+
+func UserInfoApi(c *gin.Context) {
+	user, err := us.Info(GetUserID(c))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("获取成功", user))
 }
 
 type UserUpdate struct {
@@ -127,7 +138,6 @@ func UserUpdateApi(c *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(c)
 	user := model.User{
 		Username:    bind.Username,
 		Nickname:    bind.Nickname,
@@ -137,10 +147,11 @@ func UserUpdateApi(c *gin.Context) {
 		Address:     bind.Address,
 		Note:        bind.Note,
 	}
-	err := us.Updates(session.Get("userID").(uint), user)
+	err := us.Updates(GetUserID(c), user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
+	c.JSON(http.StatusOK, util.Success("更新成功", nil))
 }

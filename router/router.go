@@ -43,6 +43,7 @@ func Engine(addr string) *gin.Engine {
 	user = auth.Group("/user")
 	user.GET("/account", api.Account)
 	user.GET("/session", api.GetSession)
+	user.GET("/info", api.UserInfoApi)
 	user.POST("/update", api.UserUpdateApi)
 	user.GET("/logout", api.LogoutApi)
 
