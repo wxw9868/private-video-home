@@ -43,7 +43,7 @@ func GinCors() gin.HandlerFunc {
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = false
 	config.AllowCredentials = true
-	config.AllowOrigins = []string{"http://127.0.0.1:3000", "http://192.168.0.2:3000", "http://192.168.0.3:3000", "http://192.168.0.4:3000", "http://192.168.0.5:3000"}
+	config.AllowOrigins = []string{"http://127.0.0.1:3000", "http://192.168.0.2:3000", "http://192.168.0.3:3000", "http://192.168.0.4:3000", "http://192.168.0.5:3000", "http://192.168.0.9:3000"}
 	return cors.New(config)
 }
 
