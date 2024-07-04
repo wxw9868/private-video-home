@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.9.1
+	github.com/mattn/go-colorable v0.1.13
 	github.com/shiningrush/avatarbuilder v0.0.0-20220126032521-dd13fcf4210d
 	github.com/spf13/cast v1.6.0
 	github.com/tidwall/gjson v1.17.1

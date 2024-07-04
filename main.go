@@ -25,7 +25,8 @@ func main() {
 		port = 8081
 	}
 	ip = "192.168.0.9"
-	port = 80
+	ip = "0.0.0.0"
+	port = 8080
 
 	addr := fmt.Sprintf("%s:%d", ip, port)
 	router := router.Engine(addr)

@@ -4,13 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mattn/go-colorable"
 	"github.com/wxw9868/video/api"
 	"github.com/wxw9868/video/middleware"
 )
 
 func Engine(addr string) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	// 强制日志颜色化
 	gin.ForceConsoleColor()
+	gin.DefaultWriter = colorable.NewColorableStdout()
 
 	router := gin.Default()
 
