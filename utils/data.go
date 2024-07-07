@@ -35,7 +35,7 @@ func GenerateAvatar(name, path string) error {
 	var frontColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
 	bgColor = palette[randint(len(palette))]
 	frontColor = palette[randint(len(palette))]
-	ab := avatarbuilder.NewAvatarBuilder("D:/GoLang/video/assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
+	ab := avatarbuilder.NewAvatarBuilder("D:/video/assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
 	ab.SetBackgroundColor(bgColor)
 	ab.SetFrontgroundColor(frontColor)
 	ab.SetFontSize(300)
