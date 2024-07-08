@@ -205,7 +205,6 @@ func VideoPlay(c *gin.Context) {
 		return
 	}
 
-	// fmt.Printf("%+v\n", vi)
 	actressArr := strings.Split(vi.ActressStr, ",")
 	idsArr := strings.Split(vi.ActressIds, ",")
 	actressHtml := ""

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -27,8 +26,8 @@ func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		// fmt.Println("AuthSession")
-		userid, ok := session.Get("userID").(uint)
-		fmt.Println("AuthSession: ", userid, ok)
+		_, ok := session.Get("userID").(uint)
+		// fmt.Println("AuthSession: ", userid, ok)
 		if !ok {
 			// fmt.Println("user out: ", userid, ok)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, util.Fail("没有访问权限"))
@@ -43,7 +42,7 @@ func GinCors() gin.HandlerFunc {
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = false
 	config.AllowCredentials = true
-	config.AllowOrigins = []string{"http://127.0.0.1:3000", "http://192.168.0.2:3000", "http://192.168.0.3:3000", "http://192.168.0.4:3000", "http://192.168.0.5:3000", "http://192.168.0.9:3000"}
+	config.AllowOrigins = []string{"http://127.0.0.1:3000", "http://192.168.0.9", "http://192.168.0.9:3000", "http://192.168.0.9:8080", "http://192.168.0.9:80"}
 	return cors.New(config)
 }
 

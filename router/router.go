@@ -4,13 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mattn/go-colorable"
 	"github.com/wxw9868/video/api"
 	"github.com/wxw9868/video/middleware"
 )
 
 func Engine(addr string) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	// 强制日志颜色化
 	gin.ForceConsoleColor()
+	gin.DefaultWriter = colorable.NewColorableStdout()
 
 	router := gin.Default()
 
@@ -47,6 +50,8 @@ func Engine(addr string) *gin.Engine {
 	user.GET("/info", api.UserInfoApi)
 	user.POST("/update", api.UserUpdateApi)
 	user.POST("/changePassword", api.ChangePasswordApi)
+	user.GET("/collect", api.UserCollectApi)
+	user.GET("/browse", api.UserBrowseApi)
 
 	video := auth.Group("/video")
 	video.GET("/list", api.VideoList)

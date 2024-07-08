@@ -120,3 +120,34 @@ func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollect
 	}
 	return &data, nil
 }
+
+type VideoCollect struct {
+}
+
+func (us *UserService) CollectList(userID uint) ([]model.Video, error) {
+	var data []model.Video
+	result := db.Table("video_UserCollectLog as ucl").
+		Select("v.*").
+		Joins("left join video_Video as v on v.id = ucl.video_id").
+		Where("ucl.user_id = ?", userID).
+		Order("ucl.id desc").
+		Find(&data)
+	if err := result.Error; err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (us *UserService) BrowseList(userID uint) ([]model.Video, error) {
+	var data []model.Video
+	result := db.Table("video_UserBrowseLog as ubl").
+		Select("v.*").
+		Joins("left join video_Video as v on v.id = ubl.video_id").
+		Where("ubl.user_id = ?", userID).
+		Order("ubl.id desc").
+		Find(&data)
+	if err := result.Error; err != nil {
+		return nil, err
+	}
+	return data, nil
+}

@@ -176,3 +176,21 @@ func UserUpdateApi(c *gin.Context) {
 
 	c.JSON(http.StatusOK, util.Success("更新成功", nil))
 }
+
+func UserCollectApi(c *gin.Context) {
+	data, err := us.CollectList(GetUserID(c))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("获取成功", data))
+}
+
+func UserBrowseApi(c *gin.Context) {
+	data, err := us.BrowseList(GetUserID(c))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("获取成功", data))
+}
