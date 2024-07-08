@@ -16,10 +16,11 @@ func Engine(addr string) *gin.Engine {
 	gin.DefaultWriter = colorable.NewColorableStdout()
 
 	router := gin.Default()
+	// Set a lower memory limit for multipart forms (default is 32 MiB)
+	router.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	// 允许跨域
 	router.Use(middleware.GinCors())
-	// router.Use(middleware.Cors())
 
 	// 性能监控
 	// pprof.Register(router)
@@ -49,7 +50,10 @@ func Engine(addr string) *gin.Engine {
 	user.GET("/session", api.GetSession)
 	user.GET("/info", api.UserInfoApi)
 	user.POST("/update", api.UserUpdateApi)
+	user.POST("/uploadAvatar", api.UserUploadAvatarApi)
 	user.POST("/changePassword", api.ChangePasswordApi)
+	user.GET("/collect", api.UserCollectApi)
+	user.GET("/browse", api.UserBrowseApi)
 
 	video := auth.Group("/video")
 	video.GET("/list", api.VideoList)
@@ -62,7 +66,6 @@ func Engine(addr string) *gin.Engine {
 	video.GET("/getPlay", api.VideoPlayApi)
 	video.GET("/browse", api.VideoBrowseApi)
 	video.POST("/collect", api.VideoCollectApi)
-	video.GET("/rename", api.VideoRename)
 	video.GET("/import", api.VideoImport)
 	video.GET("/importVideoActress", api.ImportVideoActress)
 
@@ -90,7 +93,6 @@ func Engine(addr string) *gin.Engine {
 		auth.GET("/cache/list", api.CacheVideoList)
 		auth.GET("/cache/actress", api.CacheVideoActress)
 		auth.GET("/cache/play", api.CacheVideoPlay)
-		auth.GET("/cache/rename", api.VideoRename)
 	}
 
 	// Setup Security Headers

@@ -3,10 +3,12 @@ package service
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/util/randomname"
 	"github.com/wxw9868/video/model"
+	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
 )
 
@@ -96,6 +98,13 @@ func (us *UserService) Info(id uint) (*User, error) {
 	return &user, nil
 }
 
+func (us *UserService) Update(id uint, column string, value interface{}) error {
+	if err := db.Model(&model.User{}).Where("id = ?", id).Update(column, value).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (us *UserService) Updates(id uint, updateUser model.User) error {
 	var user model.User
 
@@ -119,4 +128,61 @@ func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollect
 		return nil, errors.New("收藏记录不存在！")
 	}
 	return &data, nil
+}
+
+func (us *UserService) CollectList(userID uint) ([]Video, error) {
+	rows, err := db.Table("video_UserCollectLog as ucl").
+		Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
+		Joins("left join video_Video as v on v.id = ucl.video_id").
+		Joins("left join video_VideoLog l on l.video_id = ucl.video_id").
+		Where("ucl.user_id = ? and ucl.DeletedAt is null", userID).
+		Order("ucl.id desc").
+		Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var videos []Video
+	for rows.Next() {
+		var videoInfo VideoInfo
+		db.ScanRows(rows, &videoInfo)
+
+		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
+		video := Video{
+			ID:            videoInfo.ID,
+			Title:         videoInfo.Title,
+			Actress:       videoInfo.Actress,
+			Size:          f / 1024 / 1024,
+			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
+			ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
+			Poster:        videoInfo.Poster,
+			Width:         videoInfo.Width,
+			Height:        videoInfo.Height,
+			CodecName:     videoInfo.CodecName,
+			ChannelLayout: videoInfo.ChannelLayout,
+			Collect:       videoInfo.Collect,
+			Browse:        videoInfo.Browse,
+			Zan:           videoInfo.Zan,
+			Cai:           videoInfo.Cai,
+			Watch:         videoInfo.Watch,
+		}
+		videos = append(videos, video)
+	}
+
+	return videos, nil
+}
+
+func (us *UserService) BrowseList(userID uint) ([]model.Video, error) {
+	var data []model.Video
+	result := db.Table("video_UserBrowseLog as ubl").
+		Select("v.*").
+		Joins("left join video_Video as v on v.id = ubl.video_id").
+		Where("ubl.user_id = ?", userID).
+		Order("ubl.id desc").
+		Find(&data)
+	if err := result.Error; err != nil {
+		return nil, err
+	}
+	return data, nil
 }
