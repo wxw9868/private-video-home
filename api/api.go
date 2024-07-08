@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
@@ -490,56 +489,6 @@ func CommentCaiApi(c *gin.Context) {
 		msg = "取消踩"
 	}
 	c.JSON(http.StatusOK, util.Success(msg, nil))
-}
-
-func VideoRename(c *gin.Context) {
-	var videoDir = c.Query("dir")
-	var nameMap = map[string]string{
-		"(1)":  "",
-		"(2)":  "",
-		"(3)":  "",
-		"(4)":  "",
-		"(5)":  "",
-		"(6)":  "",
-		"(7)":  "",
-		"(8)":  "",
-		"(9)":  "",
-		"(10)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "082118-735 女熱大陸 File.064  #真菜果",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
-	}
-
-	files, err := os.ReadDir(videoDir)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
-		return
-	}
-	for _, file := range files {
-		filename := file.Name()
-		oldPath := videoDir + "/" + filename
-
-		oldName := strings.Split(filename, ".")[0]
-		newName, ok := nameMap[oldName]
-		if ok {
-			filename = strings.Replace(filename, oldName, newName, -1)
-		} else {
-			filename = strings.Replace(filename, "无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "", -1)
-			filename = strings.Replace(filename, "_tg关注_@AVWUMAYUANPIAN", "", -1)
-		}
-
-		newPath := videoDir + "/" + filename
-		os.Rename(oldPath, newPath)
-	}
-
-	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
 
 func VideoImport(c *gin.Context) {

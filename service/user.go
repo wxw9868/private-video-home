@@ -96,6 +96,13 @@ func (us *UserService) Info(id uint) (*User, error) {
 	return &user, nil
 }
 
+func (us *UserService) Update(id uint, column string, value interface{}) error {
+	if err := db.Model(&model.User{}).Where("id = ?", id).Update(column, value).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (us *UserService) Updates(id uint, updateUser model.User) error {
 	var user model.User
 

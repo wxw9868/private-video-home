@@ -1,7 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -175,6 +178,34 @@ func UserUpdateApi(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, util.Success("更新成功", nil))
+}
+
+func UserUploadAvatarApi(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(fmt.Sprintf("get form err: %s", err.Error())))
+		return
+	}
+
+	filename := filepath.Base(file.Filename)
+	avatarDir := "./assets/image/avatar/" + filename
+	if err := c.SaveUploadedFile(file, avatarDir); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(fmt.Sprintf("upload file err: %s", err.Error())))
+		return
+	}
+
+	session := sessions.Default(c)
+	if err := us.Update(session.Get("userID").(uint), "avatar", avatarDir); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	if session.Get("userAvatar").(string) != "./assets/image/avatar/avatar.png" {
+		os.Remove(session.Get("userAvatar").(string))
+	}
+	session.Set("userAvatar", avatarDir)
+	session.Save()
+
+	c.JSON(http.StatusOK, util.Success("更换成功", avatarDir))
 }
 
 func UserCollectApi(c *gin.Context) {
