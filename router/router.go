@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-colorable"
 	"github.com/wxw9868/video/api"
@@ -16,14 +17,12 @@ func Engine(addr string) *gin.Engine {
 	gin.DefaultWriter = colorable.NewColorableStdout()
 
 	router := gin.Default()
-	// Set a lower memory limit for multipart forms (default is 32 MiB)
-	router.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	// 允许跨域
 	router.Use(middleware.GinCors())
 
 	// 性能监控
-	// pprof.Register(router)
+	pprof.Register(router)
 
 	router.NoRoute(middleware.NoRoute())
 	router.GET("/ping", func(c *gin.Context) {
@@ -32,6 +31,8 @@ func Engine(addr string) *gin.Engine {
 		})
 	})
 
+	// Set a lower memory limit for multipart forms (default is 32 MiB)
+	router.MaxMultipartMemory = 8 << 20 // 8 MiB
 	router.Static("/assets", "./assets")
 	router.LoadHTMLGlob("template/*")
 
