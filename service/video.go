@@ -459,21 +459,21 @@ func deleteArray(d []uint, e uint) []uint {
 	return r
 }
 
-func recursive(data map[uint]*CommentTree, childrens map[uint][]CommentTree) map[uint]*CommentTree {
-	for _, v := range data {
-		videoComments, ok := childrens[v.ID]
-		if ok {
-			v.Childrens = videoComments
-			delete(childrens, v.ID)
-			if len(childrens) > 0 {
-				data := make(map[uint]*CommentTree, len(videoComments))
-				for _, v := range videoComments {
-					videoComment := v
-					data[v.ID] = &videoComment
-				}
-				recursive(data, childrens)
-			}
-		}
-	}
-	return data
-}
+// func recursive(data map[uint]*CommentTree, childrens map[uint][]CommentTree) map[uint]*CommentTree {
+// 	for _, v := range data {
+// 		videoComments, ok := childrens[v.ID]
+// 		if ok {
+// 			v.Childrens = videoComments
+// 			delete(childrens, v.ID)
+// 			if len(childrens) > 0 {
+// 				data := make(map[uint]*CommentTree, len(videoComments))
+// 				for _, v := range videoComments {
+// 					videoComment := v
+// 					data[v.ID] = &videoComment
+// 				}
+// 				recursive(data, childrens)
+// 			}
+// 		}
+// 	}
+// 	return data
+// }
