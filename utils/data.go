@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"image/color"
 	"image/color/palette"
@@ -283,10 +284,41 @@ func WriteMapToFile(name string, v any) error {
 	return nil
 }
 
-func VideoRename(videoDir string, nameMap map[string]string, nameSlice []string) error {
+func VideoFileRename(nameMap map[string]string, nameSlice, actressSlice []string) error {
+	filename := ""
+	for index, oldName := range nameMap {
+		filename = oldName
+		for _, v := range nameSlice {
+			filename = strings.Replace(filename, v, "", -1)
+		}
+		if filename[6:7] == "-" {
+			filename = strings.Replace(filename, filename[6:7], "_", -1)
+		}
+		if !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
+			filename = strings.Replace(filename, filename[0:10], filename[0:10]+"_", -1)
+		}
+		for _, v := range actressSlice {
+			if strings.Contains(filename, v) {
+				if v == "Vol." {
+					filename = strings.Replace(filename, v, "Vol_", -1)
+				} else {
+					filename = strings.Replace(filename, v, "_"+v, -1)
+				}
+			}
+		}
+		fmt.Println(filename)
+		nameMap[index] = filename
+	}
+	return nil
+}
+
+func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressSlice []string) error {
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
 		return err
+	}
+	if len(files) == 0 {
+		return errors.New("no file")
 	}
 
 	for _, file := range files {
@@ -301,6 +333,25 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice []string)
 			for _, v := range nameSlice {
 				filename = strings.Replace(filename, v, "", -1)
 			}
+			if filename[6:7] == "-" {
+				filename = strings.Replace(filename, filename[6:7], "_", -1)
+			}
+			if !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
+				filename = strings.Replace(filename, filename[0:10], filename[0:10]+"_", -1)
+			}
+			for _, v := range actressSlice {
+				if strings.Contains(filename, v) {
+					if v == "Vol." {
+						filename = strings.Replace(filename, v, "Vol_", -1)
+					} else {
+						if !strings.Contains(filename, "_"+v) {
+							filename = strings.Replace(filename, v, "_"+v, -1)
+						}
+					}
+				}
+			}
+			filename = strings.Replace(filename, "__", "_", -1)
+			fmt.Println(filename)
 		}
 
 		newPath := videoDir + "/" + filename

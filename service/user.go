@@ -88,13 +88,25 @@ type User struct {
 	Idcard      string `gorm:"column:idcard;type:varchar(100);comment:身份证号"`
 	Address     string `gorm:"column:address;type:string;comment:地址"`
 	Note        string `gorm:"column:note;type:string;comment:备注"`
+	CollectNum  uint   `gorm:"column:collect_num;type:uint;default:0;comment:"`
+	BrowseNum   uint   `gorm:"column:browse_num;type:uint;default:0;comment:"`
 }
 
 func (us *UserService) Info(id uint) (*User, error) {
 	var user User
-	if err := db.First(&user, id).Error; err != nil {
+
+	ucl := db.Table("video_UserCollectLog as ucl").Select("ucl.user_id,count(ucl.video_id) as collect_num").Where("ucl.DeletedAt is null and ucl.user_id = ?", id).Group("ucl.user_id")
+	ubl := db.Table("video_UserBrowseLog as ubl").Select("ubl.user_id,sum(ubl.number) as browse_num").Where("ubl.DeletedAt is null and ubl.user_id = ?", id).Group("ubl.user_id")
+	if err := db.Table("video_User as users").
+		Select("users.id,users.username,users.nickname,users.sex,users.mobile,users.email,users.qq,users.avatar,users.designation,users.realname,users.idcard,users.address,users.note,collect_num,browse_num").
+		Joins("left join (?) as ucl on ucl.user_id = users.id", ucl).
+		Joins("left join (?) as ubl on ubl.user_id = users.id", ubl).
+		Where("users.id = ?", id).
+		Group("users.id,users.username,users.nickname,users.sex,users.mobile,users.email,users.qq,users.avatar,users.designation,users.realname,users.idcard,users.address,users.note").
+		First(&user).Error; err != nil {
 		return nil, err
 	}
+
 	return &user, nil
 }
 

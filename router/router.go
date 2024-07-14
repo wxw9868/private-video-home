@@ -10,7 +10,7 @@ import (
 )
 
 func Engine(addr string) *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)
 	// 强制日志颜色化
 	gin.ForceConsoleColor()
 	gin.DefaultWriter = colorable.NewColorableStdout()
