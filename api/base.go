@@ -36,6 +36,7 @@ var (
 	us = new(service.UserService)
 	vs = new(service.VideoService)
 	as = new(service.ActressService)
+	ss = new(service.SendService)
 
 	// snapshotDir = "./assets/image/snapshot"
 	list            []string

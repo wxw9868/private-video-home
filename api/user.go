@@ -145,6 +145,33 @@ func ChangePasswordApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("修改密码成功", nil))
 }
 
+type ForgotPassword struct {
+	ResetPasswordToken string `form:"reset_password_token" json:"reset_password_token" binding:"required"`
+	Password           string `form:"password" json:"password" binding:"required"`
+	ConfirmPassword    string `form:"confirm_password" json:"confirm_password" binding:"required,eqcsfield=Password"`
+}
+
+func ForgotPasswordApi(c *gin.Context) {
+	var bind ForgotPassword
+	if err := c.ShouldBind(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	session := sessions.Default(c)
+	email := session.Get(bind.ResetPasswordToken).(string)
+	if email == "" {
+		c.JSON(http.StatusBadRequest, util.Fail("密码重置链接已失效，请重新获取"))
+		return
+	}
+
+	if err := us.ForgotPassword(email, bind.Password); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("修改密码成功", nil))
+}
+
 type UserUpdate struct {
 	Nickname    string `form:"nickname" json:"nickname" binding:"required"`
 	Username    string `form:"username" json:"username" binding:"required"`

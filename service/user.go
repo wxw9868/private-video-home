@@ -73,6 +73,18 @@ func (us *UserService) ChangePassword(id uint, oldPassword, newPassword string) 
 	}
 	return nil
 }
+func (us *UserService) ForgotPassword(email, newPassword string) error {
+	var user model.User
+	if errors.Is(db.Where("email = ?", email).First(&user).Error, gorm.ErrRecordNotFound) {
+		return errors.New("邮箱错误！")
+	}
+	password, _ := util.DataEncryption(newPassword)
+	result := db.Model(&user).Updates(model.User{Password: password})
+	if result.Error != nil {
+		return errors.New("修改密码失败！")
+	}
+	return nil
+}
 
 type User struct {
 	ID          uint
