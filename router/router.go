@@ -43,6 +43,10 @@ func Engine(addr string) *gin.Engine {
 	user.GET("/login", api.Login)
 	user.POST("/doRegister", api.RegisterApi)
 	user.POST("/doLogin", api.LoginApi)
+	user.POST("/sendMail", api.SendMailApi)
+	user.POST("/sendUrl", api.SendUrlApi)
+	user.POST("/captcha", api.CaptchaApi)
+	user.POST("/forgotPassword", api.ForgotPasswordApi)
 
 	auth := router.Group("", middleware.AuthSession())
 	user = auth.Group("/user")

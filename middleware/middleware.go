@@ -25,11 +25,8 @@ func InitSession() gin.HandlerFunc {
 func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
-		// fmt.Println("AuthSession")
 		_, ok := session.Get("userID").(uint)
-		// fmt.Println("AuthSession: ", userid, ok)
 		if !ok {
-			// fmt.Println("user out: ", userid, ok)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, util.Fail("没有访问权限"))
 			return
 		}
@@ -50,7 +47,7 @@ func GinCors() gin.HandlerFunc {
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//这是允许访问所有域
-		c.Header("Access-Control-Allow-Origin", "http://127.0.0.1:3000")
+		c.Header("Access-Control-Allow-Origin", "*")
 		//跨域请求是否需要带cookie信息，默认设置为true
 		c.Header("Access-Control-Allow-Credentials", "true")
 		//header的类型
