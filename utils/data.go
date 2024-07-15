@@ -350,7 +350,6 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 					}
 				}
 			}
-			filename = strings.Replace(filename, "__", "_", -1)
 			fmt.Println(filename)
 		}
 
