@@ -8,8 +8,8 @@ import (
 
 func TestVideoFileRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "022324-001 シェアガール ～令和版あなたの街のかわいい何でも屋さん～  #日南りん",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "081823-001 逆お持ち帰り ～酒でスケベが増した2人組の美人上司に朝までヌキ尽くされました！～   #日南りん  #佐々木かな",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
