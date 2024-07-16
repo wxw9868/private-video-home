@@ -8,8 +8,8 @@ import (
 
 func TestVideoFileRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "022324-001 シェアガール ～令和版あなたの街のかわいい何でも屋さん～  #日南りん",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "081823-001 逆お持ち帰り ～酒でスケベが増した2人組の美人上司に朝までヌキ尽くされました！～   #日南りん  #佐々木かな",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
@@ -53,7 +53,7 @@ func TestVideoRename(t *testing.T) {
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "#", " "}
-	var actressSlice = []string{"三浦凛", "宮澤さおり"}
+	var actressSlice = []string{"日南りん", "長峰しほ"}
 	if err := VideoRename("C:/Users/wxw9868/Downloads/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
