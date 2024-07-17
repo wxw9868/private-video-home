@@ -388,3 +388,27 @@ func GeneteSQL() string {
 
 	return actressSql
 }
+
+func GetTime(tt string) (d time.Time) {
+	now := time.Now()
+	year, month, day := now.Date()
+
+	// 今日日期
+	today := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+	switch tt {
+	case "today":
+		d = today
+	case "yesterday":
+		// 昨日日期
+		d = today.AddDate(0, 0, -1)
+	case "weekStart":
+		// 本周起始日期（周一）
+		d = today.AddDate(0, 0, -int(today.Weekday())+1)
+	case "monthStart":
+		// 本月起始日期
+		d = time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
+	default:
+		d = now.Local()
+	}
+	return
+}

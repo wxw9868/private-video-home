@@ -23,5 +23,8 @@
     "emmet.excludeLanguages": [
         "markdown"
     ],
-    "go.addTags": {}
+    "go.addTags": {},
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    }
 }
