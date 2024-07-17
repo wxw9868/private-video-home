@@ -197,16 +197,32 @@ func (us *UserService) CollectList(userID uint) ([]Video, error) {
 	return videos, nil
 }
 
-func (us *UserService) BrowseList(userID uint) ([]model.Video, error) {
-	var data []model.Video
+type VideoBrowse struct {
+	ID       uint   `json:"id"`
+	Title    string `json:"title"`
+	Duration string `json:"duration"`
+	Poster   string `json:"poster"`
+}
+
+func (us *UserService) BrowseList(userID uint) ([]VideoBrowse, error) {
+	var videos []model.Video
 	result := db.Table("video_UserBrowseLog as ubl").
-		Select("v.*").
+		Select("v.id,v.title,v.duration,v.poster").
 		Joins("left join video_Video as v on v.id = ubl.video_id").
-		Where("ubl.user_id = ?", userID).
-		Order("ubl.id desc").
-		Find(&data)
+		Where("ubl.user_id = ? and ubl.UpdatedAt >= ?", userID, utils.GetTime("yesterday")).
+		Order("ubl.UpdatedAt desc").
+		Find(&videos)
 	if err := result.Error; err != nil {
 		return nil, err
+	}
+	data := make([]VideoBrowse, len(videos))
+	for k, video := range videos {
+		data[k] = VideoBrowse{
+			ID:       video.ID,
+			Title:    video.Title,
+			Duration: utils.ResolveTime(uint32(video.Duration)),
+			Poster:   video.Poster,
+		}
 	}
 	return data, nil
 }
