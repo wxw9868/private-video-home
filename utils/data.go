@@ -36,7 +36,7 @@ func GenerateAvatar(name, path string) error {
 	var frontColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
 	bgColor = palette[randint(len(palette))]
 	frontColor = palette[randint(len(palette))]
-	ab := avatarbuilder.NewAvatarBuilder("D:/video/assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
+	ab := avatarbuilder.NewAvatarBuilder("E:/video/assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
 	ab.SetBackgroundColor(bgColor)
 	ab.SetFrontgroundColor(frontColor)
 	ab.SetFontSize(300)
@@ -291,22 +291,25 @@ func VideoFileRename(nameMap map[string]string, nameSlice, actressSlice []string
 		for _, v := range nameSlice {
 			filename = strings.Replace(filename, v, "", -1)
 		}
-		if filename[6:7] == "-" {
+		if len(filename) > 0 && filename[6:7] == "-" {
 			filename = strings.Replace(filename, filename[6:7], "_", -1)
 		}
-		if !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
+		if len(filename) > 0 && !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
 			filename = strings.Replace(filename, filename[0:10], filename[0:10]+"_", -1)
 		}
 		for _, v := range actressSlice {
 			if strings.Contains(filename, v) {
 				if v == "Vol." {
 					filename = strings.Replace(filename, v, "Vol_", -1)
+				} else if v == "Heyzo-" {
+					filename = strings.Replace(filename, v, "Heyzo_", -1)
+				} else if v == "File." {
+					filename = strings.Replace(filename, v, "File_", -1)
 				} else {
 					filename = strings.Replace(filename, v, "_"+v, -1)
 				}
 			}
 		}
-		fmt.Println(filename)
 		nameMap[index] = filename
 	}
 	return nil
@@ -322,37 +325,38 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 	}
 
 	for _, file := range files {
-		filename := file.Name()
-		oldPath := videoDir + "/" + filename
+		oldFilename := file.Name()
+		filename := oldFilename
 
 		oldName := strings.Split(filename, ".")[0]
 		newName, ok := nameMap[oldName]
 		if ok {
 			filename = strings.Replace(filename, oldName, newName, -1)
-		} else {
-			for _, v := range nameSlice {
-				filename = strings.Replace(filename, v, "", -1)
-			}
-			if filename[6:7] == "-" {
-				filename = strings.Replace(filename, filename[6:7], "_", -1)
-			}
-			if !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
-				filename = strings.Replace(filename, filename[0:10], filename[0:10]+"_", -1)
-			}
-			for _, v := range actressSlice {
-				if strings.Contains(filename, v) {
-					if v == "Vol." {
-						filename = strings.Replace(filename, v, "Vol_", -1)
-					} else {
-						if !strings.Contains(filename, "_"+v) {
-							filename = strings.Replace(filename, v, "_"+v, -1)
-						}
-					}
+		}
+		for _, v := range nameSlice {
+			filename = strings.Replace(filename, v, "", -1)
+		}
+		if len(filename) > 0 && filename[6:7] == "-" {
+			filename = strings.Replace(filename, filename[6:7], "_", -1)
+		}
+		if len(filename) > 0 && !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
+			filename = strings.Replace(filename, filename[0:10], filename[0:10]+"_", -1)
+		}
+		for _, v := range actressSlice {
+			if strings.Contains(filename, v) {
+				if v == "Vol." {
+					filename = strings.Replace(filename, v, "Vol_", -1)
+				} else if v == "Heyzo-" {
+					filename = strings.Replace(filename, v, "Heyzo_", -1)
+				} else if v == "File." {
+					filename = strings.Replace(filename, v, "File_", -1)
+				} else {
+					filename = strings.Replace(filename, v, "_"+v, -1)
 				}
 			}
-			fmt.Println(filename)
 		}
 
+		oldPath := videoDir + "/" + oldFilename
 		newPath := videoDir + "/" + filename
 		if err = os.Rename(oldPath, newPath); err != nil {
 			return err
