@@ -20,23 +20,23 @@ func TestVideoFileRename(t *testing.T) {
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 	}
 	var nameSlice = []string{
-		"#", " ",
-		// "无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
-		// "_一本道_无码AV_無碼AV", "_一本道_无码AV",
-		// "_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
-		// "_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV",
-	}
-	var actressSlice = []string{"高垣楓", "西川ゆい", "Vol."}
+		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
+		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
+		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
+		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "#", " "}
+	var actressSlice = []string{"佐々木かな", "Heyzo-", "Vol.", "File."}
 	if err := VideoFileRename(nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%+v\n", nameMap)
+	// fmt.Printf("%+v\n", nameMap)
 	fmt.Println("SUCCESS")
 }
 
+// #川相千里  #大沢まなみ 山中麗子
+
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "010424-001 女熱大陸 File.097   #佐々木かな",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
@@ -47,14 +47,13 @@ func TestVideoRename(t *testing.T) {
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 	}
-
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "#", " "}
-	var actressSlice = []string{"三浦凛", "宮澤さおり"}
-	if err := VideoRename("C:/Users/wxw9868/Downloads/ta", nameMap, nameSlice, actressSlice); err != nil {
+	var actressSlice = []string{"佐々木かな", "Heyzo-", "Vol.", "File."}
+	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("SUCCESS")

@@ -1,0 +1,10 @@
+.vscode/
+.git/
+*.log
+assets/demo/
+assets/video/
+bin/
+cert/
+database/
+tmp/
+*.exe
