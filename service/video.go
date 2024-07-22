@@ -99,11 +99,17 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		})
 	}
 
-	b, err := json.Marshal(&indexBatch)
-	if err != nil {
-		return nil, 0, err
+	if gofound != len(indexBatch) {
+		gofound = len(indexBatch)
+
+		b, err := json.Marshal(&indexBatch)
+		if err != nil {
+			return nil, 0, err
+		}
+		if err := Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b)); err != nil {
+			return nil, 0, err
+		}
 	}
-	Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b))
 
 	return videos, count, nil
 }

@@ -17,19 +17,6 @@ import (
 	"github.com/wxw9868/video/utils"
 )
 
-func VideoIndex(c *gin.Context) {
-	cards := make([]string, 14)
-	for i := 0; i < 14; i++ {
-		cardPath := "./assets/image/card/card" + strconv.Itoa(i+1) + ".jpeg"
-		cards[i] = cardPath
-	}
-
-	c.HTML(http.StatusOK, "index.html", gin.H{
-		"title": "首页",
-		"data":  cards,
-	})
-}
-
 type Search struct {
 	Query     string      `json:"query" binding:"required"`
 	Page      int         `json:"page"`
@@ -37,52 +24,6 @@ type Search struct {
 	Order     string      `json:"order"`
 	Highlight interface{} `json:"highlight"`
 	ScoreExp  string      `json:"scoreExp"`
-}
-
-func VideoSearch(c *gin.Context) {
-	query := c.Query("query")
-
-	b, err := json.Marshal(&Search{Query: query, Page: 1, Limit: 240, Order: "desc"})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-
-	resp, err := client.POST(utils.Join("/query", "?", "database=video"), "application/json", bytes.NewReader(b))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
-		return
-	}
-	defer resp.Body.Close()
-
-	robots, err := io.ReadAll(resp.Body)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-
-	c.HTML(http.StatusOK, "search.html", gin.H{
-		"title": "视频列表",
-		"data":  string(robots),
-	})
-}
-
-func VideoList(c *gin.Context) {
-	actressID := cast.ToInt(c.Query("actress_id"))
-	page := cast.ToInt(c.Query("page"))
-	pageSize := cast.ToInt(c.Query("pagesize"))
-	c.HTML(http.StatusOK, "video-list.html", gin.H{
-		"title":     "视频列表",
-		"actressID": actressID,
-		"page":      page,
-		"pagesize":  pageSize,
-	})
-}
-
-func VideoActress(c *gin.Context) {
-	c.HTML(http.StatusOK, "video-actress.html", gin.H{
-		"title": "演员列表",
-	})
 }
 
 func VideoSearchApi(c *gin.Context) {
@@ -189,63 +130,6 @@ func VideoActressApi(c *gin.Context) {
 
 type Play struct {
 	ID string `form:"id" binding:"required"`
-}
-
-func VideoPlay(c *gin.Context) {
-	var play Play
-	if err := c.Bind(&play); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
-		return
-	}
-
-	vi, err := vs.Info(cast.ToUint(play.ID))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-
-	actressArr := strings.Split(vi.ActressStr, ",")
-	idsArr := strings.Split(vi.ActressIds, ",")
-	actressHtml := ""
-	for i := 0; i < len(actressArr); i++ {
-		if i == 0 {
-			actressHtml += `<a href="/video/list?actress_id=` + idsArr[i] + `">` + actressArr[i] + `</a>`
-		} else {
-			actressHtml += `<a class="ms-2" href="/video/list?actress_id=` + idsArr[i] + `">` + actressArr[i] + `</a>`
-		}
-	}
-	var collectID uint = 0
-	var isCollect = false
-	usc, err := us.CollectLog(GetUserID(c), vi.ID)
-	if err == nil {
-		collectID = usc.ID
-		isCollect = true
-	}
-
-	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
-	c.HTML(http.StatusOK, "video-player.html", gin.H{
-		"title":         "视频播放",
-		"videoID":       vi.ID,
-		"videoTitle":    vi.Title,
-		"videoActress":  actressHtml,
-		"videoUrl":      videoDir + "/" + vi.Title + ".mp4",
-		"Size":          size / 1024 / 1024,
-		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
-		"ModTime":       vi.CreationTime.Format("2006-01-02 15:04:05"),
-		"Poster":        vi.Poster,
-		"Width":         vi.Width,
-		"Height":        vi.Height,
-		"CodecName":     vi.CodecName,
-		"ChannelLayout": vi.ChannelLayout,
-		"Collect":       vi.Collect,
-		"Browse":        vi.Browse,
-		"Zan":           vi.Zan,
-		"Cai":           vi.Cai,
-		"Watch":         vi.Watch,
-		"CollectID":     collectID,
-		"IsCollect":     isCollect,
-		"Avatar":        sessions.Default(c).Get("userAvatar").(string),
-	})
 }
 
 func VideoPlayApi(c *gin.Context) {
