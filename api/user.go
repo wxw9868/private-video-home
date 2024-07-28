@@ -12,24 +12,6 @@ import (
 	"github.com/wxw9868/video/model"
 )
 
-func Register(c *gin.Context) {
-	c.HTML(http.StatusOK, "sign-up.html", gin.H{
-		"title": "注册",
-	})
-}
-
-func Login(c *gin.Context) {
-	c.HTML(http.StatusOK, "sign-in.html", gin.H{
-		"title": "登录",
-	})
-}
-
-func Account(c *gin.Context) {
-	c.HTML(http.StatusOK, "account.html", gin.H{
-		"title": "账号设置",
-	})
-}
-
 type RegisterReq struct {
 	Username       string `form:"username" json:"username" binding:"required"`
 	Email          string `form:"email" json:"email" binding:"required,email"`

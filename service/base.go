@@ -17,6 +17,7 @@ import (
 )
 
 var db = sqlite.DB()
+var gofound = 0
 var mutex = new(sync.Mutex)
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
@@ -118,7 +119,6 @@ func ImportActress() error {
 	var actressMap = make(map[string]struct{})
 
 	utils.ReadFileToMap("actress.json", &actressMap)
-	// fmt.Printf("map: %+v\n", actressMap)
 
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
 	for actress, _ := range actressMap {
@@ -148,11 +148,11 @@ func Post(url string, body io.Reader) error {
 	}
 	defer resp.Body.Close()
 
-	robots, err := io.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(robots))
+
 	return nil
 }
 

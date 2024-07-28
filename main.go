@@ -16,10 +16,10 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	addr := fmt.Sprintf("%s:%d", "0.0.0.0", 8080)
-	router := router.Engine(addr)
+	addr := fmt.Sprintf("%s:%d", "0.0.0.0", 8090)
+	r := router.Engine(addr)
 
-	if err := router.Run(addr); err != nil {
+	if err := r.Run(addr); err != nil {
 		log.Fatal(err)
 	}
 
