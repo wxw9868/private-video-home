@@ -8,11 +8,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
-	"github.com/wxw9868/video/initialize/httpclient"
+	gofoundClient "github.com/wxw9868/video/initialize/gofound"
 	"github.com/wxw9868/video/utils"
 )
 
-var client = httpclient.HttpClient()
+var client = gofoundClient.GofoundClient()
 
 type Index struct {
 	Id       uint32      `json:"id" binding:"required"`

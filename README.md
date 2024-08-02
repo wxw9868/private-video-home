@@ -36,18 +36,43 @@ sqlite3 -version
 > 直接下载 [可执行文件](https://github.com/newpanjing/gofound/releases) 可以不用编译，省去这一步。
 ```sh
 git clone https://github.com/sea-team/gofound.git
+cd gofound
 go get && go build 
 ```
-* 启动
+* 命令启动
 ```sh
 ./gofound --addr=:8080 --data=./data
 ```
-* docker部署
+* Docker命令部署
 ```sh
 docker build -t gofound .
 docker run -d --name gofound -p 5678:5678 -v /mnt/data/gofound:/usr/local/go_found/data gofound:latest
 ```
+###  1.4. <a name='Redis'></a>1. 安装和启动 Redis
+```sh
+# 拉取官方的最新版本的镜像
+docker pull redis:latest
+# 运行 redis 容器
+docker run -itd --name my-video-redis -p 6379:6379 \
+--mount E:/video/conf/redis.conf:/redis/config/redis.conf \
+--mount type=bind,source=E:/video/database/redis,target=/data \
+redis \
+redis-server /redis/config/redis.conf \
+redis-server --appendonly yes
 
+# 通过 redis-cli 连接测试使用 redis 服务
+$ docker exec -it my-video-redis /bin/bash
+```
+## 安装和启动 Video
+```sh
+docker build -t my-video:v1 .
+
+docker run -d -p 8080:8080 --name my-video \
+--mount type=bind,source=E:/video/assets,target=/usr/src/app/assets \
+--mount type=bind,source=E:/video/database/sqlite,target=/usr/src/app/database/sqlite my-video:v1
+
+docker stop <容器id>
+```
 ##  2. <a name='-1'></a>实时重载
 ###  2.1. <a name='air'></a>安装 air
 ```sh
