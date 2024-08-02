@@ -23,7 +23,7 @@ redis:
   db: 0
 
 #阿里云短信配置
-alisms:
-  regionIC: cn-hangzhou
-  accessKeyIC: LTAIGSWvIq07UahP
-  accessKeySecret: lBloVsVhju5uD7oZNzCOzeiC6jPMZu
+# alisms:
+#   regionIC: cn-hangzhou
+#   accessKeyIC: LTAIGSWvIq07UahP
+#   accessKeySecret: lBloVsVhju5uD7oZNzCOzeiC6jPMZu
