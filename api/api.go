@@ -94,40 +94,6 @@ func VideoListApi(c *gin.Context) {
 	}))
 }
 
-type Actress struct {
-	Page   int    `uri:"page" form:"page" json:"page"`
-	Size   int    `uri:"size" form:"size" json:"size"`
-	Action string `uri:"action" form:"action" json:"action"`
-	Sort   string `uri:"sort" form:"sort" json:"sort"`
-}
-
-func VideoActressApi(c *gin.Context) {
-	var bind Video
-	if err := c.Bind(&bind); err != nil {
-		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
-		return
-	}
-
-	actresss, err := as.Find(bind.Page, bind.Size, bind.Action, bind.Sort)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-
-	// var data = make(map[string]struct{})
-	// for _, v := range actresss {
-	// 	data[v.Actress] = struct{}{}
-	// }
-	// fmt.Printf("%d\n", len(data))
-	// utils.WriteMapToFile("data.json", &data)
-	// fmt.Printf("%+v\n", actresss)
-	// fmt.Printf("%d\n", len(actresss))
-
-	c.JSON(http.StatusOK, util.Success("视频列表", map[string]interface{}{
-		"list": actresss,
-	}))
-}
-
 type Play struct {
 	ID string `form:"id" binding:"required"`
 }
