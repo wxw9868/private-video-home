@@ -10,14 +10,14 @@ import (
 	"time"
 
 	sqlite "github.com/wxw9868/video/initialize/db"
-	"github.com/wxw9868/video/initialize/httpclient"
+	gofoundClient "github.com/wxw9868/video/initialize/gofound"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
 )
 
 var db = sqlite.DB()
-var gofound = 0
+var gofoundCount = 0
 var mutex = new(sync.Mutex)
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
@@ -142,7 +142,7 @@ func ImportActress() error {
 }
 
 func Post(url string, body io.Reader) error {
-	resp, err := httpclient.HttpClient().POST(url, "application/json", body)
+	resp, err := gofoundClient.GofoundClient().POST(url, "application/json", body)
 	if err != nil {
 		return err
 	}

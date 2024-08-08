@@ -1,0 +1,23 @@
+#系统配置
+system:
+  host: '0.0.0.0'
+  port: '8080'
+  #配置https证书
+  cert:
+  key:
+
+#数据库配置
+database:
+  db_type: postgres
+  db_user:
+  db_pass:
+  db_name:
+  db_host:
+  db_port:
+
+#Redis配置
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ''
+  db: 0

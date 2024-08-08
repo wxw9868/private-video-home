@@ -99,8 +99,8 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		})
 	}
 
-	if gofound != len(indexBatch) {
-		gofound = len(indexBatch)
+	if gofoundCount != len(indexBatch) {
+		gofoundCount = len(indexBatch)
 
 		b, err := json.Marshal(&indexBatch)
 		if err != nil {

@@ -360,6 +360,8 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 			}
 		}
 
+		//filename = strings.Replace(filename, "_亀井ひとみ", "_杉浦花音", -1)
+
 		oldPath := videoDir + "/" + oldFilename
 		newPath := videoDir + "/" + filename
 		if err = os.Rename(oldPath, newPath); err != nil {
