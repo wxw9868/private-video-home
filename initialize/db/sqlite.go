@@ -28,7 +28,7 @@ func init() {
 	)
 
 	var err error
-	db, err = gorm.Open(sqlite.Open("./database/video.db"), &gorm.Config{
+	db, err = gorm.Open(sqlite.Open("./database/sqlite/video.db"), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   "video_",                        // table name prefix, table for `User` would be `t_users`
 			SingularTable: true,                            // use singular table name, table for `User` would be `user` with this option enabled
