@@ -71,6 +71,10 @@ func Engine(addr string) *gin.Engine {
 	comment.POST("/zan", api.CommentZanApi)
 	comment.POST("/cai", api.CommentCaiApi)
 
+	danmu := auth.Group("/danmu")
+	danmu.GET("/list", api.DanmuListApi)
+	danmu.POST("/save", api.DanmuSaveApi)
+
 	search := auth.Group("/search")
 	search.POST("/api/index", api.SearchIndex)
 	search.POST("/api/index/batch", api.SearchIndexBatch)

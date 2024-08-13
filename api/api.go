@@ -341,6 +341,37 @@ func CommentCaiApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
+func DanmuListApi(c *gin.Context) {
+	id := c.Query("video_id")
+
+	userID := GetUserID(c)
+
+	list, err := vs.CommentList(cast.ToUint(id), userID)
+	if err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("评论列表", list))
+}
+
+type DanmuSave struct {
+	VideoID uint   `form:"video_id" json:"video_id" binding:"required"`
+	Text    string `form:"text" json:"text" binding:"required"`
+	Time    uint8  `form:"time" json:"time"`
+	Mode    uint8  `form:"mode" json:"mode"`
+	Color   string `form:"color" json:"color" binding:"required"`
+	Border  bool   `form:"border" json:"border" binding:"required"`
+	Style   string `form:"style" json:"style"`
+}
+
+func DanmuSaveApi(c *gin.Context) {
+	var bind CommentCai
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+}
+
 func VideoImport(c *gin.Context) {
 	var videoDir = c.Query("dir")
 	if err := service.VideoImport(videoDir); err != nil {
