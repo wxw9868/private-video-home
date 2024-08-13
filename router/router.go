@@ -58,7 +58,6 @@ func Engine(addr string) *gin.Engine {
 	video := auth.Group("/video")
 	video.GET("/getSearch", api.VideoSearchApi)
 	video.GET("/getList", api.VideoListApi)
-	video.GET("/getActress", api.VideoActressApi)
 	video.GET("/getPlay", api.VideoPlayApi)
 	video.GET("/browse", api.VideoBrowseApi)
 	video.POST("/collect", api.VideoCollectApi)
@@ -72,7 +71,7 @@ func Engine(addr string) *gin.Engine {
 	comment.POST("/zan", api.CommentZanApi)
 	comment.POST("/cai", api.CommentCaiApi)
 
-	search := router.Group("/search")
+	search := auth.Group("/search")
 	search.POST("/api/index", api.SearchIndex)
 	search.POST("/api/index/batch", api.SearchIndexBatch)
 	search.POST("/api/index/remove", api.SearchIndexRemove)
@@ -80,6 +79,23 @@ func Engine(addr string) *gin.Engine {
 	search.GET("/api/status", api.SearchStatus)
 	search.GET("/api/db/drop", api.SearchDbDrop)
 	search.GET("/api/word/cut", api.SearchWordCut)
+
+	actress := auth.Group("/actress")
+	actress.POST("/add", api.ActressAddApi)
+	actress.POST("/edit", api.ActressEditApi)
+	actress.GET("/delete", api.ActressDeleteApi)
+	actress.GET("/list", api.ActressListApi)
+
+	tag := auth.Group("/tag")
+	tag.POST("/add", api.TagAddApi)
+	tag.POST("/edit", api.TagEditApi)
+	tag.GET("/delete", api.TagDeleteApi)
+	tag.GET("/list", api.TagListApi)
+
+	stock := auth.Group("/stock")
+	stock.POST("/import_trading_records", api.ImportTradingRecordsApi)
+	stock.GET("/liquidation", api.LiquidationApi)
+	stock.GET("/trading_records", api.TradingRecordsApi)
 
 	// Setup Security Headers
 	// router.Use(func(c *gin.Context) {

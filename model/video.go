@@ -20,12 +20,6 @@ type Video struct {
 	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
 }
 
-type Actress struct {
-	gorm.Model
-	Actress string `gorm:"column:actress;type:varchar(100);uniqueIndex;comment:演员"`
-	Avatar  string `gorm:"column:avatar;type:varchar(255);comment:头像"`
-}
-
 type VideoLog struct {
 	gorm.Model
 	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
@@ -60,4 +54,10 @@ type VideoActress struct {
 	gorm.Model
 	VideoId   uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
 	ActressId uint `gorm:"column:actress_id;type:uint;not null;default:0;comment:演员ID"`
+}
+
+type VideoTag struct {
+	gorm.Model
+	VideoId uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
+	TagId   uint `gorm:"column:tag_id;type:uint;not null;default:0;comment:标签ID"`
 }
