@@ -12,7 +12,7 @@ import (
 
 func NoRoute() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, "404.html", nil)
+		c.JSON(http.StatusNotFound, "404")
 		c.Abort()
 	}
 }

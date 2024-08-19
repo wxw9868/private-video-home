@@ -483,3 +483,37 @@ func deleteArray(d []uint, e uint) []uint {
 // 	}
 // 	return data
 // }
+
+type VideoDanmu struct {
+	Text   string  `json:"text" gorm:"column:text;type:text;not null;comment:弹幕文本"`
+	Time   float64 `json:"time" gorm:"column:time;type:double;not null;comment:弹幕时间, 默认为当前播放器时间"`
+	Mode   uint8   `json:"mode" gorm:"column:mode;type:uint;not null;default:0;comment:弹幕模式: 0: 滚动(默认)，1: 顶部，2: 底部"`
+	Color  string  `json:"color" gorm:"column:color;type:text;not null;comment:弹幕颜色，默认为白色"`
+	Border bool    `json:"border" gorm:"column:border;type:bool;not null;default:false;comment:弹幕是否有描边, 默认为 false"`
+	// Style  string `json:"style" gorm:"column:style;type:text;not null;comment:弹幕自定义样式, 默认为空对象"`
+}
+
+func (vs *VideoService) DanmuList(videoID uint) ([]VideoDanmu, error) {
+	var list []VideoDanmu
+	if err := db.Model(&model.VideoDanmu{}).Where("video_id = ?", videoID).Order("time asc").Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+func (vs *VideoService) DanmuSave(videoID, userID uint, text string, time float64, mode uint8, color string, border bool, style string) error {
+	var danmu = model.VideoDanmu{
+		VideoId: videoID,
+		UserId:  userID,
+		Text:    text,
+		Time:    time,
+		Mode:    mode,
+		Color:   color,
+		Border:  border,
+		Style:   style,
+	}
+	if err := db.Create(&danmu).Error; err != nil {
+		return err
+	}
+	return nil
+}

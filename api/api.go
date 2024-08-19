@@ -344,32 +344,38 @@ func CommentCaiApi(c *gin.Context) {
 func DanmuListApi(c *gin.Context) {
 	id := c.Query("video_id")
 
-	userID := GetUserID(c)
-
-	list, err := vs.CommentList(cast.ToUint(id), userID)
+	list, err := vs.DanmuList(cast.ToUint(id))
 	if err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, util.Success("评论列表", list))
+	c.JSON(http.StatusOK, util.Success("弹幕列表", list))
 }
 
 type DanmuSave struct {
-	VideoID uint   `form:"video_id" json:"video_id" binding:"required"`
-	Text    string `form:"text" json:"text" binding:"required"`
-	Time    uint8  `form:"time" json:"time"`
-	Mode    uint8  `form:"mode" json:"mode"`
-	Color   string `form:"color" json:"color" binding:"required"`
-	Border  bool   `form:"border" json:"border" binding:"required"`
-	Style   string `form:"style" json:"style"`
+	VideoID uint    `form:"video_id" json:"video_id" binding:"required"`
+	Text    string  `form:"text" json:"text" binding:"required"`
+	Time    float64 `form:"time" json:"time"`
+	Mode    uint8   `form:"mode" json:"mode"`
+	Color   string  `form:"color" json:"color" binding:"required"`
+	Border  bool    `form:"border" json:"border"`
+	Style   string  `form:"style" json:"style"`
 }
 
 func DanmuSaveApi(c *gin.Context) {
-	var bind CommentCai
+	var bind DanmuSave
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
+
+	userID := GetUserID(c)
+
+	if err := vs.DanmuSave(bind.VideoID, userID, bind.Text, bind.Time, bind.Mode, bind.Color, bind.Border, bind.Style); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("发送成功", nil))
 }
 
 func VideoImport(c *gin.Context) {
