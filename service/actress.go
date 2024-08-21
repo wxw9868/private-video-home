@@ -43,6 +43,11 @@ type Actress struct {
 func (as *ActressService) List(page, pageSize int, action, sort string) ([]Actress, error) {
 	var actresss []Actress
 	sql := "SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id group by 1,2,3"
+
+	if action == "null" || sort == "null" {
+		action = ""
+		sort = ""
+	}
 	if action != "" && sort != "" {
 		sql += utils.Join(" order by ", action, " ", sort)
 	}
