@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	sqlite "github.com/wxw9868/video/initialize/db"
 	gofoundClient "github.com/wxw9868/video/initialize/gofound"
 	"github.com/wxw9868/video/model"
@@ -201,4 +202,70 @@ func VideoActress() error {
 		return nil
 	})
 	return err
+}
+
+func VideoActressAdditionalInformation() error {
+	var actresss []model.Actress
+	if err := db.Find(&actresss).Error; err != nil {
+		return err
+	}
+	for _, v := range actresss {
+		m := v
+
+		elems := make([]string, 3)
+		elems[0] = "https://xslist.org/search?query="
+		elems[1] = v.Actress
+		elems[2] = "&lg=zh"
+		doc, err := utils.GetWebDocument(strings.Join(elems, ""))
+		if err != nil {
+			return err
+		}
+		href, _ := doc.Find("a").Attr("href")
+
+		doc, err = utils.GetWebDocument(href)
+		if err != nil {
+			return err
+		}
+		sss1 := doc.Find("#sss1")
+		// actress := sss1.Find("header").Text()
+		alias := sss1.Find("p").Text()
+		avatar, _ := sss1.Find("img").Attr("src")
+
+		saveFile := ""
+		utils.DownloadImage(avatar, saveFile)
+
+		m.Alias = alias
+		m.Avatar = avatar
+		doc.Find("h2").Each(func(i int, s *goquery.Selection) {
+			if i == 0 {
+				personal, _ := s.Next().Html()
+				personal = strings.Replace(strings.Replace(strings.Replace(personal, "<span itemprop=\"height\">", "", -1), "<span itemprop=\"nationality\">", "", -1), "</span>", "", -1)
+				personals := strings.Split(personal, "<br/>")
+				birth := personals[0]                  // 出生
+				measurements := personals[1]           // 三围
+				cup_size := personals[2]               // 罩杯
+				debut_date := personals[3]             // 出道日期
+				star_sign := personals[4]              // 星座
+				blood_group := personals[5]            // 血型
+				stature := personals[6]                // 身高
+				nationality := personals[7]            // 国籍
+				introduction := s.Next().Next().Text() // 简介
+
+				m.Birth = birth
+				m.Measurements = measurements
+				m.CupSize = cup_size
+				m.DebutDate = debut_date
+				m.StarSign = star_sign
+				m.BloodGroup = blood_group
+				m.Stature = stature
+				m.Nationality = nationality
+				m.Introduction = introduction
+			}
+		})
+		if err := db.Save(&m).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

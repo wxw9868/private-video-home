@@ -12,12 +12,15 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
 	"github.com/shiningrush/avatarbuilder"
 	"github.com/shiningrush/avatarbuilder/calc"
@@ -421,4 +424,47 @@ func GetTime(tt string) (d time.Time) {
 		d = now.Local()
 	}
 	return
+}
+
+func GetWebDocument(url string) (*goquery.Document, error) {
+	// Request the HTML page.
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		// log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		return nil, errors.New(res.Status)
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	return doc, nil
+}
+
+func DownloadImage(url, savePath string) error {
+	// 发起 GET 请求获取图片数据
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	// 获取原文件名
+	_, saveFile := path.Split(res.Request.URL.Path)
+
+	// 创建保存图片的文件
+	file, err := os.Create(path.Join(savePath, saveFile))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// 将响应体的数据写入文件
+	_, err = io.Copy(file, res.Body)
+	return err
 }

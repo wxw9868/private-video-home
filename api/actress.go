@@ -8,7 +8,18 @@ import (
 )
 
 type ActressAdd struct {
-	Name string `form:"name" json:"name" binding:"required"`
+	Name         string `form:"name" json:"name" binding:"required"`
+	Alias        string `form:"alias" json:"alias"`
+	Avatar       string `form:"avatar" json:"avatar"`
+	Birth        string `form:"birth" json:"birth"`
+	Measurements string `form:"measurements" json:"measurements"`
+	CupSize      string `form:"cup_size" json:"cup_size"`
+	DebutDate    string `form:"debut_date" json:"debut_date"`
+	StarSign     string `form:"star_sign" json:"star_sign"`
+	BloodGroup   string `form:"blood_group" json:"blood_group"`
+	Stature      string `form:"stature" json:"stature"`
+	Nationality  string `form:"nationality" json:"nationality"`
+	Introduction string `form:"introduction" json:"introduction"`
 }
 
 func ActressAddApi(c *gin.Context) {

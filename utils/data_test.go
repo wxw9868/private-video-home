@@ -2,11 +2,12 @@ package utils
 
 import (
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func TestVideoFileRename(t *testing.T) {
@@ -66,26 +67,30 @@ func TestGeneteSQL(t *testing.T) {
 	t.Log(s)
 }
 
-// https://github.com/PuerkitoBio/goquery
-// https://github.com/gocolly/colly
-
-// https://xslist.org/search?query=小野寺梨紗&lg=zh
-var nameMap = map[string]string{
-	"天音りん":  "https://xslist.org/zh/model/3023.html",
-	"小野寺梨紗": "https://xslist.org/zh/model/242.html",
+func TestDownloadImage(t *testing.T) {
+	url := "https://www.golang-mix.com/imgs/user.png"
+	savePath := "/Users/v_weixiongwei/go/src/video/assets/image/avatar/"
+	err := DownloadImage(url, savePath)
+	t.Logf("err is %s\n", err)
 }
 
+// https://github.com/PuerkitoBio/goquery
+// https://github.com/gocolly/colly
+// https://xslist.org/search?query=小野寺梨紗&lg=zh
+
 func TestPachong(t *testing.T) {
-	url := "https://xslist.org/search?query=小野寺梨紗&lg=zh"
+	url := getUrl("小野寺梨紗")
+
 	doc := getDoc(url)
 	href, _ := doc.Find("a").Attr("href")
+
 	doc = getDoc(href)
 	actress := doc.Find("#sss1").Find("header").Text()
 	alias := doc.Find("#sss1").Find("p").Text()
-	img, _ := doc.Find("#sss1").Find("img").Attr("src")
+	avatar, _ := doc.Find("#sss1").Find("img").Attr("src")
 	fmt.Printf("actress is %s \n", strings.Trim(actress, " "))
 	fmt.Printf("alias is %s \n", alias)
-	fmt.Printf("img is %s \n", img)
+	fmt.Printf("avatar is %s \n", avatar)
 	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
 		if i == 0 {
 			title := s.Text()
@@ -94,12 +99,19 @@ func TestPachong(t *testing.T) {
 			personal = strings.Replace(strings.Replace(strings.Replace(personal, "<span itemprop=\"height\">", "", -1), "<span itemprop=\"nationality\">", "", -1), "</span>", "", -1)
 			personals := strings.Split(personal, "<br/>")
 			//fmt.Println(personals)
+			// birth := personals[0]        // 出生
+			// measurements := personals[1] // 三围
+			// cup_size := personals[2]     // 罩杯
+			// debut_date := personals[3]   // 出道日期
+			// star_sign := personals[4]    // 星座
+			// blood_group := personals[5]  // 血型
+			// stature := personals[6]      // 身高
+			// nationality := personals[7]  // 国籍
 			for i2, s2 := range personals {
-				//fmt.Println(i2, s2)
 				fmt.Printf("i is %d personal is %s \n", i2, s2)
 			}
-			Introduction := s.Next().Next().Text()
-			fmt.Printf("Introduction is %s \n", Introduction)
+			introduction := s.Next().Next().Text() // 简介
+			fmt.Printf("Introduction is %s \n", introduction)
 		}
 	})
 	//fmt.Println(info)
@@ -113,6 +125,14 @@ func TestPachong(t *testing.T) {
 	//	fmt.Printf("Review %d: %s\n", i, title)
 	//	fmt.Printf("Review %d: %s\n", i, href)
 	//})
+}
+
+func getUrl(query string) string {
+	elems := make([]string, 3)
+	elems[0] = "https://xslist.org/search?query="
+	elems[1] = query
+	elems[2] = "&lg=zh"
+	return strings.Join(elems, "")
 }
 
 func getDoc(url string) *goquery.Document {
