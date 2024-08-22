@@ -205,22 +205,35 @@ func VideoActress() error {
 }
 
 func VideoActressAdditionalInformation() error {
+	//var m model.Actress
+	//if err := db.Where("actress = ?", name).First(&m).Error; err != nil {
+	//	return err
+	//}
 	var actresss []model.Actress
-	if err := db.Find(&actresss).Error; err != nil {
+	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
 		return err
 	}
-	for _, v := range actresss {
-		m := v
+	for i := 0; i < len(actresss); i++ {
+		actress := actresss[i]
+		fmt.Println(actress.ID, actress.Actress)
 
 		elems := make([]string, 3)
 		elems[0] = "https://xslist.org/search?query="
-		elems[1] = v.Actress
+		elems[1] = actress.Actress
+		//elems[1] = "友利七葉"
 		elems[2] = "&lg=zh"
 		doc, err := utils.GetWebDocument(strings.Join(elems, ""))
 		if err != nil {
 			return err
 		}
+		//fmt.Println(doc.Html())
+
+		if doc.Find("body").Text() == "No results found." {
+			fmt.Println("continue")
+			continue
+		}
 		href, _ := doc.Find("a").Attr("href")
+		//fmt.Println(href)
 
 		doc, err = utils.GetWebDocument(href)
 		if err != nil {
@@ -231,9 +244,16 @@ func VideoActressAdditionalInformation() error {
 		alias := sss1.Find("p").Text()
 		avatar, _ := sss1.Find("img").Attr("src")
 
-		saveFile := ""
-		utils.DownloadImage(avatar, saveFile)
+		savePath := "E:/video/assets/image/avatar/"
+		avatar, err = utils.DownloadImage(avatar, savePath)
+		if err != nil {
+			return err
+		}
+		if alias != "" {
+			alias = strings.Trim(strings.Split(alias, ":")[1], " ")
+		}
 
+		m := model.Actress{}
 		m.Alias = alias
 		m.Avatar = avatar
 		doc.Find("h2").Each(func(i int, s *goquery.Selection) {
@@ -243,28 +263,32 @@ func VideoActressAdditionalInformation() error {
 				personals := strings.Split(personal, "<br/>")
 				birth := personals[0]                  // 出生
 				measurements := personals[1]           // 三围
-				cup_size := personals[2]               // 罩杯
-				debut_date := personals[3]             // 出道日期
-				star_sign := personals[4]              // 星座
-				blood_group := personals[5]            // 血型
+				cupSze := personals[2]                 // 罩杯
+				debutDate := personals[3]              // 出道日期
+				starSign := personals[4]               // 星座
+				bloodGroup := personals[5]             // 血型
 				stature := personals[6]                // 身高
 				nationality := personals[7]            // 国籍
 				introduction := s.Next().Next().Text() // 简介
 
-				m.Birth = birth
-				m.Measurements = measurements
-				m.CupSize = cup_size
-				m.DebutDate = debut_date
-				m.StarSign = star_sign
-				m.BloodGroup = blood_group
-				m.Stature = stature
-				m.Nationality = nationality
-				m.Introduction = introduction
+				m.Birth = strings.Trim(strings.Split(birth, ":")[1], " ")
+				m.Measurements = strings.Trim(strings.Split(measurements, ":")[1], " ")
+				m.CupSize = strings.Trim(strings.Split(cupSze, ":")[1], " ")
+				m.DebutDate = strings.Trim(strings.Split(debutDate, ":")[1], " ")
+				m.StarSign = strings.Trim(strings.Split(starSign, ":")[1], " ")
+				m.BloodGroup = strings.Trim(strings.Split(bloodGroup, ":")[1], " ")
+				m.Stature = strings.Trim(strings.Split(stature, ":")[1], " ")
+				m.Nationality = strings.Trim(strings.Split(nationality, ":")[1], " ")
+				m.Introduction = strings.Trim(strings.Split(introduction, ":")[1], " ")
 			}
 		})
-		if err := db.Save(&m).Error; err != nil {
+		fmt.Printf("%+v\n", m)
+		if err = db.Model(&actress).Updates(m).Error; err != nil {
 			return err
 		}
+		m = model.Actress{}
+		time.Sleep(time.Microsecond * 300)
+		//return nil
 	}
 
 	return nil

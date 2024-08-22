@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type Actress struct {
 	gorm.Model
 	Actress      string `gorm:"column:actress;type:varchar(100);uniqueIndex;comment:演员名称"`
-	Alias        string `gorm:"column:alias;type:varchar(255);uniqueIndex;comment:演员别称"`
+	Alias        string `gorm:"column:alias;type:varchar(255);comment:演员别称"`
 	Avatar       string `gorm:"column:avatar;type:varchar(255);comment:头像"`
 	Birth        string `gorm:"column:birth;type:varchar(30);comment:出生"`
 	Measurements string `gorm:"column:measurements;type:varchar(30);comment:三围"`

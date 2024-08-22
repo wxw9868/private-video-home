@@ -429,6 +429,7 @@ func GetTime(tt string) (d time.Time) {
 func GetWebDocument(url string) (*goquery.Document, error) {
 	// Request the HTML page.
 	res, err := http.Get(url)
+	//fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
@@ -446,11 +447,11 @@ func GetWebDocument(url string) (*goquery.Document, error) {
 	return doc, nil
 }
 
-func DownloadImage(url, savePath string) error {
+func DownloadImage(url, savePath string) (string, error) {
 	// 发起 GET 请求获取图片数据
 	res, err := http.Get(url)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer res.Body.Close()
 
@@ -460,11 +461,14 @@ func DownloadImage(url, savePath string) error {
 	// 创建保存图片的文件
 	file, err := os.Create(path.Join(savePath, saveFile))
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 
 	// 将响应体的数据写入文件
 	_, err = io.Copy(file, res.Body)
-	return err
+	if err != nil {
+		return "", err
+	}
+	return path.Join("./assets/image/avatar/", saveFile), nil
 }

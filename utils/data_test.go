@@ -70,16 +70,74 @@ func TestGeneteSQL(t *testing.T) {
 func TestDownloadImage(t *testing.T) {
 	url := "https://www.golang-mix.com/imgs/user.png"
 	savePath := "/Users/v_weixiongwei/go/src/video/assets/image/avatar/"
-	err := DownloadImage(url, savePath)
+	_, err := DownloadImage(url, savePath)
 	t.Logf("err is %s\n", err)
 }
 
 // https://github.com/PuerkitoBio/goquery
 // https://github.com/gocolly/colly
 // https://xslist.org/search?query=小野寺梨紗&lg=zh
+// https://www.9sex.tv/cn/search?_token=eKfWaNle2cSL9iHl65TplHFLXjRmMIxzTgkYFaf0&type=actresses&query=
+// https://cn.airav.wiki/?search_type=actors&lng=zh-CN&search=
 
 func TestPachong(t *testing.T) {
-	url := getUrl("小野寺梨紗")
+	Pachong2()
+	Pachong3()
+}
+
+func Pachong3() {
+	elems := make([]string, 2)
+	elems[0] = "https://cn.airav.wiki/?search_type=actors&lng=zh-CN&search="
+	elems[1] = "小野寺梨紗"
+	url := strings.Join(elems, "")
+	fmt.Printf("url is %s \n", url)
+
+	doc := getDoc(url)
+	fmt.Println(doc)
+	return
+	href, _ := doc.Find("a").Attr("href")
+
+	doc = getDoc(href)
+	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
+		if i == 0 {
+			title := s.Text()
+			fmt.Printf("title is %s \n", title)
+		}
+	})
+}
+
+func Pachong2() {
+	elems := make([]string, 2)
+	elems[0] = "https://www.9sex.tv/cn/search?_token=eKfWaNle2cSL9iHl65TplHFLXjRmMIxzTgkYFaf0&type=actresses&query="
+	elems[1] = "小野寺梨紗"
+	url := strings.Join(elems, "")
+	fmt.Printf("url is %s \n", url)
+
+	doc := getDoc(url)
+	fmt.Println(doc)
+	doc.Find("li > a").Each(func(i int, s *goquery.Selection) {
+		if i == 0 {
+			title := s.Text()
+			fmt.Printf("title is %s \n", title)
+			return
+		}
+	})
+
+	href, _ := doc.Find("a").Attr("href")
+	doc = getDoc(href)
+	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
+		if i == 0 {
+
+		}
+	})
+}
+
+func Pachong1() {
+	elems := make([]string, 3)
+	elems[0] = "https://xslist.org/search?query="
+	elems[1] = "小野寺梨紗"
+	elems[2] = "&lg=zh"
+	url := strings.Join(elems, "")
 
 	doc := getDoc(url)
 	href, _ := doc.Find("a").Attr("href")
@@ -114,25 +172,6 @@ func TestPachong(t *testing.T) {
 			fmt.Printf("Introduction is %s \n", introduction)
 		}
 	})
-	//fmt.Println(info)
-	//fmt.Println(h)
-
-	// Find the review items
-	//doc.Find(".clearfix").Each(func(i int, s *goquery.Selection) {
-	//	// For each item found, get the title
-	//	title := s.Find("a").Text()
-	//	href, _ := s.Find("a").Attr("href")
-	//	fmt.Printf("Review %d: %s\n", i, title)
-	//	fmt.Printf("Review %d: %s\n", i, href)
-	//})
-}
-
-func getUrl(query string) string {
-	elems := make([]string, 3)
-	elems[0] = "https://xslist.org/search?query="
-	elems[1] = query
-	elems[2] = "&lg=zh"
-	return strings.Join(elems, "")
 }
 
 func getDoc(url string) *goquery.Document {
