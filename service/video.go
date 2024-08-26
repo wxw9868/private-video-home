@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path"
 	"strconv"
 	"time"
 
@@ -78,6 +80,14 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		db.ScanRows(rows, &videoInfo)
 
 		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
+
+		poster := videoInfo.Poster
+		thumbnailFile := videoInfo.Title + "_s360" + ".jpg"
+		_, err = os.Stat(path.Join(thumbnailPath, thumbnailFile))
+		if !os.IsNotExist(err) {
+			poster = "./assets/image/thumbnail/" + thumbnailFile
+		}
+
 		video := Video{
 			ID:            videoInfo.ID,
 			Title:         videoInfo.Title,
@@ -85,7 +95,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 			Size:          f / 1024 / 1024,
 			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
 			ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			Poster:        videoInfo.Poster,
+			Poster:        poster,
 			Width:         videoInfo.Width,
 			Height:        videoInfo.Height,
 			CodecName:     videoInfo.CodecName,

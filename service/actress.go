@@ -40,10 +40,13 @@ type Actress struct {
 	Count   uint32 `gorm:"column:count" json:"count"`
 }
 
-func (as *ActressService) List(page, pageSize int, action, sort string) ([]Actress, error) {
+func (as *ActressService) List(page, pageSize int, action, sort, actress string) ([]Actress, error) {
 	var actresss []Actress
-	sql := "SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id group by 1,2,3"
-
+	sql := "SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id"
+	if actress != "" {
+		sql += utils.Join(" where a.actress = ", "'", actress, "'")
+	}
+	sql += " group by 1,2,3"
 	if action == "null" || sort == "null" {
 		action = ""
 		sort = ""

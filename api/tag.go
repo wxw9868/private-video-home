@@ -76,7 +76,7 @@ func TagListApi(c *gin.Context) {
 		return
 	}
 
-	tags, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort)
+	tags, err := ts.List(bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

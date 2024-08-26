@@ -2,12 +2,22 @@ package utils
 
 import (
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/disintegration/imaging"
+	"golang.org/x/image/draw"
+	"image"
+	"image/color"
+	"image/jpeg"
+	"image/png"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
+	"path"
+	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/PuerkitoBio/goquery"
+	"time"
 )
 
 func TestVideoFileRename(t *testing.T) {
@@ -68,9 +78,11 @@ func TestGeneteSQL(t *testing.T) {
 }
 
 func TestDownloadImage(t *testing.T) {
-	url := "https://www.golang-mix.com/imgs/user.png"
-	savePath := "/Users/v_weixiongwei/go/src/video/assets/image/avatar/"
-	_, err := DownloadImage(url, savePath)
+	src := "https://cdn.njav.tv/resize/s360/5/e5/1pondo-122922_001/thumb_h.jpg"
+	//savePath := "/Users/v_weixiongwei/go/src/video/assets/image/avatar/"
+	savePath := "E:/video/assets/image/thumbnail/"
+	saveFile := "s360" + path.Ext(src)
+	err := DownloadImage(src, savePath, saveFile)
 	t.Logf("err is %s\n", err)
 }
 
@@ -81,55 +93,160 @@ func TestDownloadImage(t *testing.T) {
 // https://cn.airav.wiki/?search_type=actors&lng=zh-CN&search=
 
 func TestPachong(t *testing.T) {
-	Pachong2()
-	Pachong3()
+	//url := Join("https://920share.com/?s=", "衣吹かのん")
+	url := Join("https://ggjav.com/main/search?string=", "小泉真希")
+	doc, err := GetWebDocument("GET", url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(doc)
+	//av6kCom()
+	//av1688Cc()
 }
 
-func Pachong3() {
-	elems := make([]string, 2)
-	elems[0] = "https://cn.airav.wiki/?search_type=actors&lng=zh-CN&search="
-	elems[1] = "小野寺梨紗"
-	url := strings.Join(elems, "")
-	fmt.Printf("url is %s \n", url)
+func av6kCom() {
+	param := url.Values{"q": {"小泉真希"}}
+	doc, err := GetWebDocument("POST", "https://av6k.com/plus/search.php", strings.NewReader(param.Encode()))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	doc := getDoc(url)
-	fmt.Println(doc)
-	return
-	href, _ := doc.Find("a").Attr("href")
-
-	doc = getDoc(href)
-	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
+	var page int
+	doc.Find(".pages_c").Find("td").Each(func(i int, s *goquery.Selection) {
 		if i == 0 {
-			title := s.Text()
-			fmt.Printf("title is %s \n", title)
+			s.Find("b").Each(func(i int, s *goquery.Selection) {
+				if i == 1 {
+					page, _ = strconv.Atoi(s.Text())
+				}
+			})
 		}
 	})
+	//fmt.Println(page)
+
+	data := make(map[string]string)
+
+	for i := 1; i <= page; i++ {
+		if i > 1 {
+			doc, err = GetWebDocument("GET", Join("https://av6k.com/search/", "小泉真希", "-", strconv.Itoa(i), ".html"), nil)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		doc.Find(".newVideoC").Find(".listA").Each(func(i int, s *goquery.Selection) {
+			src, _ := s.Find("img").Attr("src")
+			key := strings.Trim(s.Find(".listACT").Text(), " ")
+			a := key[10:11]
+			b := key[11:12]
+			c := strings.Contains(key, "heyzo_hd_")
+			fmt.Println(a, b, key)
+
+			if b == "]" || a == "-" || c {
+				if b == "]" {
+					key = key[1:11]
+					if strings.Contains(key, "Heyzo") || strings.Contains(key, "HEYZO") {
+						key = strings.ToUpper(strings.Replace(key, "-", "_", -1))
+					} else {
+						key = strings.Replace(key, "-", "_", -1)
+						key = strings.Split(key, "_")[0]
+					}
+				} else if a == "-" {
+					key = key[0:10]
+					if strings.Contains(key, "Heyzo") || strings.Contains(key, "HEYZO") {
+						key = strings.ToUpper(strings.Replace(key, "-", "_", -1))
+					} else {
+						key = strings.ToUpper(strings.Replace(key, "-", "_", -1))
+						key = strings.Split(key, "_")[0]
+					}
+				} else if c {
+					key = strings.ToUpper(strings.Replace(strings.Split(key, " ")[0], "_hd_", "_", -1))
+				}
+				//fmt.Println(key)
+				data[key] = Join("https://av6k.com", src)
+			}
+		})
+		time.Sleep(time.Microsecond * 100)
+	}
+
+	fmt.Printf("%+v\n", data)
+
+	// https://av6k.com/uploads/allimg/220813/2-220Q30U3450-L.jpg
+	// https://av6k.com/uploads/allimg/220813/2-220Q30U3450-L.jpg
 }
 
-func Pachong2() {
-	elems := make([]string, 2)
-	elems[0] = "https://www.9sex.tv/cn/search?_token=eKfWaNle2cSL9iHl65TplHFLXjRmMIxzTgkYFaf0&type=actresses&query="
-	elems[1] = "小野寺梨紗"
-	url := strings.Join(elems, "")
-	fmt.Printf("url is %s \n", url)
+func av1688Cc() {
+	url := Join("https://av1688.cc/?s=", "小泉真希")
+	doc, err := GetWebDocument("GET", url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	doc := getDoc(url)
-	fmt.Println(doc)
-	doc.Find("li > a").Each(func(i int, s *goquery.Selection) {
-		if i == 0 {
-			title := s.Text()
-			fmt.Printf("title is %s \n", title)
-			return
+	var page int
+	doc.Find(".pagination").Find("li").Each(func(i int, s *goquery.Selection) {
+		if i == doc.Find(".pagination").Find("li").Length()-1 {
+			page, _ = strconv.Atoi(strings.Split(s.Text(), " ")[1])
 		}
 	})
+	//fmt.Println(page)
 
-	href, _ := doc.Find("a").Attr("href")
-	doc = getDoc(href)
-	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
-		if i == 0 {
+	data := make(map[string]string)
 
+	for i := 1; i <= page; i++ {
+		if i > 1 {
+			url = Join("https://av1688.cc/page/", strconv.Itoa(i), "?s=", "小泉真希")
+			doc, err = GetWebDocument("GET", url, nil)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
-	})
+
+		doc.Find("#posts").Find("a").Each(func(i int, s *goquery.Selection) {
+			src, _ := s.Find("img").Attr("data-src")
+			key, _ := s.Find("img").Attr("alt")
+
+			Pondo := strings.Contains(key, "1pondo")
+			Caribbeancom := strings.Contains(key, "Caribbeancom")
+			HEYZO := strings.Contains(key, "HEYZO")
+			musume := strings.Contains(key, "10musume")
+			Pacopacomama := strings.Contains(key, "Pacopacomama")
+			a := strings.Contains(key, "加勒比")
+			b := strings.Contains(key, "一本道")
+			c := strings.Contains(key, "カリビアンコム")
+			d := strings.Contains(key, "加勒比PPV动画")
+			f := strings.Contains(key, "Caribbeancompr-")
+			g := strings.Contains(key, "一本道1pon")
+
+			if Pondo || Caribbeancom || HEYZO || musume || Pacopacomama || a || b || c || d || f || g {
+				fmt.Println(key)
+				if HEYZO {
+					key = key[0:10]
+					key = strings.ToUpper(strings.Replace(key, "-", "_", -1))
+					key = strings.ToUpper(strings.Replace(key, " ", "_", -1))
+				} else if f {
+					key = strings.Split(key, " ")[0]
+					key = strings.Split(key, "-")[1]
+					key = strings.Split(key, "_")[0]
+				} else if g {
+					key = strings.Split(key, " ")[0]
+					m := len(key) - 10
+					n := len(key)
+					key = strings.Replace(key[m:n], "-", "_", -1)
+					key = strings.Split(key, "_")[0]
+				} else {
+					key = strings.Split(key, " ")[1]
+					key = strings.Replace(key, "-", "_", -1)
+					key = strings.Split(key, "_")[0]
+				}
+				data[key] = src
+			}
+		})
+
+	}
+
+	fmt.Printf("%+v\n", data)
+
+	// https://av1688.cc/wp-content/uploads/2024/07/20240714_6692c1d00b490.jpg
+	// https://av1688.cc/wp-content/uploads/2024/07/20240714_6692c1d00b490.jpg
 }
 
 func Pachong1() {
@@ -138,6 +255,7 @@ func Pachong1() {
 	elems[1] = "小野寺梨紗"
 	elems[2] = "&lg=zh"
 	url := strings.Join(elems, "")
+	fmt.Println(url)
 
 	doc := getDoc(url)
 	href, _ := doc.Find("a").Attr("href")
@@ -176,6 +294,10 @@ func Pachong1() {
 
 func getDoc(url string) *goquery.Document {
 	// Request the HTML page.
+	//client := &http.Client{
+	//	Timeout: time.Millisecond * 3000,
+	//}
+	//res, err := client.Get(url)
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -191,4 +313,184 @@ func getDoc(url string) *goquery.Document {
 		log.Fatal(err)
 	}
 	return doc
+}
+
+// 去除水印
+func removeWatermark(inputPath, outputPath string) error {
+	// 读取原始图片
+	file, err := os.Open(inputPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return err
+	}
+
+	// 判断水印位置
+	bounds := img.Bounds()
+	x := bounds.Dx() - 0
+	y := bounds.Dy() - 30
+
+	// 去除水印
+	img = imaging.Crop(img, image.Rect(0, 0, x, y))
+
+	// 保存处理后的图片
+	err = imaging.Save(img, outputPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// 修复水印
+func fixWatermark(inputPath, watermarkPath, outputPath string) error {
+	// 读取原始图片和水印图片
+	file, err := os.Open(inputPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return err
+	}
+
+	watermark, err := imaging.Open(watermarkPath)
+	if err != nil {
+		return err
+	}
+
+	// 修复水印
+	img = imaging.OverlayCenter(img, watermark, 1.0)
+
+	// 保存处理后的图片
+	err = imaging.Save(img, outputPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// https://www.cnblogs.com/Finley/p/16589798.html
+func TestShuiyin(t *testing.T) {
+	savePath := "E:/video/assets/image/thumbnail/"
+	inputPath := "101923_001_スケスケ襦袢姿で最高のおもてなし_りおん_s360.jpg"
+	outputPath := "output.jpg"
+	//watermarkPath := "watermark.png"
+
+	err := removeWatermark(savePath+inputPath, outputPath)
+	if err != nil {
+		fmt.Println("Failed to remove watermark:", err)
+		return
+	}
+
+	//err = fixWatermark(inputPath, watermarkPath, outputPath)
+	//if err != nil {
+	//	fmt.Println("Failed to fix watermark:", err)
+	//	return
+	//}
+
+	fmt.Println("Watermark removed and fixed successfully!")
+
+	removeImg(savePath + inputPath)
+
+	removeImg1(savePath + inputPath)
+}
+
+func removeWatermark1(img image.Image, watermark image.Image) image.Image {
+	b := watermark.Bounds()
+	// 确保水印在图片内
+	if !b.In(img.Bounds()) {
+		return img
+	}
+	// 创建水印遮罩
+	mask := image.NewNRGBA(b)
+	draw.Draw(mask, mask.Bounds(), image.NewUniform(color.Transparent), image.ZP, draw.Src)
+	// 使用遮罩去除水印
+	watermark = imaging.Paste(img, mask, image.Point{X: 667, Y: 418})
+	return watermark
+}
+
+func removeImg1(inputPath string) {
+	// 打开原始图片和水印图片
+	src, err := os.Open(inputPath)
+	if err != nil {
+		log.Fatalf("os.Open: %v", err)
+	}
+	defer src.Close()
+
+	watermark, err := os.Open("logo2.png")
+	if err != nil {
+		log.Fatalf("os.Open: %v", err)
+	}
+	defer watermark.Close()
+
+	// 解码图片
+	img, err := jpeg.Decode(src)
+	if err != nil {
+		log.Fatalf("jpeg.Decode: %v", err)
+	}
+
+	watermarkImg, err := png.Decode(watermark)
+	if err != nil {
+		log.Fatalf("png.Decode: %v", err)
+	}
+
+	// 去除水印
+	result := removeWatermark1(img, watermarkImg)
+
+	// 保存结果
+	output, err := os.Create("result.jpg")
+	if err != nil {
+		log.Fatalf("os.Create: %v", err)
+	}
+	defer output.Close()
+
+	err = jpeg.Encode(output, result, nil)
+	if err != nil {
+		log.Fatalf("jpeg.Encode: %v", err)
+	}
+}
+
+func removeImg(inputPath string) {
+	// 打开原始图片
+	file, err := os.Open(inputPath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	// 读取原始图片
+	img, _, err := image.Decode(file)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// 创建一个与原始图片大小相同的透明画布
+	canvas := image.NewRGBA(img.Bounds())
+
+	// 将原始图片绘制到画布上
+	draw.Draw(canvas, img.Bounds(), img, image.Point{X: 0, Y: 0}, draw.Src)
+
+	// 在画布上去除某一个对象（这里以一个矩形框为例）
+	rect := image.Rect(667, 418, 800, 450)
+	draw.Draw(canvas, rect, &image.Uniform{color.Transparent}, image.Point{X: 0, Y: 0}, draw.Src)
+
+	// 存储处理后的图片
+	outFile, err := os.Create("removed.png")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer outFile.Close()
+	png.Encode(outFile, canvas)
+	fmt.Println("图片去除成功！")
 }

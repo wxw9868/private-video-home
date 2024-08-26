@@ -63,6 +63,8 @@ func Engine(addr string) *gin.Engine {
 	video.POST("/collect", api.VideoCollectApi)
 	video.GET("/import", api.VideoImport)
 	video.GET("/importVideoActress", api.ImportVideoActress)
+	video.GET("/getVideoPic", api.GetVideoPic)
+	video.GET("/oneVideoPic", api.OneVideoPic)
 
 	comment := auth.Group("/comment")
 	comment.GET("/list", api.VideoCommentListApi)
