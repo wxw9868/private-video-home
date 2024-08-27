@@ -223,7 +223,9 @@ func VideoActressAdditionalInformation() error {
 
 	for i := 0; i < len(actresss); i++ {
 		actress := actresss[i]
-		fmt.Println(actress.ID, actress.Actress)
+		//fmt.Println(actress.ID, actress.Actress)
+
+		//url := utils.Join("https://netflav.com/actress?keyword=", "杉浦花音")
 
 		elems := make([]string, 3)
 		elems[0] = "https://xslist.org/search?query="
