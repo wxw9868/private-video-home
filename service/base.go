@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -302,6 +303,7 @@ func VideoActressAdditionalInformation() error {
 }
 
 func AllVideoPic(page, pageSize int, site string) error {
+	//return cut(site)
 	var count int64
 	if err := db.Model(&model.Video{}).Count(&count).Error; err != nil {
 		return err
@@ -668,4 +670,53 @@ func njavTv(actress string, videos []model.Video) error {
 	}
 
 	return nil
+}
+
+func cut(site string) error {
+	var actresss []model.Actress
+	if err := db.Find(&actresss).Error; err != nil {
+		return err
+	}
+
+	numCPU := runtime.NumCPU()
+	ch := make(chan string, numCPU)
+	wg := new(sync.WaitGroup)
+
+	for i := 0; i < numCPU; i++ {
+		wg.Add(1)
+		go work(ch, site, wg, i)
+	}
+
+	for _, actress := range actresss {
+		ch <- actress.Actress
+	}
+
+	wg.Wait()
+
+	return nil
+}
+
+func work(ch chan string, site string, wg *sync.WaitGroup, i int) {
+	wg.Done()
+	for {
+		select {
+		case actress, ok := <-ch:
+			if !ok {
+				return
+			}
+			var err error
+			var videos []model.Video
+			err = db.Where("actress = ?", actress).Find(&videos).Error
+
+			switch site {
+			case "av1688Cc":
+				err = av1688Cc(actress, videos)
+			case "av6kCom":
+				err = av6kCom(actress, videos)
+			default:
+				err = njavTv(actress, videos)
+			}
+			fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
+		}
+	}
 }

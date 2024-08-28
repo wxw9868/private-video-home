@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -93,6 +94,9 @@ func TestDownloadImage(t *testing.T) {
 // https://cn.airav.wiki/?search_type=actors&lng=zh-CN&search=
 
 func TestPachong(t *testing.T) {
+	numCPU := runtime.NumCPU()
+	fmt.Println(numCPU)
+	return
 	//url := Join("https://920share.com/?s=", "衣吹かのん")
 	//url := Join("https://ggjav.com/main/search?string=", "小泉真希")
 	url := Join("https://netflav.com/search?type=title&keyword=", "杉浦花音")
