@@ -274,8 +274,24 @@ func ReadFileToMap(name string, v any) error {
 	return nil
 }
 
-// 读取 map 数据到文件
-func WriteMapToFile(name string, v any) error {
+// 将内容追加到文件
+func AppendContentToFile(filename string, b []byte) error {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write(b); err != nil {
+		f.Close()
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 将数据写入文件
+func WriteFile(name string, v any) error {
 	bytes, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -378,8 +394,7 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 func GeneteSQL() string {
 	var data = make(map[string]struct{})
 	ReadFileToMap("data.json", &data)
-	fmt.Println(len(data))
-	return ""
+
 	var avatarDir = "./assets/image/avatar"
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
 	var root = "/Users/v_weixiongwei/go/src/video"
@@ -429,7 +444,6 @@ func GetTime(tt string) (d time.Time) {
 func GetWebDocument(url string) (*goquery.Document, error) {
 	// Request the HTML page.
 	res, err := http.Get(url)
-	//fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
