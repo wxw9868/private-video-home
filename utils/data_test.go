@@ -14,7 +14,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -94,8 +93,7 @@ func TestDownloadImage(t *testing.T) {
 // https://cn.airav.wiki/?search_type=actors&lng=zh-CN&search=
 
 func TestPachong(t *testing.T) {
-	numCPU := runtime.NumCPU()
-	fmt.Println(numCPU)
+	Pachong1()
 	return
 	//url := Join("https://920share.com/?s=", "衣吹かのん")
 	//url := Join("https://ggjav.com/main/search?string=", "小泉真希")
@@ -269,10 +267,16 @@ func Pachong1() {
 	url := strings.Join(elems, "")
 	fmt.Println(url)
 
-	doc := getDoc(url)
+	doc, err := GetWebDocument("GET", url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	href, _ := doc.Find("a").Attr("href")
 
-	doc = getDoc(href)
+	doc, err = GetWebDocument("GET", href, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	actress := doc.Find("#sss1").Find("header").Text()
 	alias := doc.Find("#sss1").Find("p").Text()
 	avatar, _ := doc.Find("#sss1").Find("img").Attr("src")

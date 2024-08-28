@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -213,6 +214,7 @@ func VideoActress() error {
 }
 
 func VideoActressAdditionalInformation() error {
+	return AddInfoToActress()
 	//var m model.Actress
 	//if err := db.Where("actress = ?", name).First(&m).Error; err != nil {
 	//	return err
@@ -298,6 +300,115 @@ func VideoActressAdditionalInformation() error {
 		m = model.Actress{}
 		time.Sleep(time.Microsecond * 300)
 	}
+
+	return nil
+}
+
+func AddInfoToActress() error {
+	var actresss []model.Actress
+	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
+		return err
+	}
+
+	numCPU := runtime.NumCPU()
+	ch := make(chan string, numCPU)
+	wg := new(sync.WaitGroup)
+
+	for i := 0; i < numCPU; i++ {
+		wg.Add(1)
+		go func(ch chan string, wg *sync.WaitGroup, i int) {
+			defer wg.Done()
+			for {
+				select {
+				case actress, ok := <-ch:
+					if !ok {
+						return
+					}
+					var err error
+					err = doTask(actress)
+					fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
+				}
+			}
+		}(ch, wg, i)
+	}
+
+	for _, actress := range actresss {
+		ch <- actress.Actress
+	}
+
+	wg.Wait()
+
+	return nil
+}
+
+func doTask(actress string) error {
+	elems := make([]string, 3)
+	elems[0] = "https://xslist.org/search?query="
+	elems[1] = actress
+	elems[2] = "&lg=zh"
+	doc, err := utils.GetWebDocument("GET", strings.Join(elems, ""), nil)
+	if err != nil {
+		return err
+	}
+	if doc.Find("body").Text() == "No results found." {
+		return errors.New("No results found.")
+	}
+	href, _ := doc.Find("a").Attr("href")
+
+	doc, err = utils.GetWebDocument("GET", href, nil)
+	if err != nil {
+		return err
+	}
+	sss1 := doc.Find("#sss1")
+	alias := sss1.Find("p").Text()
+	avatar, _ := sss1.Find("img").Attr("src")
+
+	savePath := "E:/video/assets/image/avatar/"
+	_, saveFile := path.Split(href)
+	err = utils.DownloadImage(avatar, savePath, saveFile)
+	if err != nil {
+		return err
+	}
+
+	path.Join("./assets/image/avatar/", saveFile)
+	if alias != "" {
+		alias = strings.Trim(strings.Split(alias, ":")[1], " ")
+	}
+
+	m := model.Actress{}
+	m.Alias = alias
+	m.Avatar = avatar
+	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
+		if i == 0 {
+			personal, _ := s.Next().Html()
+			personal = strings.Replace(strings.Replace(strings.Replace(personal, "<span itemprop=\"height\">", "", -1), "<span itemprop=\"nationality\">", "", -1), "</span>", "", -1)
+			personals := strings.Split(personal, "<br/>")
+			birth := personals[0]                  // 出生
+			measurements := personals[1]           // 三围
+			cupSze := personals[2]                 // 罩杯
+			debutDate := personals[3]              // 出道日期
+			starSign := personals[4]               // 星座
+			bloodGroup := personals[5]             // 血型
+			stature := personals[6]                // 身高
+			nationality := personals[7]            // 国籍
+			introduction := s.Next().Next().Text() // 简介
+
+			m.Birth = strings.Trim(strings.Split(birth, ":")[1], " ")
+			m.Measurements = strings.Trim(strings.Split(measurements, ":")[1], " ")
+			m.CupSize = strings.Trim(strings.Split(cupSze, ":")[1], " ")
+			m.DebutDate = strings.Trim(strings.Split(debutDate, ":")[1], " ")
+			m.StarSign = strings.Trim(strings.Split(starSign, ":")[1], " ")
+			m.BloodGroup = strings.Trim(strings.Split(bloodGroup, ":")[1], " ")
+			m.Stature = strings.Trim(strings.Split(stature, ":")[1], " ")
+			m.Nationality = strings.Trim(strings.Split(nationality, ":")[1], " ")
+			m.Introduction = strings.Trim(strings.Split(introduction, ":")[1], " ")
+		}
+	})
+	//fmt.Printf("%+v\n", m)
+	if err = db.Model(&actress).Updates(m).Error; err != nil {
+		return err
+	}
+	time.Sleep(time.Microsecond * 300)
 
 	return nil
 }
