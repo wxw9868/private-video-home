@@ -2,29 +2,46 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"net/http"
+	"time"
 
-	"github.com/wxw9868/video/initialize/db"
+	"github.com/gin-contrib/pprof"
+	ginzap "github.com/gin-contrib/zap"
+	"github.com/gin-gonic/gin"
+	"github.com/mattn/go-colorable"
+	"github.com/wxw9868/video/config"
+	"github.com/wxw9868/video/middleware"
 	"github.com/wxw9868/video/router"
+	"go.uber.org/zap"
 )
 
 func main() {
-	db.RegisterTables()
+	// gin.SetMode(gin.ReleaseMode)
 
-	// ip, err := utils.GetLocalIP()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	// 强制日志颜色化
+	gin.ForceConsoleColor()
+	gin.DefaultWriter = colorable.NewColorableStdout()
 
-	addr := fmt.Sprintf("%s:%d", "0.0.0.0", 8080)
-	r := router.Engine(addr)
+	r := gin.New()
+	logger, _ := zap.NewProduction()
+	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	r.Use(ginzap.RecoveryWithZap(logger, true))
+	r.Use(middleware.GinCors()) // 允许跨域
+	r.NoRoute(middleware.NoRoute())
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
 
-	if err := r.Run(addr); err != nil {
-		log.Fatal(err)
+	// Set a lower memory limit for multipart forms (default is 32 MiB)
+	r.MaxMultipartMemory = 8 << 20 // 8 MiB
+	r.Static("/assets", "./assets")
+
+	pprof.Register(r) // 性能监控
+	router.Engine(r)
+
+	if err := r.Run(fmt.Sprintf("%s:%d", config.Config().System.Host, config.Config().System.Port)); err != nil {
+		panic(err)
 	}
-
-	// if err := router.RunTLS(addr, "
-	//cert/server.pem", "cert/server.key"); err != nil {
-	// 	log.Fatal(err)
-	// }
 }

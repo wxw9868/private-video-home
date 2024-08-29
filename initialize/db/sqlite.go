@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wxw9868/video/config"
 	"github.com/wxw9868/video/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -19,16 +20,16 @@ func init() {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
-			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                  logger.Info, // Log level
-			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-			ParameterizedQueries:      true,        // Don't include params in the SQL log
-			Colorful:                  false,       // Disable color
+			SlowThreshold:             time.Second,   // Slow SQL threshold
+			LogLevel:                  logger.Silent, // Log level
+			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      true,          // Don't include params in the SQL log
+			Colorful:                  false,         // Disable color
 		},
 	)
 
 	var err error
-	db, err = gorm.Open(sqlite.Open("./database/sqlite/video.db"), &gorm.Config{
+	db, err = gorm.Open(sqlite.Open(config.Config().Database.DBPath), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   "video_",                        // table name prefix, table for `User` would be `t_users`
 			SingularTable: true,                            // use singular table name, table for `User` would be `user` with this option enabled
@@ -58,13 +59,8 @@ func init() {
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	log.Println("数据库启动成功")
-}
 
-func DB() *gorm.DB {
-	return db
-}
-
-func RegisterTables() {
+	// 迁移 schema
 	if err := db.AutoMigrate(
 		&model.User{}, &model.UserCollectLog{},
 		&model.UserBrowseLog{}, &model.UserCommentLog{},
@@ -73,6 +69,10 @@ func RegisterTables() {
 		&model.VideoActress{}, &model.VideoTag{}, &model.VideoDanmu{},
 		&model.Liquidation{}, &model.TradingRecords{},
 	); err != nil {
-		panic(err)
+		log.Fatalf("迁移 schema 失败: %s\n", err)
 	}
+}
+
+func DB() *gorm.DB {
+	return db
 }

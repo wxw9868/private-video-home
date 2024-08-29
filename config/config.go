@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"path/filepath"
 	"runtime"
@@ -12,7 +11,7 @@ import (
 
 var c config
 
-func GetConfig() *config {
+func Config() *config {
 	return &c
 }
 
@@ -24,14 +23,13 @@ func init() {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			log.Panic("Fatal error config file: ", err)
 		} else {
-			fmt.Println("Config file error:", err)
+			log.Println("Config file error:", err)
 		}
 	}
-	unmarshal()
 
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		unmarshal()
-		fmt.Println("Config file changed:", e.String())
+		log.Println("Config file changed:", e.String())
 	})
 	viper.WatchConfig()
 }
@@ -65,27 +63,16 @@ type config struct {
 
 type system struct {
 	Host string `mapstructure:"host"`
-	Port string `mapstructure:"port"`
-	Cert string `mapstructure:"cert"` //证书
-	Key  string `mapstructure:"key"`  //证书
+	Port uint8  `mapstructure:"port"`
 }
 
 type database struct {
-	DbType string `mapstructure:"db_type"`
-	DbHost string `mapstructure:"db_host"`
-	DbPort string `mapstructure:"db_port"`
-	DbUser string `mapstructure:"db_user"`
-	DbPass string `mapstructure:"db_pass"`
-	DbName string `mapstructure:"db_name"`
-
-	SslRootCert string `mapstructure:"ssl_root_cert"`
-	SslKey      string `mapstructure:"ssl_key"`
-	SslCert     string `mapstructure:"ssl_cert"`
+	DBPath string `mapstructure:"db_path"`
 }
 
 type redis struct {
 	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
+	Port     uint8  `mapstructure:"port"`
 	Password string `mapstructure:"password"`
 	DB       int    `mapstructure:"db"`
 }
