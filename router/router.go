@@ -91,8 +91,8 @@ func Engine(addr string) *gin.Engine {
 	actress.POST("/edit", api.ActressEditApi)
 	actress.GET("/delete", api.ActressDeleteApi)
 	actress.GET("/list", api.ActressListApi)
-	actress.GET("/AllAddInfo", api.AllAddlInfoToActress)
 	actress.GET("/OneAddInfo", api.OneAddlInfoToActress)
+	actress.GET("/AllAddInfo", api.AllAddlInfoToActress)
 
 	tag := auth.Group("/tag")
 	tag.POST("/add", api.TagAddApi)

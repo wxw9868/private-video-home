@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -33,7 +34,9 @@ func TestVideoFileRename(t *testing.T) {
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 	}
-	var nameSlice = []string{"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV", "_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "#", " "}
+	var nameSlice = []string{"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
+		"_一本道_无码AV_無碼AV", "_一本道_无码AV", "_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV",
+		"_天然素人_无码AV", "_#Heyzo_无码AV", "#", " "}
 	var actressSlice = []string{"佐々木かな", "Heyzo-", "Vol.", "File."}
 	if err := VideoFileRename(nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
@@ -79,21 +82,25 @@ func TestGeneteSQL(t *testing.T) {
 
 func TestDownloadImage(t *testing.T) {
 	src := "https://cdn.njav.tv/resize/s360/5/e5/1pondo-122922_001/thumb_h.jpg"
-	//savePath := "/Users/v_weixiongwei/go/src/video/assets/image/avatar/"
 
-	savePath := "E:/video/assets/image/thumbnail/"
-	saveFile := "s360" + path.Ext(src)
+	var savePath string
+
+	switch runtime.GOOS {
+	case "linux":
+	case "darwin":
+		savePath = "/Users/v_weixiongwei/go/src/video/assets/image/thumbnail/"
+	case "windows":
+		savePath = "E:/video/assets/image/thumbnail/"
+	}
+
+	saveFile := "_s360" + path.Ext(src)
 	err := DownloadImage(src, savePath, saveFile)
 	t.Logf("err is %s\n", err)
 }
 
-// https://github.com/PuerkitoBio/goquery
-// https://github.com/gocolly/colly
-// https://xslist.org/search?query=小野寺梨紗&lg=zh
-// https://www.9sex.tv/cn/search?_token=eKfWaNle2cSL9iHl65TplHFLXjRmMIxzTgkYFaf0&type=actresses&query=
-// https://cn.airav.wiki/?search_type=actors&lng=zh-CN&search=
-
 func TestPachong(t *testing.T) {
+	Pachong1()
+	return
 	//url := Join("https://920share.com/?s=", "衣吹かのん")
 	//url := Join("https://ggjav.com/main/search?string=", "小泉真希")
 	url := Join("https://netflav.com/search?type=title&keyword=", "杉浦花音")
@@ -109,8 +116,8 @@ func TestPachong(t *testing.T) {
 	}
 	fmt.Println(doc)
 
-	//av6kCom()
-	//av1688Cc()
+	av6kCom()
+	av1688Cc()
 }
 
 func av6kCom() {
@@ -130,7 +137,6 @@ func av6kCom() {
 			})
 		}
 	})
-	//fmt.Println(page)
 
 	data := make(map[string]string)
 
@@ -170,7 +176,6 @@ func av6kCom() {
 				} else if c {
 					key = strings.ToUpper(strings.Replace(strings.Split(key, " ")[0], "_hd_", "_", -1))
 				}
-				//fmt.Println(key)
 				data[key] = Join("https://av6k.com", src)
 			}
 		})
@@ -178,9 +183,6 @@ func av6kCom() {
 	}
 
 	fmt.Printf("%+v\n", data)
-
-	// https://av6k.com/uploads/allimg/220813/2-220Q30U3450-L.jpg
-	// https://av6k.com/uploads/allimg/220813/2-220Q30U3450-L.jpg
 }
 
 func av1688Cc() {
@@ -196,7 +198,6 @@ func av1688Cc() {
 			page, _ = strconv.Atoi(strings.Split(s.Text(), " ")[1])
 		}
 	})
-	//fmt.Println(page)
 
 	data := make(map[string]string)
 
@@ -253,23 +254,20 @@ func av1688Cc() {
 	}
 
 	fmt.Printf("%+v\n", data)
-
-	// https://av1688.cc/wp-content/uploads/2024/07/20240714_6692c1d00b490.jpg
-	// https://av1688.cc/wp-content/uploads/2024/07/20240714_6692c1d00b490.jpg
 }
 
 func Pachong1() {
-	elems := make([]string, 3)
-	elems[0] = "https://xslist.org/search?query="
-	elems[1] = "小野寺梨紗"
-	elems[2] = "&lg=zh"
-	url := strings.Join(elems, "")
-	fmt.Println(url)
-
-	doc, _ := GetWebDocument("GET", url, nil)
+	url := Join("https://xslist.org/search?query=", "小野寺梨紗", "&lg=zh")
+	doc, err := GetWebDocument("GET", url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	href, _ := doc.Find("a").Attr("href")
 
-	doc, _ = GetWebDocument("GET", href, nil)
+	doc, err = GetWebDocument("GET", href, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	actress := doc.Find("#sss1").Find("header").Text()
 	alias := doc.Find("#sss1").Find("p").Text()
 	avatar, _ := doc.Find("#sss1").Find("img").Attr("src")

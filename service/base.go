@@ -26,9 +26,11 @@ import (
 var db = sqlite.DB()
 var gofoundCount = 0
 var mutex = new(sync.Mutex)
-var posterPath = "E:/video/assets/image/poster/"
+
 var thumbnailPath = "E:/video/assets/image/thumbnail/"
-var previewPath = "E:/video/assets/image/preview/"
+
+// var posterPath = "E:/video/assets/image/poster/"
+// var previewPath = "E:/video/assets/image/preview/"
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -46,6 +48,21 @@ func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 		offset := (page - 1) * pageSize
 		return db.Offset(offset).Limit(pageSize)
 	}
+}
+
+func Post(url string, body io.Reader) error {
+	resp, err := gofoundClient.GofoundClient().POST(url, "application/json", body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	_, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func VideoImport(videoDir string) error {
@@ -92,7 +109,7 @@ func VideoImport(videoDir string) error {
 	}
 
 	if len(actressList) > 0 {
-		for actress, _ := range actressList {
+		for actress := range actressList {
 			avatarPath := avatarDir + "/" + actress + ".png"
 
 			_, err := os.Stat(avatarPath)
@@ -131,7 +148,7 @@ func ImportActress() error {
 	utils.ReadFileToMap("actress.json", &actressMap)
 
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-	for actress, _ := range actressMap {
+	for actress := range actressMap {
 		avatarPath := avatarDir + "/" + actress + ".png"
 		_, err := os.Stat(avatarPath)
 		if os.IsNotExist(err) {
@@ -148,21 +165,6 @@ func ImportActress() error {
 	if err := db.Exec(actressSql).Error; err != nil {
 		return err
 	}
-	return nil
-}
-
-func Post(url string, body io.Reader) error {
-	resp, err := gofoundClient.GofoundClient().POST(url, "application/json", body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	_, err = io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -213,23 +215,6 @@ func VideoActress() error {
 	return err
 }
 
-func AllAddlInfoToActress() error {
-	var actresss []model.Actress
-	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
-		return err
-	}
-
-	for i := 0; i < len(actresss); i++ {
-		actress := actresss[i]
-		if err := OneAddlInfoToActress(actress.Actress); err != nil {
-			continue
-		}
-		time.Sleep(time.Microsecond * 300)
-	}
-
-	return nil
-}
-
 func OneAddlInfoToActress(actress string) error {
 	url := utils.Join("https://xslist.org/search?query=", actress, "&lg=zh")
 	doc, err := utils.GetWebDocument("GET", url, nil)
@@ -237,7 +222,7 @@ func OneAddlInfoToActress(actress string) error {
 		return err
 	}
 	if doc.Find("body").Text() == "No results found." {
-		return errors.New("No results found")
+		return errors.New("no results found")
 	}
 	href, _ := doc.Find("a").Attr("href")
 
@@ -249,16 +234,23 @@ func OneAddlInfoToActress(actress string) error {
 	alias := sss1.Find("p").Text()
 	avatar, _ := sss1.Find("img").Attr("src")
 
-	savePath := "E:/video/assets/image/avatar/"
+	var savePath string
+	switch runtime.GOOS {
+	case "linux":
+	case "darwin":
+		savePath = "/Users/v_weixiongwei/go/src/video/assets/image/avatar/"
+	case "windows":
+		savePath = "E:/video/assets/image/avatar/"
+	}
 	_, saveFile := path.Split(href)
 	err = utils.DownloadImage(avatar, savePath, saveFile)
 	if err != nil {
 		return err
 	}
+
 	if alias != "" {
 		alias = strings.Trim(strings.Split(alias, ":")[1], " ")
 	}
-
 	m := model.Actress{}
 	m.Alias = alias
 	m.Avatar = avatar
@@ -292,6 +284,38 @@ func OneAddlInfoToActress(actress string) error {
 	if err = db.Model(&actress).Updates(m).Error; err != nil {
 		return err
 	}
+	time.Sleep(time.Microsecond * 300)
+
+	return nil
+}
+
+func AllAddlInfoToActress() error {
+	var actresss []model.Actress
+	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
+		return err
+	}
+
+	numCPU := runtime.NumCPU()
+	ch := make(chan string, numCPU)
+	wg := new(sync.WaitGroup)
+
+	for i := 0; i < numCPU; i++ {
+		wg.Add(1)
+		go func(ch chan string, wg *sync.WaitGroup, i int) {
+			defer wg.Done()
+			for actress := range ch {
+				err := OneAddlInfoToActress(actress)
+				fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
+			}
+		}(ch, wg, i)
+	}
+
+	for _, actress := range actresss {
+		ch <- actress.Actress
+	}
+	close(ch)
+
+	wg.Wait()
 
 	return nil
 }
@@ -306,83 +330,45 @@ func AllVideoPic(page, pageSize int, site string) error {
 	if err := db.Scopes(Paginate(page, pageSize, int(count))).Find(&actresss).Error; err != nil {
 		return err
 	}
-	//fmt.Printf("%+v\n", actresss)
 
-	for i := 0; i < len(actresss); i++ {
-		actress := actresss[i]
+	numCPU := runtime.NumCPU()
+	ch := make(chan string, numCPU)
+	wg := new(sync.WaitGroup)
 
-		var videos []model.Video
-		if err := db.Where("actress = ?", actress.Actress).Find(&videos).Error; err != nil {
-			return err
-		}
+	for i := 0; i < numCPU; i++ {
+		wg.Add(1)
+		go func(ch chan string, site string, wg *sync.WaitGroup, i int) {
+			wg.Done()
 
-		var err error
+			for actress := range ch {
+				var err error
+				var videos []model.Video
+				err = db.Where("actress = ?", actress).Find(&videos).Error
+				fmt.Println(err)
 
-		switch site {
-		case "av1688Cc":
-			err = av1688Cc(actress.Actress, videos)
-		case "av6kCom":
-			err = av6kCom(actress.Actress, videos)
-		default:
-			err = njavTv(actress.Actress, videos)
-		}
-
-		if err != nil {
-			return err
-		}
+				switch site {
+				case "av1688Cc":
+					err = av1688Cc(actress, videos)
+				case "av6kCom":
+					err = av6kCom(actress, videos)
+				default:
+					err = njavTv(actress, videos)
+				}
+				fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
+			}
+		}(ch, site, wg, i)
 	}
+
+	for _, actress := range actresss {
+		ch <- actress.Actress
+	}
+	close(ch)
+
+	wg.Wait()
 
 	//datas := make(map[string]map[string]string)
 	//err := utils.WriteMapToFile("E:/video/assets/data/data.json", datas)
 	return nil
-}
-
-func acc() {
-	n := runtime.NumCPU()
-	ch := make(chan string, n)
-	wg := new(sync.WaitGroup)
-
-	for i := 0; i < n; i++ {
-		wg.Add(1)
-		go work(ch, "", wg)
-	}
-
-	var actresss []model.Actress
-	db.Find(&actresss)
-
-	for i := 0; i < len(actresss); i++ {
-		actress := actresss[i]
-		ch <- actress.Actress
-	}
-
-	wg.Wait()
-}
-
-func work(ch chan string, site string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for {
-		select {
-		case actress, ok := <-ch:
-			if !ok {
-				return
-			}
-			var err error
-			var videos []model.Video
-			err = db.Where("actress = ?", actress).Find(&videos).Error
-			fmt.Printf("actress: %s\n", err)
-
-			switch site {
-			case "av1688Cc":
-				err = av1688Cc(actress, videos)
-			case "av6kCom":
-				err = av6kCom(actress, videos)
-			default:
-				err = njavTv(actress, videos)
-			}
-		default:
-
-		}
-	}
 }
 
 func OneVideoPic(actress string, site string) error {
@@ -392,7 +378,6 @@ func OneVideoPic(actress string, site string) error {
 	}
 
 	var err error
-
 	switch site {
 	case "av1688Cc":
 		err = av1688Cc(actress, videos)

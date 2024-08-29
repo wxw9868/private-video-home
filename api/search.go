@@ -128,6 +128,10 @@ func Post(c *gin.Context, url string, body io.Reader) {
 	// formattedJSONString := string(formattedJSONBytes)
 
 	_, err = c.Writer.Write(robots)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
 }
 
 func Get(c *gin.Context, url string) {
@@ -144,4 +148,8 @@ func Get(c *gin.Context, url string) {
 		return
 	}
 	_, err = c.Writer.Write(robots)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
 }
