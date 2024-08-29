@@ -441,48 +441,78 @@ func GetTime(tt string) (d time.Time) {
 	return
 }
 
-func GetWebDocument(url string) (*goquery.Document, error) {
+func GetWebDocument(method, url string, body io.Reader) (*goquery.Document, error) {
 	// Request the HTML page.
-	res, err := http.Get(url)
+	client := http.Client{
+		Timeout: 50 * time.Second,
+	}
+	request, err := http.NewRequest(method, url, body)
+	if err != nil {
+		fmt.Printf("wrong http request: %s", err.Error())
+		return nil, fmt.Errorf("wrong http request: %s", err.Error())
+	}
+	if method == "POST" {
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+
+	//request.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+	//request.Header.Set("Accept-Encoding", "gzip, deflate, br, zstd")
+	//request.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+	//request.Header.Set("Cache-Control", "max-age=0")
+	//request.Header.Set("Cookie", "PHPSESSID=9obaisvpmeihs89mvagsdv52li; asgfp2=f5dd9aa3698173f51f045d69e9cb5265; ts_popunder=Sun%20Aug%2025%202024%2018%3A46%3A41%20GMT%2B0800%20(%E4%B8%AD%E5%9B%BD%E6%A0%87%E5%87%86%E6%97%B6%E9%97%B4); ts_popunder-cnt=1; kt_ips=36.112.207.149%2C16.163.108.207%2C18.166.53.143%2C18.166.57.106%2C43.198.115.215%2C18.167.90.126%2C18.163.101.255%2C137.220.191.103; __cf_bm=m3R1Jno.a0gaukkxqX05uWvVxR9OfSh.nrFwzmqCa78-1724572813-1.0.1.1-qTUHMOikaBRXaADHoZ7WRDYFnVxbj5kiEQZnmAuLVALrx9BAYDBu5n0EgiJVr1dHDInSHLbJnTh3wDpkU8Pcvg; _ga_1DTX7D4FHE=GS1.1.1724567906.6.1.1724572814.0.0.0; cf_clearance=0aX4buDBlymofICkJdn9E0kYDhj30NfCV0h2GwLJyFE-1724572815-1.2.1.1-XsyFxpIbWnFgUS91I0Pev2bktn6Rdm9.sZG8AsyqgubiolLW1cjuUSu3yvDxcCfzPLIFDh5zhv8UmN6IuSMcstv5cPZtD06sRf7TGklpr3xzJ_zL0IhRjmpsTbCggCgfA41hC_C3XfdZjzHsEbPv8u2zDqZ2WEdvlEUGO66z1J9reFbVaqRFEpM3ZdN9DqKsVdtSKv2f4BqDDunoeDopLqC20n5LZxH46rW7RcYocIFmWp3FkaWcVGYCKSuCI5vkk6x1_GXCkKjmG5DTvccAUmyMOC93pURmvvOjKtNf0Q9xhOc562ainbzazk8Nm7k8pp7._5BpHo5Jz_YE9H_gG_RsYYco1HdDfTOVJOz8kyogVhgO7MV00EN58dlCX1dT2TYWjFjxWjr_Xnxx.d6jXQ")
+	//request.Header.Set("Cache-Control", "max-age=0")
+	//request.Header.Set("Priority", "u=0, i")
+	//request.Header.Set("Sec-Ch-Ua", `Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"`)
+	//request.Header.Set("Sec-Ch-Ua-Mobile", "?0")
+	//request.Header.Set("Sec-Ch-Ua-Platform", "Windows")
+	//request.Header.Set("Sec-Fetch-Dest", "document")
+	//request.Header.Set("Sec-Fetch-Mode", "navigate")
+	//request.Header.Set("Sec-Fetch-Site", "none")
+	//request.Header.Set("Sec-Fetch-User", "?1")
+	//request.Header.Set("Upgrade-Insecure-Requests", "1")
+	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
+	resp, err := client.Do(request)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		// log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
-		return nil, errors.New(res.Status)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Error status code:", resp.StatusCode)
+		return nil, fmt.Errorf("wrong http status code: %d", resp.StatusCode)
 	}
 
 	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(res.Body)
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	return doc, nil
 }
 
-func DownloadImage(url, savePath string) (string, error) {
+func DownloadImage(url, savePath, saveFile string) error {
 	// 发起 GET 请求获取图片数据
 	res, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer res.Body.Close()
 
-	// 获取原文件名
-	_, saveFile := path.Split(res.Request.URL.Path)
+	if saveFile == "" {
+		// 获取原文件名
+		_, saveFile = path.Split(res.Request.URL.Path)
+	}
 
 	// 创建保存图片的文件
 	file, err := os.Create(path.Join(savePath, saveFile))
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer file.Close()
 
 	// 将响应体的数据写入文件
 	_, err = io.Copy(file, res.Body)
 	if err != nil {
-		return "", err
+		return err
 	}
-	return path.Join("./assets/image/avatar/", saveFile), nil
+	return nil
 }

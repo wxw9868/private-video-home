@@ -74,10 +74,11 @@ func ActressDeleteApi(c *gin.Context) {
 }
 
 type ActressList struct {
-	Page   int    `uri:"page" form:"page" json:"page"`
-	Size   int    `uri:"size" form:"size" json:"size"`
-	Action string `uri:"action" form:"action" json:"action"`
-	Sort   string `uri:"sort" form:"sort" json:"sort"`
+	Page    int    `uri:"page" form:"page" json:"page"`
+	Size    int    `uri:"size" form:"size" json:"size"`
+	Action  string `uri:"action" form:"action" json:"action"`
+	Sort    string `uri:"sort" form:"sort" json:"sort"`
+	Actress string `uri:"actress"  form:"actress"  json:"actress"`
 }
 
 func ActressListApi(c *gin.Context) {
@@ -87,7 +88,7 @@ func ActressListApi(c *gin.Context) {
 		return
 	}
 
-	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort)
+	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

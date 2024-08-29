@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
+	"path"
 	"strconv"
 	"strings"
 
@@ -130,6 +132,15 @@ func VideoPlayApi(c *gin.Context) {
 	}
 
 	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
+
+	poster := vi.Poster
+	previewPath := "E:/video/assets/image/preview/"
+	previewFile := vi.Title + ".jpg"
+	_, err = os.Stat(path.Join(previewPath, previewFile))
+	if !os.IsNotExist(err) {
+		poster = "./assets/image/preview/" + previewFile
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"videoID":       vi.ID,
 		"videoTitle":    vi.Title,
@@ -138,7 +149,7 @@ func VideoPlayApi(c *gin.Context) {
 		"Size":          size / 1024 / 1024,
 		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
 		"ModTime":       vi.CreationTime.Format("2006-01-02 15:04:05"),
-		"Poster":        vi.Poster,
+		"Poster":        poster,
 		"Width":         vi.Width,
 		"Height":        vi.Height,
 		"CodecName":     vi.CodecName,
@@ -397,10 +408,57 @@ func ImportVideoActress(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
 
-func AdditionalInformation(c *gin.Context) {
-	//var name = c.Query("name")
+func AllAddlInfoToActress(c *gin.Context) {
+	if err := service.AllAddlInfoToActress(); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
 
-	if err := service.VideoActressAdditionalInformation(); err != nil {
+func OneAddlInfoToActress(c *gin.Context) {
+	var actress = c.Query("actress")
+	if err := service.OneAddlInfoToActress(actress); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
+
+type VideoPic struct {
+	Page int    `uri:"page" form:"page" json:"page"`
+	Size int    `uri:"size" form:"size" json:"size"`
+	Site string `uri:"site" form:"site" json:"site"`
+}
+
+func GetVideoPic(c *gin.Context) {
+	var bind VideoPic
+	if err := c.Bind(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	if err := service.AllVideoPic(bind.Page, bind.Size, bind.Site); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
+
+type VideoPic1 struct {
+	Actress string `uri:"actress" form:"actress" json:"actress"`
+	Site    string `uri:"site" form:"site" json:"site"`
+}
+
+func OneVideoPic(c *gin.Context) {
+	var bind VideoPic1
+	if err := c.Bind(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+
+	if err := service.OneVideoPic(bind.Actress, bind.Site); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return
 	}
