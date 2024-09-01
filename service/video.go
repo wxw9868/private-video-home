@@ -82,11 +82,21 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
 
 		poster := videoInfo.Poster
-		thumbnailFile := videoInfo.Title + "_s360" + ".jpg"
-		_, err = os.Stat(path.Join(thumbnailPath, thumbnailFile))
-		if !os.IsNotExist(err) {
-			poster = "./assets/image/thumbnail/" + thumbnailFile
+		_, err = os.Stat(path.Join("E:/video", poster))
+		if os.IsNotExist(err) {
+			fmt.Println("poster: ")
+			fmt.Println(poster)
 		}
+
+		//
+		//previewFile := videoInfo.Title + ".jpg"
+		//thumbnailFile := videoInfo.Title + "_s360" + ".jpg"
+		//_, err = os.Stat(path.Join(thumbnailPath, thumbnailFile))
+		//_, err = os.Stat(path.Join(previewPath, previewFile))
+		//if os.IsNotExist(err) {
+		//	poster = "./assets/image/thumbnail/" + thumbnailFile
+		//	poster = "./assets/image/preview/" + previewFile
+		//}
 
 		video := Video{
 			ID:            videoInfo.ID,

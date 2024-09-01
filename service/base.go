@@ -30,7 +30,7 @@ var mutex = new(sync.Mutex)
 var thumbnailPath = "E:/video/assets/image/thumbnail/"
 
 // var posterPath = "E:/video/assets/image/poster/"
-// var previewPath = "E:/video/assets/image/preview/"
+var previewPath = "E:/video/assets/image/preview/"
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {

@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
-	"path"
 	"strconv"
 	"strings"
 
@@ -134,12 +132,12 @@ func VideoPlayApi(c *gin.Context) {
 	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
 
 	poster := vi.Poster
-	previewPath := "E:/video/assets/image/preview/"
-	previewFile := vi.Title + ".jpg"
-	_, err = os.Stat(path.Join(previewPath, previewFile))
-	if !os.IsNotExist(err) {
-		poster = "./assets/image/preview/" + previewFile
-	}
+	//previewPath := "E:/video/assets/image/preview/"
+	//previewFile := vi.Title + ".jpg"
+	//_, err = os.Stat(path.Join(previewPath, previewFile))
+	//if !os.IsNotExist(err) {
+	//	poster = "./assets/image/preview/" + previewFile
+	//}
 
 	c.JSON(http.StatusOK, gin.H{
 		"videoID":       vi.ID,
@@ -170,7 +168,7 @@ type VideoCollect struct {
 	Collect int  `form:"collect" json:"collect" binding:"required,oneof=1 -1"`
 }
 
-// 收藏
+// VideoCollectApi 收藏
 func VideoCollectApi(c *gin.Context) {
 	var bind VideoCollect
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -196,7 +194,7 @@ type VideoBrowse struct {
 	VideoID uint `form:"video_id" json:"video_id" binding:"required"`
 }
 
-// 浏览
+// VideoBrowseApi 浏览
 func VideoBrowseApi(c *gin.Context) {
 	var bind VideoBrowse
 	if err := c.ShouldBind(&bind); err != nil {
@@ -220,7 +218,7 @@ type VideoComment struct {
 	Content string `form:"content" json:"content" binding:"required"`
 }
 
-// 评论
+// VideoCommentApi 评论
 func VideoCommentApi(c *gin.Context) {
 	var bind VideoComment
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -255,7 +253,7 @@ type VideoReply struct {
 	Content  string `form:"content" json:"content" binding:"required"`
 }
 
-// 回复
+// VideoReplyApi 回复
 func VideoReplyApi(c *gin.Context) {
 	var bind VideoReply
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -303,7 +301,7 @@ type CommentZan struct {
 	Zan       int  `form:"zan" json:"zan" binding:"required,oneof=1 -1"`
 }
 
-// 赞
+// CommentZanApi 赞
 func CommentZanApi(c *gin.Context) {
 	var bind CommentZan
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -330,7 +328,7 @@ type CommentCai struct {
 	Cai       int  `form:"cai" json:"cai" binding:"required,oneof=1 -1"`
 }
 
-// 踩
+// CommentCaiApi 踩
 func CommentCaiApi(c *gin.Context) {
 	var bind CommentCai
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -408,7 +406,7 @@ func ImportVideoActress(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
 
-func OneAddlInfoToActress(c *gin.Context) {
+func OneAddInfoToActress(c *gin.Context) {
 	var actress = c.Query("actress")
 	if err := service.OneAddlInfoToActress(actress); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
@@ -417,7 +415,7 @@ func OneAddlInfoToActress(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
 
-func AllAddlInfoToActress(c *gin.Context) {
+func AllAddInfoToActress(c *gin.Context) {
 	if err := service.AllAddlInfoToActress(); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return
