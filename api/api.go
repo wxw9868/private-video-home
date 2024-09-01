@@ -408,14 +408,20 @@ func ImportVideoActress(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
 
-func AdditionalInformation(c *gin.Context) {
-	//var name = c.Query("name")
-
-	if err := service.VideoActressAdditionalInformation(); err != nil {
+func OneAddlInfoToActress(c *gin.Context) {
+	var actress = c.Query("actress")
+	if err := service.OneAddlInfoToActress(actress); err != nil {
 		c.JSON(http.StatusOK, util.Fail(err.Error()))
 		return
 	}
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
 
+func AllAddlInfoToActress(c *gin.Context) {
+	if err := service.AllAddlInfoToActress(); err != nil {
+		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		return
+	}
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
 

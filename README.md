@@ -53,13 +53,7 @@ docker run -d --name gofound -p 5678:5678 -v /mnt/data/gofound:/usr/local/go_fou
 # 拉取官方的最新版本的镜像
 docker pull redis:latest
 # 运行 redis 容器
-docker run -itd --name my-video-redis -p 6379:6379 \
---mount E:/video/conf/redis.conf:/redis/config/redis.conf \
---mount type=bind,source=E:/video/database/redis,target=/data \
-redis \
-redis-server /redis/config/redis.conf \
-redis-server --appendonly yes
-
+docker run -d -p 6379:6379 --name my-video-redis -v E:/video/database/redis:/data -v E:/video/config/redis.conf:/etc/redis/redis.conf redis redis-server /etc/redis/redis.conf redis-server --appendonly yes
 # 通过 redis-cli 连接测试使用 redis 服务
 $ docker exec -it my-video-redis /bin/bash
 ```

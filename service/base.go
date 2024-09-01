@@ -26,9 +26,11 @@ import (
 var db = sqlite.DB()
 var gofoundCount = 0
 var mutex = new(sync.Mutex)
-var posterPath = "E:/video/assets/image/poster/"
+
 var thumbnailPath = "E:/video/assets/image/thumbnail/"
-var previewPath = "E:/video/assets/image/preview/"
+
+// var posterPath = "E:/video/assets/image/poster/"
+// var previewPath = "E:/video/assets/image/preview/"
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -46,6 +48,21 @@ func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 		offset := (page - 1) * pageSize
 		return db.Offset(offset).Limit(pageSize)
 	}
+}
+
+func Post(url string, body io.Reader) error {
+	resp, err := gofoundClient.GofoundClient().POST(url, "application/json", body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	_, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func VideoImport(videoDir string) error {
@@ -92,7 +109,7 @@ func VideoImport(videoDir string) error {
 	}
 
 	if len(actressList) > 0 {
-		for actress, _ := range actressList {
+		for actress := range actressList {
 			avatarPath := avatarDir + "/" + actress + ".png"
 
 			_, err := os.Stat(avatarPath)
@@ -131,7 +148,7 @@ func ImportActress() error {
 	utils.ReadFileToMap("actress.json", &actressMap)
 
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-	for actress, _ := range actressMap {
+	for actress := range actressMap {
 		avatarPath := avatarDir + "/" + actress + ".png"
 		_, err := os.Stat(avatarPath)
 		if os.IsNotExist(err) {
@@ -148,21 +165,6 @@ func ImportActress() error {
 	if err := db.Exec(actressSql).Error; err != nil {
 		return err
 	}
-	return nil
-}
-
-func Post(url string, body io.Reader) error {
-	resp, err := gofoundClient.GofoundClient().POST(url, "application/json", body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	_, err = io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -213,145 +215,14 @@ func VideoActress() error {
 	return err
 }
 
-func VideoActressAdditionalInformation() error {
-	return AddInfoToActress()
-	//var m model.Actress
-	//if err := db.Where("actress = ?", name).First(&m).Error; err != nil {
-	//	return err
-	//}
-	var actresss []model.Actress
-	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
-		return err
-	}
-
-	for i := 0; i < len(actresss); i++ {
-		actress := actresss[i]
-		//fmt.Println(actress.ID, actress.Actress)
-
-		//url := utils.Join("https://netflav.com/actress?keyword=", "杉浦花音")
-
-		elems := make([]string, 3)
-		elems[0] = "https://xslist.org/search?query="
-		elems[1] = actress.Actress
-		elems[2] = "&lg=zh"
-		doc, err := utils.GetWebDocument("GET", strings.Join(elems, ""), nil)
-		if err != nil {
-			return err
-		}
-		if doc.Find("body").Text() == "No results found." {
-			fmt.Println("continue")
-			continue
-		}
-		href, _ := doc.Find("a").Attr("href")
-
-		doc, err = utils.GetWebDocument("GET", href, nil)
-		if err != nil {
-			return err
-		}
-		sss1 := doc.Find("#sss1")
-		alias := sss1.Find("p").Text()
-		avatar, _ := sss1.Find("img").Attr("src")
-
-		savePath := "E:/video/assets/image/avatar/"
-		_, saveFile := path.Split(href)
-		err = utils.DownloadImage(avatar, savePath, saveFile)
-		if err != nil {
-			return err
-		}
-
-		path.Join("./assets/image/avatar/", saveFile)
-		if alias != "" {
-			alias = strings.Trim(strings.Split(alias, ":")[1], " ")
-		}
-
-		m := model.Actress{}
-		m.Alias = alias
-		m.Avatar = avatar
-		doc.Find("h2").Each(func(i int, s *goquery.Selection) {
-			if i == 0 {
-				personal, _ := s.Next().Html()
-				personal = strings.Replace(strings.Replace(strings.Replace(personal, "<span itemprop=\"height\">", "", -1), "<span itemprop=\"nationality\">", "", -1), "</span>", "", -1)
-				personals := strings.Split(personal, "<br/>")
-				birth := personals[0]                  // 出生
-				measurements := personals[1]           // 三围
-				cupSze := personals[2]                 // 罩杯
-				debutDate := personals[3]              // 出道日期
-				starSign := personals[4]               // 星座
-				bloodGroup := personals[5]             // 血型
-				stature := personals[6]                // 身高
-				nationality := personals[7]            // 国籍
-				introduction := s.Next().Next().Text() // 简介
-
-				m.Birth = strings.Trim(strings.Split(birth, ":")[1], " ")
-				m.Measurements = strings.Trim(strings.Split(measurements, ":")[1], " ")
-				m.CupSize = strings.Trim(strings.Split(cupSze, ":")[1], " ")
-				m.DebutDate = strings.Trim(strings.Split(debutDate, ":")[1], " ")
-				m.StarSign = strings.Trim(strings.Split(starSign, ":")[1], " ")
-				m.BloodGroup = strings.Trim(strings.Split(bloodGroup, ":")[1], " ")
-				m.Stature = strings.Trim(strings.Split(stature, ":")[1], " ")
-				m.Nationality = strings.Trim(strings.Split(nationality, ":")[1], " ")
-				m.Introduction = strings.Trim(strings.Split(introduction, ":")[1], " ")
-			}
-		})
-		//fmt.Printf("%+v\n", m)
-		if err = db.Model(&actress).Updates(m).Error; err != nil {
-			return err
-		}
-		m = model.Actress{}
-		time.Sleep(time.Microsecond * 300)
-	}
-
-	return nil
-}
-
-func AddInfoToActress() error {
-	var actresss []model.Actress
-	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
-		return err
-	}
-
-	numCPU := runtime.NumCPU()
-	ch := make(chan string, numCPU)
-	wg := new(sync.WaitGroup)
-
-	for i := 0; i < numCPU; i++ {
-		wg.Add(1)
-		go func(ch chan string, wg *sync.WaitGroup, i int) {
-			defer wg.Done()
-			for {
-				select {
-				case actress, ok := <-ch:
-					if !ok {
-						return
-					}
-					var err error
-					err = doTask(actress)
-					fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
-				}
-			}
-		}(ch, wg, i)
-	}
-
-	for _, actress := range actresss {
-		ch <- actress.Actress
-	}
-
-	wg.Wait()
-
-	return nil
-}
-
-func doTask(actress string) error {
-	elems := make([]string, 3)
-	elems[0] = "https://xslist.org/search?query="
-	elems[1] = actress
-	elems[2] = "&lg=zh"
-	doc, err := utils.GetWebDocument("GET", strings.Join(elems, ""), nil)
+func OneAddlInfoToActress(actress string) error {
+	url := utils.Join("https://xslist.org/search?query=", actress, "&lg=zh")
+	doc, err := utils.GetWebDocument("GET", url, nil)
 	if err != nil {
 		return err
 	}
 	if doc.Find("body").Text() == "No results found." {
-		return errors.New("No results found.")
+		return errors.New("no results found")
 	}
 	href, _ := doc.Find("a").Attr("href")
 
@@ -363,18 +234,23 @@ func doTask(actress string) error {
 	alias := sss1.Find("p").Text()
 	avatar, _ := sss1.Find("img").Attr("src")
 
-	savePath := "E:/video/assets/image/avatar/"
+	var savePath string
+	switch runtime.GOOS {
+	case "linux":
+	case "darwin":
+		savePath = "/Users/v_weixiongwei/go/src/video/assets/image/avatar/"
+	case "windows":
+		savePath = "E:/video/assets/image/avatar/"
+	}
 	_, saveFile := path.Split(href)
 	err = utils.DownloadImage(avatar, savePath, saveFile)
 	if err != nil {
 		return err
 	}
 
-	path.Join("./assets/image/avatar/", saveFile)
 	if alias != "" {
 		alias = strings.Trim(strings.Split(alias, ":")[1], " ")
 	}
-
 	m := model.Actress{}
 	m.Alias = alias
 	m.Avatar = avatar
@@ -413,8 +289,38 @@ func doTask(actress string) error {
 	return nil
 }
 
+func AllAddlInfoToActress() error {
+	var actresss []model.Actress
+	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
+		return err
+	}
+
+	numCPU := runtime.NumCPU()
+	ch := make(chan string, numCPU)
+	wg := new(sync.WaitGroup)
+
+	for i := 0; i < numCPU; i++ {
+		wg.Add(1)
+		go func(ch chan string, wg *sync.WaitGroup, i int) {
+			defer wg.Done()
+			for actress := range ch {
+				err := OneAddlInfoToActress(actress)
+				fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
+			}
+		}(ch, wg, i)
+	}
+
+	for _, actress := range actresss {
+		ch <- actress.Actress
+	}
+	close(ch)
+
+	wg.Wait()
+
+	return nil
+}
+
 func AllVideoPic(page, pageSize int, site string) error {
-	//return cut(site)
 	var count int64
 	if err := db.Model(&model.Video{}).Count(&count).Error; err != nil {
 		return err
@@ -424,31 +330,41 @@ func AllVideoPic(page, pageSize int, site string) error {
 	if err := db.Scopes(Paginate(page, pageSize, int(count))).Find(&actresss).Error; err != nil {
 		return err
 	}
-	//fmt.Printf("%+v\n", actresss)
 
-	for i := 0; i < len(actresss); i++ {
-		actress := actresss[i]
+	numCPU := runtime.NumCPU()
+	ch := make(chan string, numCPU)
+	wg := new(sync.WaitGroup)
 
-		var videos []model.Video
-		if err := db.Where("actress = ?", actress.Actress).Find(&videos).Error; err != nil {
-			return err
-		}
+	for i := 0; i < numCPU; i++ {
+		wg.Add(1)
+		go func(ch chan string, site string, wg *sync.WaitGroup, i int) {
+			wg.Done()
 
-		var err error
+			for actress := range ch {
+				var err error
+				var videos []model.Video
+				err = db.Where("actress = ?", actress).Find(&videos).Error
+				fmt.Println(err)
 
-		switch site {
-		case "av1688Cc":
-			err = av1688Cc(actress.Actress, videos)
-		case "av6kCom":
-			err = av6kCom(actress.Actress, videos)
-		default:
-			err = njavTv(actress.Actress, videos)
-		}
-
-		if err != nil {
-			return err
-		}
+				switch site {
+				case "av1688Cc":
+					err = av1688Cc(actress, videos)
+				case "av6kCom":
+					err = av6kCom(actress, videos)
+				default:
+					err = njavTv(actress, videos)
+				}
+				fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
+			}
+		}(ch, site, wg, i)
 	}
+
+	for _, actress := range actresss {
+		ch <- actress.Actress
+	}
+	close(ch)
+
+	wg.Wait()
 
 	//datas := make(map[string]map[string]string)
 	//err := utils.WriteMapToFile("E:/video/assets/data/data.json", datas)
@@ -462,7 +378,6 @@ func OneVideoPic(actress string, site string) error {
 	}
 
 	var err error
-
 	switch site {
 	case "av1688Cc":
 		err = av1688Cc(actress, videos)
@@ -781,53 +696,4 @@ func njavTv(actress string, videos []model.Video) error {
 	}
 
 	return nil
-}
-
-func cut(site string) error {
-	var actresss []model.Actress
-	if err := db.Find(&actresss).Error; err != nil {
-		return err
-	}
-
-	numCPU := runtime.NumCPU()
-	ch := make(chan string, numCPU)
-	wg := new(sync.WaitGroup)
-
-	for i := 0; i < numCPU; i++ {
-		wg.Add(1)
-		go work(ch, site, wg, i)
-	}
-
-	for _, actress := range actresss {
-		ch <- actress.Actress
-	}
-
-	wg.Wait()
-
-	return nil
-}
-
-func work(ch chan string, site string, wg *sync.WaitGroup, i int) {
-	wg.Done()
-	for {
-		select {
-		case actress, ok := <-ch:
-			if !ok {
-				return
-			}
-			var err error
-			var videos []model.Video
-			err = db.Where("actress = ?", actress).Find(&videos).Error
-
-			switch site {
-			case "av1688Cc":
-				err = av1688Cc(actress, videos)
-			case "av6kCom":
-				err = av6kCom(actress, videos)
-			default:
-				err = njavTv(actress, videos)
-			}
-			fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
-		}
-	}
 }

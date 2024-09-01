@@ -1,10 +1,13 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
-
+	"github.com/wxw9868/video/initialize/rdb"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
+	"strconv"
 )
 
 type ActressService struct{}
@@ -63,5 +66,20 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 	if err := db.Raw(sql).Scopes(Paginate(page, pageSize, int(count))).Scan(&actresss).Error; err != nil {
 		return nil, err
 	}
+
+	var ids []uint
+	for _, a := range actresss {
+		ids = append(ids, a.ID)
+		rdb.Rdb().HSet(context.Background(), utils.Join("video_actress_", strconv.Itoa(int(a.ID))), "id", a.ID, "actress", a.Actress, "avatar", a.Avatar, "count", a.Count)
+	}
+	bytes, err := json.Marshal(ids)
+	if err != nil {
+		return nil, err
+	}
+	err = rdb.Rdb().HSet(context.Background(), "video_actress", "len", len(actresss), "ids", bytes).Err()
+	if err != nil {
+		return nil, err
+	}
+	
 	return actresss, nil
 }

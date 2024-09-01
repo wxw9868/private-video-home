@@ -1,42 +1,15 @@
 package router
 
 import (
-	"net/http"
-
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
-	"github.com/mattn/go-colorable"
 	"github.com/wxw9868/video/api"
 	"github.com/wxw9868/video/middleware"
 )
 
-func Engine(addr string) *gin.Engine {
-	// gin.SetMode(gin.ReleaseMode)
-	// 强制日志颜色化
-	gin.ForceConsoleColor()
-	gin.DefaultWriter = colorable.NewColorableStdout()
+func Engine(r *gin.Engine) {
 
-	router := gin.Default()
-
-	// 允许跨域
-	router.Use(middleware.GinCors())
-
-	// 性能监控
-	pprof.Register(router)
-
-	router.NoRoute(middleware.NoRoute())
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	// Set a lower memory limit for multipart forms (default is 32 MiB)
-	router.MaxMultipartMemory = 8 << 20 // 8 MiB
-	router.Static("/assets", "./assets")
-
-	router.Use(middleware.InitSession())
-	user := router.Group("/user")
+	r.Use(middleware.InitSession())
+	user := r.Group("/user")
 	user.POST("/doRegister", api.RegisterApi)
 	user.POST("/doLogin", api.LoginApi)
 	user.POST("/sendMail", api.SendMailApi)
@@ -44,7 +17,7 @@ func Engine(addr string) *gin.Engine {
 	user.POST("/captcha", api.CaptchaApi)
 	user.POST("/forgotPassword", api.ForgotPasswordApi)
 
-	auth := router.Group("", middleware.AuthSession())
+	auth := r.Group("", middleware.AuthSession())
 	user = auth.Group("/user")
 	user.GET("/logout", api.LogoutApi)
 	user.GET("/session", api.GetSession)
@@ -91,7 +64,8 @@ func Engine(addr string) *gin.Engine {
 	actress.POST("/edit", api.ActressEditApi)
 	actress.GET("/delete", api.ActressDeleteApi)
 	actress.GET("/list", api.ActressListApi)
-	actress.GET("/addInfo", api.AdditionalInformation)
+	actress.GET("/OneAddInfo", api.OneAddlInfoToActress)
+	actress.GET("/AllAddInfo", api.AllAddlInfoToActress)
 
 	tag := auth.Group("/tag")
 	tag.POST("/add", api.TagAddApi)
@@ -119,6 +93,4 @@ func Engine(addr string) *gin.Engine {
 	// 	c.Header("Permissions-Policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()")
 	// 	c.Next()
 	// })
-
-	return router
 }
