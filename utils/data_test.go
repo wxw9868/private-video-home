@@ -479,7 +479,3 @@ func removeImg(inputPath string) {
 	png.Encode(outFile, canvas)
 	fmt.Println("图片去除成功！")
 }
-
-var data = map[string]string{
-	"Heyzo_1931_パイパン素人娘を制服コスでいただきます！_杉浦花音": "https://image.nowav.tv/2023/05/720phdxx24756.jpg",
-}

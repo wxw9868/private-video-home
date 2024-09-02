@@ -6,7 +6,7 @@ import (
 	"github.com/wxw9868/video/middleware"
 )
 
-func Engine(r *gin.Engine) {
+func Router(r *gin.Engine) {
 	r.Use(middleware.InitSession())
 	user := r.Group("/user")
 	user.POST("/doRegister", api.RegisterApi)
