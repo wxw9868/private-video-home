@@ -23,6 +23,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var avatarDir = "./assets/image/avatar"
+var posterDir = "./assets/image/poster"
 var db = sqlite.DB()
 var gofoundCount = 0
 var mutex = new(sync.Mutex)
@@ -66,8 +68,6 @@ func VideoImport(videoDir string) error {
 		return err
 	}
 
-	var avatarDir = "./assets/image/avatar"
-	var posterDir = "./assets/image/poster"
 	var actressList = make(map[string]struct{})
 	var videoSql = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
@@ -137,7 +137,6 @@ func VideoImport(videoDir string) error {
 }
 
 func ImportActress() error {
-	var avatarDir = "./assets/image/avatar"
 	var actressMap = make(map[string]struct{})
 
 	utils.ReadFileToMap("actress.json", &actressMap)

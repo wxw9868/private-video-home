@@ -33,15 +33,13 @@ const (
 )
 
 var (
-	ss = new(service.SendService)
-
+	ss    = new(service.SendService)
 	us    = new(service.UserService)
 	vs    = new(service.VideoService)
 	as    = new(service.ActressService)
 	ts    = new(service.TagService)
 	stock = new(service.StockService)
 
-	// snapshotDir = "./assets/image/snapshot"
 	list            []string
 	videos          []video
 	actresss        []actress
