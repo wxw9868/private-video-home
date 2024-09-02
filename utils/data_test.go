@@ -116,9 +116,10 @@ func TestPachong(t *testing.T) {
 		log.Fatal(err)
 	}
 	fmt.Println(doc)
+	return
 
-	//av6kCom()
-	//av1688Cc()
+	av6kCom()
+	av1688Cc()
 }
 
 func av6kCom() {
@@ -332,35 +333,35 @@ func removeWatermark(inputPath, outputPath string) error {
 }
 
 // 修复水印
-func fixWatermark(inputPath, watermarkPath, outputPath string) error {
-	// 读取原始图片和水印图片
-	file, err := os.Open(inputPath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+// func fixWatermark(inputPath, watermarkPath, outputPath string) error {
+// 	// 读取原始图片和水印图片
+// 	file, err := os.Open(inputPath)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer file.Close()
 
-	img, _, err := image.Decode(file)
-	if err != nil {
-		return err
-	}
+// 	img, _, err := image.Decode(file)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	watermark, err := imaging.Open(watermarkPath)
-	if err != nil {
-		return err
-	}
+// 	watermark, err := imaging.Open(watermarkPath)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// 修复水印
-	img = imaging.OverlayCenter(img, watermark, 1.0)
+// 	// 修复水印
+// 	img = imaging.OverlayCenter(img, watermark, 1.0)
 
-	// 保存处理后的图片
-	err = imaging.Save(img, outputPath)
-	if err != nil {
-		return err
-	}
+// 	// 保存处理后的图片
+// 	err = imaging.Save(img, outputPath)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // https://www.cnblogs.com/Finley/p/16589798.html
 func TestShuiyin(t *testing.T) {
