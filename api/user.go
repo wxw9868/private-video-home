@@ -164,7 +164,7 @@ type UserUpdate struct {
 	Note        string `form:"note" json:"note"`
 }
 
-func UserUpdateApi(c *gin.Context) {
+func UserSaveApi(c *gin.Context) {
 	var bind UserUpdate
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
