@@ -2,30 +2,28 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/gin-contrib/pprof"
-	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-colorable"
 	"github.com/wxw9868/video/config"
 	"github.com/wxw9868/video/middleware"
 	"github.com/wxw9868/video/router"
-	"go.uber.org/zap"
+	"net/http"
 )
 
 func main() {
-	// gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 
 	// 强制日志颜色化
 	gin.ForceConsoleColor()
 	gin.DefaultWriter = colorable.NewColorableStdout()
 
-	r := gin.New()
-	logger, _ := zap.NewProduction()
-	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
-	r.Use(ginzap.RecoveryWithZap(logger, true))
+	r := gin.Default()
+
+	//r := gin.New()
+	//logger, _ := zap.NewProduction()
+	//r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	//r.Use(ginzap.RecoveryWithZap(logger, true))
 	r.Use(middleware.GinCors()) // 允许跨域
 	r.NoRoute(middleware.NoRoute())
 	r.GET("/ping", func(c *gin.Context) {

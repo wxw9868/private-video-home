@@ -1,9 +1,13 @@
 package httpclient
 
-import "github.com/wxw9868/video/utils"
+import (
+	"fmt"
+	"github.com/wxw9868/video/config"
+	"github.com/wxw9868/video/utils"
+)
 
 func GofoundClient() *utils.GofoundClient {
-	// api := "http://127.0.0.1:5678/api"
-	api := "http://192.168.0.9:5678/api"
+	conf := config.Config().Gofound
+	api := fmt.Sprintf("http://%s:%d/api", conf.Host, conf.Port)
 	return utils.NewGofoundClient(api)
 }

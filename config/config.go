@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"path"
 	"path/filepath"
 	"runtime"
 
@@ -18,7 +19,7 @@ func Config() *config {
 func init() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath(path.Join(AbsPath("")))
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			log.Panic("Fatal error config file: ", err)
@@ -26,6 +27,7 @@ func init() {
 			log.Println("Config file error:", err)
 		}
 	}
+	unmarshal()
 
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		unmarshal()
@@ -58,12 +60,13 @@ type config struct {
 	System   system
 	Database database
 	Redis    redis
+	Gofound  gofound
 	Alisms   alisms
 }
 
 type system struct {
 	Host string `mapstructure:"host"`
-	Port uint8  `mapstructure:"port"`
+	Port uint   `mapstructure:"port"`
 }
 
 type database struct {
@@ -72,9 +75,14 @@ type database struct {
 
 type redis struct {
 	Host     string `mapstructure:"host"`
-	Port     uint8  `mapstructure:"port"`
+	Port     uint   `mapstructure:"port"`
 	Password string `mapstructure:"password"`
 	DB       int    `mapstructure:"db"`
+}
+
+type gofound struct {
+	Host string `mapstructure:"host"`
+	Port uint   `mapstructure:"port"`
 }
 
 type alisms struct {

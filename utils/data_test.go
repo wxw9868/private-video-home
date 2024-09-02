@@ -99,25 +99,26 @@ func TestDownloadImage(t *testing.T) {
 }
 
 func TestPachong(t *testing.T) {
-	Pachong1()
-	return
+	//Pachong1()
 	//url := Join("https://920share.com/?s=", "衣吹かのん")
 	//url := Join("https://ggjav.com/main/search?string=", "小泉真希")
-	url := Join("https://netflav.com/search?type=title&keyword=", "杉浦花音")
+	//url := Join("https://netflav.com/search?type=title&keyword=", "杉浦花音")
 
 	//url := Join("https://jable.tv/search/", "杉浦花音", "/")
 	//url := Join("https://missav.com/cn/search/", "杉浦花音")
 	//url := Join("https://dgaqp.com/search/", "杉浦花音")
 	//url := Join("https://supjav.com/zh/?s=", "杉浦花音")
 	//url := Join("https://ggjav.com/main/search?string", "杉浦花音")
+
+	url := Join("https://nowav.tv/?s=", "亀井ひとみ")
 	doc, err := GetWebDocument("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(doc)
 
-	av6kCom()
-	av1688Cc()
+	//av6kCom()
+	//av1688Cc()
 }
 
 func av6kCom() {
@@ -477,4 +478,8 @@ func removeImg(inputPath string) {
 	defer outFile.Close()
 	png.Encode(outFile, canvas)
 	fmt.Println("图片去除成功！")
+}
+
+var data = map[string]string{
+	"Heyzo_1931_パイパン素人娘を制服コスでいただきます！_杉浦花音": "https://image.nowav.tv/2023/05/720phdxx24756.jpg",
 }

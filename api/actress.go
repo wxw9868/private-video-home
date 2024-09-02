@@ -1,10 +1,10 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
+	"github.com/wxw9868/video/service"
+	"net/http"
 )
 
 type ActressAdd struct {
@@ -88,7 +88,35 @@ func ActressListApi(c *gin.Context) {
 		return
 	}
 
-	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
+	var actresss []service.Actress
+	var err error
+
+	//result, err := rdb.Rdb().HGetAll(c, "video_actress").Result()
+	//if bind.Actress == "" && err == nil {
+	//	ids := strings.Replace(strings.Replace(result["ids"], "[", "", -1), "]", "", -1)
+	//
+	//	fmt.Println(ids)
+	//	for _, id := range strings.Split(ids, ",") {
+	//		data := rdb.Rdb().HGetAll(c, utils.Join("video_actress_", id)).Val()
+	//
+	//		i, _ := strconv.Atoi(data["id"])
+	//		count, _ := strconv.Atoi(data["count"])
+	//		actresss = append(actresss, service.Actress{
+	//			ID:      uint(i),
+	//			Actress: data["actress"],
+	//			Avatar:  data["avatar"],
+	//			Count:   uint32(count),
+	//		})
+	//	}
+	//} else {
+	//	actresss, err = as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
+	//	if err != nil {
+	//		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+	//		return
+	//	}
+	//}
+
+	actresss, err = as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

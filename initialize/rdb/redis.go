@@ -25,7 +25,7 @@ func init() {
 	if err != nil {
 		log.Fatalf("无法连接到 Redis: %s\n", err)
 	}
-	log.Printf("连接成功: %s\n", pong)
+	log.Printf("Redis 连接成功: %s\n", pong)
 }
 
 func Rdb() *redis.Client {
