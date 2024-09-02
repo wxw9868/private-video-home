@@ -179,7 +179,7 @@ func VideoCollectApi(c *gin.Context) {
 	userID := GetUserID(c)
 
 	if err := vs.Collect(bind.VideoID, bind.Collect, userID); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -205,7 +205,7 @@ func VideoBrowseApi(c *gin.Context) {
 	userID := GetUserID(c)
 
 	if err := vs.Browse(bind.VideoID, userID); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -230,7 +230,7 @@ func VideoCommentApi(c *gin.Context) {
 
 	commentID, err := vs.Comment(bind.VideoID, bind.Content, userID)
 	if err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -265,7 +265,7 @@ func VideoReplyApi(c *gin.Context) {
 
 	commentID, err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID)
 	if err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -290,7 +290,7 @@ func VideoCommentListApi(c *gin.Context) {
 
 	list, err := vs.CommentList(cast.ToUint(id), userID)
 	if err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("评论列表", list))
@@ -312,7 +312,7 @@ func CommentZanApi(c *gin.Context) {
 	userID := GetUserID(c)
 
 	if err := vs.Zan(bind.CommentID, userID, bind.Zan); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -339,7 +339,7 @@ func CommentCaiApi(c *gin.Context) {
 	userID := GetUserID(c)
 
 	if err := vs.Cai(bind.CommentID, userID, bind.Cai); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -355,7 +355,7 @@ func DanmuListApi(c *gin.Context) {
 
 	list, err := vs.DanmuList(cast.ToUint(id))
 	if err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("弹幕列表", list))
@@ -381,25 +381,26 @@ func DanmuSaveApi(c *gin.Context) {
 	userID := GetUserID(c)
 
 	if err := vs.DanmuSave(bind.VideoID, userID, bind.Text, bind.Time, bind.Mode, bind.Color, bind.Border, bind.Style); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("发送成功", nil))
 }
 
-func VideoImport(c *gin.Context) {
+func VideoImportApi(c *gin.Context) {
 	var videoDir = c.Query("dir")
 	if err := service.VideoImport(videoDir); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }
 
-func ImportVideoActress(c *gin.Context) {
-	if err := service.VideoActress(); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+func ResetTableApi(c *gin.Context) {
+	var table = c.Query("table")
+	if err := service.ResetTable(table); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -409,7 +410,7 @@ func ImportVideoActress(c *gin.Context) {
 func OneAddInfoToActress(c *gin.Context) {
 	var actress = c.Query("actress")
 	if err := service.OneAddlInfoToActress(actress); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
@@ -417,7 +418,7 @@ func OneAddInfoToActress(c *gin.Context) {
 
 func AllAddInfoToActress(c *gin.Context) {
 	if err := service.AllAddlInfoToActress(); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
@@ -437,7 +438,7 @@ func GetVideoPic(c *gin.Context) {
 	}
 
 	if err := service.AllVideoPic(bind.Page, bind.Size, bind.Site); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
@@ -457,7 +458,7 @@ func OneVideoPic(c *gin.Context) {
 	}
 
 	if err := service.OneVideoPic(bind.Actress, bind.Site); err != nil {
-		c.JSON(http.StatusOK, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 

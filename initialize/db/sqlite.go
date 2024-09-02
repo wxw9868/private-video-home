@@ -58,7 +58,7 @@ func init() {
 	// SetConnMaxLifetime 设置了连接可复用的最大时间。
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	log.Println("数据库启动成功")
+	log.Println("数据库连接成功")
 
 	// 迁移 schema
 	if err := db.AutoMigrate(

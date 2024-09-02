@@ -399,7 +399,7 @@ func GeneteSQL() string {
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
 	var root = "/Users/v_weixiongwei/go/src/video"
 	root = "D:/GoLang/video"
-	for actress, _ := range data {
+	for actress := range data {
 		avatarPath := avatarDir + "/" + actress + ".png"
 		rootPath := root + "/assets/image/avatar" + "/" + actress + ".png"
 		_, err := os.Stat(rootPath)

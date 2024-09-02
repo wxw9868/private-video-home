@@ -14,11 +14,9 @@ func (s *StockService) ImportTradingRecords(filepath string) error {
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			panic(err)
-		}
-	}()
+	if err := f.Close(); err != nil {
+		return err
+	}
 
 	// 获取工作表列表
 	Sheet1 := f.GetSheetList()[0]

@@ -23,14 +23,11 @@ import (
 	"gorm.io/gorm"
 )
 
+var avatarDir = "./assets/image/avatar"
+var posterDir = "./assets/image/poster"
 var db = sqlite.DB()
 var gofoundCount = 0
 var mutex = new(sync.Mutex)
-
-var thumbnailPath = "E:/video/assets/image/thumbnail/"
-
-// var posterPath = "E:/video/assets/image/poster/"
-var previewPath = "E:/video/assets/image/preview/"
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -71,8 +68,6 @@ func VideoImport(videoDir string) error {
 		return err
 	}
 
-	var avatarDir = "./assets/image/avatar"
-	var posterDir = "./assets/image/poster"
 	var actressList = make(map[string]struct{})
 	var videoSql = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
@@ -112,7 +107,7 @@ func VideoImport(videoDir string) error {
 		for actress := range actressList {
 			avatarPath := avatarDir + "/" + actress + ".png"
 
-			_, err := os.Stat(avatarPath)
+			_, err = os.Stat(avatarPath)
 			if os.IsNotExist(err) {
 				nameSlice := []rune(actress)
 				if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
@@ -130,10 +125,33 @@ func VideoImport(videoDir string) error {
 	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
 
 	err = db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Exec(videoSql).Error; err != nil {
+		if err = tx.Exec(videoSql).Error; err != nil {
 			return err
 		}
-		if err := tx.Exec(actressSql).Error; err != nil {
+		if err = tx.Exec(actressSql).Error; err != nil {
+			return err
+		}
+
+		var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
+		for key := range actressList {
+			var actress model.Actress
+			if err = tx.Where("actress = ?", key).First(&actress).Error; err != nil {
+				return err
+			}
+			var videos []model.Video
+			if err = tx.Where("title LIKE ?", "%"+key+"%").Find(&videos).Error; err != nil {
+				return err
+			}
+			if len(videos) > 0 {
+				for _, video := range videos {
+					sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
+				}
+			}
+		}
+
+		sqlBytes := []byte(sql)
+		sql = string(sqlBytes[:len(sqlBytes)-2])
+		if err = tx.Exec(sql).Error; err != nil {
 			return err
 		}
 		return nil
@@ -141,73 +159,16 @@ func VideoImport(videoDir string) error {
 	return err
 }
 
-func ImportActress() error {
-	var avatarDir = "./assets/image/avatar"
-	var actressMap = make(map[string]struct{})
-
-	utils.ReadFileToMap("actress.json", &actressMap)
-
-	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-	for actress := range actressMap {
-		avatarPath := avatarDir + "/" + actress + ".png"
-		_, err := os.Stat(avatarPath)
-		if os.IsNotExist(err) {
-			nameSlice := []rune(actress)
-			if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
-				return err
-			}
-		}
-		actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
-	}
-	actressSqlBytes := []byte(actressSql)
-	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
-
-	if err := db.Exec(actressSql).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-type VideoActressData struct {
-	VideoID   uint   `json:"video_id" gorm:"column:video_id"`
-	Actress   string `json:"actress" gorm:"column:actress"`
-	ActressID uint   `json:"actress_id" gorm:"column:actress_id"`
-}
-
-// 使用联合索引解决问题
-func VideoActress() error {
-	var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
-	var actresss []model.Actress
-	var videos []model.Video
-
-	if err := db.Find(&actresss).Error; err != nil {
-		return err
-	}
-	// fmt.Printf("%+v\n", actressData)
-	if len(actresss) > 0 {
-		for _, actress := range actresss {
-			db.Where("title LIKE ?", "%"+actress.Actress+"%").Find(&videos)
-			if len(videos) > 0 {
-				for _, video := range videos {
-					sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
-				}
-			}
-		}
-	}
-
-	sqlBytes := []byte(sql)
-	sql = string(sqlBytes[:len(sqlBytes)-2])
-
+// ResetTable 使用联合索引解决问题
+func ResetTable(table string) error {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		// 删除数据
-		if err := tx.Exec("DELETE FROM video_VideoActress").Error; err != nil {
+		fmt.Sprintf("")
+		if err := tx.Exec("DELETE FROM ?", table).Error; err != nil {
 			return err
 		}
 		// 重置主键
-		if err := tx.Exec("UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'video_VideoActress'").Error; err != nil {
-			return err
-		}
-		if err := tx.Exec(sql).Error; err != nil {
+		if err := tx.Exec("UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = ?", table).Error; err != nil {
 			return err
 		}
 		return nil

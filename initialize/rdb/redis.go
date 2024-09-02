@@ -23,9 +23,9 @@ func init() {
 	// 测试连接
 	pong, err := rdb.Ping(ctx).Result()
 	if err != nil {
-		log.Fatalf("无法连接到 Redis: %s\n", err)
+		log.Fatalf("Redis连接超时: %s\n", err)
 	}
-	log.Printf("Redis 连接成功: %s\n", pong)
+	log.Printf("Redis连接成功: %s\n", pong)
 }
 
 func Rdb() *redis.Client {

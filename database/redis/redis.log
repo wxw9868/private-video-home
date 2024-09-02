@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 1:C 29 Aug 2024 16:13:09.697 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
 1:C 29 Aug 2024 16:13:09.816 * Redis version=7.4.0, bits=64, commit=00000000, modified=0, pid=1, just started
 1:C 29 Aug 2024 16:13:09.822 * Configuration loaded
@@ -231,3 +232,111 @@
 20:C 01 Sep 2024 18:42:57.845 * DB saved on disk
 20:C 01 Sep 2024 18:42:57.856 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
 1:M 01 Sep 2024 18:42:57.945 * Background saving terminated with success
+=======
+17475:C 02 Sep 2024 18:43:33.962 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+17475:C 02 Sep 2024 18:43:33.962 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=17475, just started
+17475:C 02 Sep 2024 18:43:33.962 * Configuration loaded
+17475:M 02 Sep 2024 18:43:33.965 * Increased maximum number of open files to 10032 (it was originally set to 256).
+17475:M 02 Sep 2024 18:43:33.965 * monotonic clock: POSIX clock_gettime
+17475:M 02 Sep 2024 18:43:33.969 * Running mode=standalone, port=6379.
+17475:M 02 Sep 2024 18:43:33.969 # WARNING: The TCP backlog setting of 511 cannot be enforced because kern.ipc.somaxconn is set to the lower value of 128.
+17475:M 02 Sep 2024 18:43:33.970 * Server initialized
+17475:M 02 Sep 2024 18:43:33.972 # Can't handle RDB format version 12
+17475:M 02 Sep 2024 18:43:33.972 # Fatal error loading the DB, check server logs. Exiting.
+17515:C 02 Sep 2024 18:43:54.454 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+17515:C 02 Sep 2024 18:43:54.454 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=17515, just started
+17515:C 02 Sep 2024 18:43:54.455 * Configuration loaded
+17515:M 02 Sep 2024 18:43:54.457 * Increased maximum number of open files to 10032 (it was originally set to 256).
+17515:M 02 Sep 2024 18:43:54.457 * monotonic clock: POSIX clock_gettime
+17515:M 02 Sep 2024 18:43:54.459 * Running mode=standalone, port=6379.
+17515:M 02 Sep 2024 18:43:54.459 # WARNING: The TCP backlog setting of 511 cannot be enforced because kern.ipc.somaxconn is set to the lower value of 128.
+17515:M 02 Sep 2024 18:43:54.460 * Server initialized
+17515:M 02 Sep 2024 18:43:54.463 # Can't handle RDB format version 12
+17515:M 02 Sep 2024 18:43:54.463 # Fatal error loading the DB, check server logs. Exiting.
+>>>>>>> cb81cc933a2ef55a0beb0d6609fa6d7b85867986
+1:signal-handler (1725291003) Received SIGTERM scheduling shutdown...
+1:M 02 Sep 2024 15:30:03.233 * User requested shutdown...
+1:M 02 Sep 2024 15:30:03.243 * Saving the final RDB snapshot before exiting.
+1:M 02 Sep 2024 15:30:03.301 * DB saved on disk
+1:M 02 Sep 2024 15:30:03.312 # Redis is now ready to exit, bye bye...
+1:C 02 Sep 2024 15:30:22.725 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 02 Sep 2024 15:30:22.743 * Redis version=7.4.0, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 02 Sep 2024 15:30:22.754 * Configuration loaded
+1:M 02 Sep 2024 15:30:22.766 * monotonic clock: POSIX clock_gettime
+1:M 02 Sep 2024 15:30:22.779 * Running mode=standalone, port=6379.
+1:M 02 Sep 2024 15:30:22.789 * Server initialized
+1:M 02 Sep 2024 15:30:22.802 * Loading RDB produced by version 7.4.0
+1:M 02 Sep 2024 15:30:22.811 * RDB age 19 seconds
+1:M 02 Sep 2024 15:30:22.823 * RDB memory usage when created 1.03 Mb
+1:M 02 Sep 2024 15:30:22.836 * Done loading RDB, keys loaded: 172, keys expired: 0.
+1:M 02 Sep 2024 15:30:22.846 * DB loaded from disk: 0.046 seconds
+1:M 02 Sep 2024 15:30:22.857 * Ready to accept connections tcp
+1:M 02 Sep 2024 15:38:19.130 * 10 changes in 300 seconds. Saving...
+1:M 02 Sep 2024 15:38:22.522 * Background saving started by pid 22
+22:C 02 Sep 2024 15:38:22.576 * DB saved on disk
+22:C 02 Sep 2024 15:38:22.589 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 15:38:22.632 * Background saving terminated with success
+1:M 02 Sep 2024 15:43:23.031 * 10 changes in 300 seconds. Saving...
+1:M 02 Sep 2024 15:43:23.461 * Background saving started by pid 23
+23:C 02 Sep 2024 15:43:23.521 * DB saved on disk
+23:C 02 Sep 2024 15:43:23.533 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 15:43:23.575 * Background saving terminated with success
+1:M 02 Sep 2024 16:01:40.448 * 1 changes in 900 seconds. Saving...
+1:M 02 Sep 2024 16:01:40.521 * Background saving started by pid 24
+24:C 02 Sep 2024 16:01:40.608 * DB saved on disk
+24:C 02 Sep 2024 16:01:40.631 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 16:01:40.744 * Background saving terminated with success
+1:M 02 Sep 2024 16:06:41.083 * 10 changes in 300 seconds. Saving...
+1:M 02 Sep 2024 16:06:44.469 * Background saving started by pid 25
+25:C 02 Sep 2024 16:06:44.527 * DB saved on disk
+25:C 02 Sep 2024 16:06:44.540 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 16:06:44.582 * Background saving terminated with success
+1:M 02 Sep 2024 17:06:39.573 * 1 changes in 900 seconds. Saving...
+1:M 02 Sep 2024 17:06:40.015 * Background saving started by pid 26
+26:C 02 Sep 2024 17:06:40.072 * DB saved on disk
+26:C 02 Sep 2024 17:06:40.078 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 17:06:40.123 * Background saving terminated with success
+1:M 02 Sep 2024 17:11:41.005 * 10 changes in 300 seconds. Saving...
+1:M 02 Sep 2024 17:11:41.071 * Background saving started by pid 27
+27:C 02 Sep 2024 17:11:41.129 * DB saved on disk
+27:C 02 Sep 2024 17:11:41.141 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 17:11:41.185 * Background saving terminated with success
+1:M 02 Sep 2024 17:19:50.101 * 10 changes in 300 seconds. Saving...
+1:M 02 Sep 2024 17:19:50.135 * Background saving started by pid 28
+28:C 02 Sep 2024 17:19:50.191 * DB saved on disk
+28:C 02 Sep 2024 17:19:50.202 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 17:19:50.245 * Background saving terminated with success
+1:M 02 Sep 2024 17:24:51.107 * 10 changes in 300 seconds. Saving...
+1:M 02 Sep 2024 17:24:54.483 * Background saving started by pid 29
+29:C 02 Sep 2024 17:24:54.540 * DB saved on disk
+29:C 02 Sep 2024 17:24:54.553 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 02 Sep 2024 17:24:54.601 * Background saving terminated with success
+1:M 02 Sep 2024 17:29:55.047 * 10 changes in 300 seconds. Saving...
+1:M 02 Sep 2024 17:30:02.085 * Background saving started by pid 30
+30:C 02 Sep 2024 17:30:02.193 * DB saved on disk
+30:C 02 Sep 2024 17:30:02.218 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
+1:M 02 Sep 2024 17:30:02.314 * Background saving terminated with success
+1:C 02 Sep 2024 17:44:07.245 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 02 Sep 2024 17:44:07.258 * Redis version=7.4.0, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 02 Sep 2024 17:44:07.261 * Configuration loaded
+1:M 02 Sep 2024 17:44:07.265 * monotonic clock: POSIX clock_gettime
+1:M 02 Sep 2024 17:44:07.271 * Running mode=standalone, port=6379.
+1:M 02 Sep 2024 17:44:07.274 * Server initialized
+1:M 02 Sep 2024 17:44:07.303 * Loading RDB produced by version 7.4.0
+1:M 02 Sep 2024 17:44:07.306 * RDB age 845 seconds
+1:M 02 Sep 2024 17:44:07.308 * RDB memory usage when created 1.03 Mb
+1:M 02 Sep 2024 17:44:07.362 * Done loading RDB, keys loaded: 172, keys expired: 0.
+1:M 02 Sep 2024 17:44:07.367 * DB loaded from disk: 0.090 seconds
+1:M 02 Sep 2024 17:44:07.369 * Ready to accept connections tcp
+1:C 02 Sep 2024 17:51:28.110 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 02 Sep 2024 17:51:28.112 * Redis version=7.4.0, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 02 Sep 2024 17:51:28.115 * Configuration loaded
+1:M 02 Sep 2024 17:51:28.118 * monotonic clock: POSIX clock_gettime
+1:M 02 Sep 2024 17:51:28.123 * Running mode=standalone, port=6379.
+1:M 02 Sep 2024 17:51:28.127 * Server initialized
+1:M 02 Sep 2024 17:51:28.131 * Loading RDB produced by version 7.4.0
+1:M 02 Sep 2024 17:51:28.133 * RDB age 1286 seconds
+1:M 02 Sep 2024 17:51:28.135 * RDB memory usage when created 1.03 Mb
+1:M 02 Sep 2024 17:51:28.139 * Done loading RDB, keys loaded: 172, keys expired: 0.
+1:M 02 Sep 2024 17:51:28.142 * DB loaded from disk: 0.013 seconds
+1:M 02 Sep 2024 17:51:28.144 * Ready to accept connections tcp

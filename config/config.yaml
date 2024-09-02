@@ -9,11 +9,13 @@ database:
 
 #Redis配置
 redis:
+  # host: 'localhost'
   host: 192.168.0.9
   port: 6379
   password: '123456'
   db: 0
 
 gofound:
+  # host: 'localhost'
   host: 192.168.0.9
   port: 5678
