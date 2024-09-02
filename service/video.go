@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
-	"path"
 	"strconv"
 	"time"
 
@@ -81,23 +79,6 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 
 		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
 
-		poster := videoInfo.Poster
-		_, err = os.Stat(path.Join("E:/video", poster))
-		if os.IsNotExist(err) {
-			fmt.Println("poster: ")
-			fmt.Println(poster)
-		}
-
-		//
-		//previewFile := videoInfo.Title + ".jpg"
-		//thumbnailFile := videoInfo.Title + "_s360" + ".jpg"
-		//_, err = os.Stat(path.Join(thumbnailPath, thumbnailFile))
-		//_, err = os.Stat(path.Join(previewPath, previewFile))
-		//if os.IsNotExist(err) {
-		//	poster = "./assets/image/thumbnail/" + thumbnailFile
-		//	poster = "./assets/image/preview/" + previewFile
-		//}
-
 		video := Video{
 			ID:            videoInfo.ID,
 			Title:         videoInfo.Title,
@@ -105,7 +86,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 			Size:          f / 1024 / 1024,
 			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
 			ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			Poster:        poster,
+			Poster:        videoInfo.Poster,
 			Width:         videoInfo.Width,
 			Height:        videoInfo.Height,
 			CodecName:     videoInfo.CodecName,
@@ -445,9 +426,6 @@ func tree(list []VideoComment) []*CommentTree {
 
 	trees := recursiveSort(data, childrens, dataSort, childrensSort)
 
-	// fmt.Println(len(dataSort), len(trees))
-	// fmt.Printf("%+v\n", trees)
-	// fmt.Printf("%+v\n", dataSort)
 	result := make([]*CommentTree, len(trees))
 	for k, v := range dataSort {
 		result[k] = trees[v]
