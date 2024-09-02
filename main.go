@@ -41,7 +41,8 @@ func main() {
 	pprof.Register(r) // 性能监控
 	router.Engine(r)
 
-	if err := r.Run(fmt.Sprintf("%s:%d", config.Config().System.Host, config.Config().System.Port)); err != nil {
+	conf := config.Config().System
+	if err := r.Run(fmt.Sprintf("%s:%d", conf.Host, conf.Port)); err != nil {
 		panic(err)
 	}
 }

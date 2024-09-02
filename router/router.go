@@ -7,7 +7,6 @@ import (
 )
 
 func Engine(r *gin.Engine) {
-
 	r.Use(middleware.InitSession())
 	user := r.Group("/user")
 	user.POST("/doRegister", api.RegisterApi)

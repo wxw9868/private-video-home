@@ -73,11 +73,11 @@ func ImportTradingRecordsApi(c *gin.Context) {
 		}
 		if isFileExist(dst) {
 			if err = os.Remove(dst); err != nil {
-				fmt.Errorf("文件删除失败: %s", err)
+				c.JSON(http.StatusInternalServerError, util.Fail(fmt.Errorf("文件删除失败: %s", err).Error()))
+				return
 			}
 		}
-		fmt.Errorf("文件导入失败: %s", err)
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		c.JSON(http.StatusInternalServerError, util.Fail(fmt.Errorf("文件导入失败: %s", err).Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("导入成功", nil))
