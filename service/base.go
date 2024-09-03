@@ -23,8 +23,8 @@ import (
 	"gorm.io/gorm"
 )
 
-var avatarDir = "./assets/image/avatar"
-var posterDir = "./assets/image/poster"
+var avatarDir = "assets/image/avatar"
+var posterDir = "assets/image/poster"
 var db = sqlite.DB()
 var gofoundCount = 0
 var mutex = new(sync.Mutex)
@@ -68,45 +68,47 @@ func VideoImport(videoDir string) error {
 		return err
 	}
 
-	var actressList = make(map[string]struct{})
-	var videoSql = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
-	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-
+	var actressMap = make(map[string]struct{})
+	var videoSQL = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
 	for _, file := range files {
 		filename := file.Name()
 		ext := filepath.Ext(filename)
 		if ext == ".mp4" {
 			title := strings.Split(filename, ".")[0]
-			arr := strings.Split(title, "_")
-			actress := arr[len(arr)-1]
+			array := strings.Split(title, "_")
+			actress := array[len(array)-1]
 
 			mutex.Lock()
-			if _, ok := actressList[actress]; !ok {
-				actressList[actress] = struct{}{}
+			if _, ok := actressMap[actress]; !ok {
+				actressMap[actress] = struct{}{}
 			}
 			mutex.Unlock()
 
 			filePath := videoDir + "/" + filename
 			posterPath := posterDir + "/" + title + ".jpg"
-			_, err = os.Stat(posterPath)
-			if os.IsNotExist(err) {
-				if err = utils.ReadFrameAsJpeg(filePath, posterPath, "00:1:58"); err != nil {
-					return err
-				}
-			}
 			videoInfo, err := utils.VideoInfo(filePath)
 			if err != nil {
 				return err
 			}
 
-			videoSql += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ", title, actress, videoInfo["size"].(int64), videoInfo["duration"].(float64), posterPath, videoInfo["width"].(int64), videoInfo["height"].(int64), fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string)), videoInfo["channel_layout"].(string), videoInfo["creation_time"].(time.Time), time.Now().Local(), time.Now().Local())
+			nowTime := time.Now().Local()
+			size := videoInfo["size"].(int64)
+			duration := videoInfo["duration"].(float64)
+			width := videoInfo["width"].(int64)
+			height := videoInfo["height"].(int64)
+			codec := fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string))
+			channelLayout := videoInfo["channel_layout"].(string)
+			creationTime := videoInfo["creation_time"].(time.Time)
+			videoSQL += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ", title, actress, size, duration, posterPath, width, height, codec, channelLayout, creationTime, nowTime, nowTime)
 		}
 	}
+	videoSqlBytes := []byte(videoSQL)
+	videoSQL = string(videoSqlBytes[:len(videoSqlBytes)-2])
 
-	if len(actressList) > 0 {
-		for actress := range actressList {
+	var actressSQL = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	if len(actressMap) > 0 {
+		for actress := range actressMap {
 			avatarPath := avatarDir + "/" + actress + ".png"
-
 			_, err = os.Stat(avatarPath)
 			if os.IsNotExist(err) {
 				nameSlice := []rune(actress)
@@ -114,26 +116,26 @@ func VideoImport(videoDir string) error {
 					return err
 				}
 			}
-
-			actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
+			actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
 		}
+
+		actressSqlBytes := []byte(actressSQL)
+		actressSQL = string(actressSqlBytes[:len(actressSqlBytes)-2])
 	}
 
-	videoSqlBytes := []byte(videoSql)
-	actressSqlBytes := []byte(actressSql)
-	videoSql = string(videoSqlBytes[:len(videoSqlBytes)-2])
-	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
-
 	err = db.Transaction(func(tx *gorm.DB) error {
-		if err = tx.Exec(videoSql).Error; err != nil {
+		if err = tx.Exec(videoSQL).Error; err != nil {
 			return err
 		}
-		if err = tx.Exec(actressSql).Error; err != nil {
-			return err
+
+		if len(actressMap) > 0 {
+			if err = tx.Exec(actressSQL).Error; err != nil {
+				return err
+			}
 		}
 
 		var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
-		for key := range actressList {
+		for key := range actressMap {
 			var actress model.Actress
 			if err = tx.Where("actress = ?", key).First(&actress).Error; err != nil {
 				return err
@@ -163,7 +165,6 @@ func VideoImport(videoDir string) error {
 func ResetTable(table string) error {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		// 删除数据
-		fmt.Sprintf("")
 		if err := tx.Exec("DELETE FROM ?", table).Error; err != nil {
 			return err
 		}

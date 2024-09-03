@@ -210,26 +210,28 @@ func ReadFrameAsJpeg(inFileName, outFileName, ss string) error {
 }
 
 func VideoInfo(inFileName string) (map[string]interface{}, error) {
-	a, err := ffmpeg.Probe(inFileName)
+	s, err := ffmpeg.Probe(inFileName)
 	if err != nil {
 		return nil, err
 	}
 
-	isCreationTime := gjson.Get(a, "format.tags.creation_time").IsBool()
 	var creationTime time.Time
-	if isCreationTime {
-		creationTime = gjson.Get(a, "format.tags.creation_time").Time().Add(0)
+	if gjson.Get(s, "format.tags.creation_time").IsBool() {
+		creationTime = gjson.Get(s, "format.tags.creation_time").Time().Add(0)
 	} else {
-		fi, _ := os.Stat(inFileName)
+		fi, err := os.Stat(inFileName)
+		if err != nil {
+			return nil, err
+		}
 		creationTime = fi.ModTime()
 	}
-	duration := gjson.Get(a, "format.duration").Float()
-	size := gjson.Get(a, "format.size").Int()
-	width := gjson.Get(a, "streams.0.width").Int()
-	height := gjson.Get(a, "streams.0.height").Int()
-	codecName0 := gjson.Get(a, "streams.0.codec_name").String()
-	codecName1 := gjson.Get(a, "streams.1.codec_name").String()
-	channelLayout := gjson.Get(a, "streams.1.channel_layout").String()
+	duration := gjson.Get(s, "format.duration").Float()
+	size := gjson.Get(s, "format.size").Int()
+	width := gjson.Get(s, "streams.0.width").Int()
+	height := gjson.Get(s, "streams.0.height").Int()
+	codecName0 := gjson.Get(s, "streams.0.codec_name").String()
+	codecName1 := gjson.Get(s, "streams.1.codec_name").String()
+	channelLayout := gjson.Get(s, "streams.1.channel_layout").String()
 
 	// fmt.Println(a)
 	// fmt.Printf("大小：%d\n", size)
@@ -458,18 +460,7 @@ func GetWebDocument(method, url string, body io.Reader) (*goquery.Document, erro
 	//request.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
 	//request.Header.Set("Accept-Encoding", "gzip, deflate, br, zstd")
 	//request.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
-	//request.Header.Set("Cache-Control", "max-age=0")
-	//request.Header.Set("Cookie", "_ga=GA1.1.1180785194.1724257847; cf_clearance=62F5GSqr9i5Bml0Vh8dZlqvEGh_BADdM9zchcyKr.1c-1724872114-1.2.1.1-CoRSLMOiTbOF1qfyBVhPD1XJ3lSn9mrc3lwul1JRng6gnJgk.V4Gzh_izFDTozv4c6GF6i8YB6w7lBV4dQ84gTqmm_RFDn0VwS7ko2ciQPr9FfzqYi2rxmB1g.18defyf3qt34KYvuQxB5UVmW8fcL_7kZMbCt.y2wNAsKm2XG8ysPYfw1Z5OdTM9xgmL5duBD5rNWXE2WUqRTSBe0L4JS1l6N9lTng.tCv3gTYiF74V5WMqb5nq2Z3QkJ.dg6MZlaJBnKsvJ40TFUu6jiSIbQyNY519VPa7WU7ow6ZPtG4p6a4X2HYMwsgkxUfYz8FUM6mSycVcHLe2CfEeKZcb5wxVZh09sxfnTbsaeb1b7LkAOUKBslyaSFK2aq4y4hz2sKtC_A1Odb8UWKcd76Fa3m3rk8QGNU5mFTGjoVnPx7utxB7WJ0kGLDNm.OyvVGyM; _ga_V49SP7QGE6=GS1.1.1724872143.7.1.1724872753.0.0.0")
-	//request.Header.Set("Cache-Control", "max-age=0")
-	//request.Header.Set("Priority", "u=0, i")
-	//request.Header.Set("Sec-Ch-Ua", `Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"`)
-	//request.Header.Set("Sec-Ch-Ua-Mobile", "?0")
-	//request.Header.Set("Sec-Ch-Ua-Platform", "Windows")
-	//request.Header.Set("Sec-Fetch-Dest", "document")
-	//request.Header.Set("Sec-Fetch-Mode", "navigate")
-	//request.Header.Set("Sec-Fetch-Site", "none")
-	//request.Header.Set("Sec-Fetch-User", "?1")
-	//request.Header.Set("Upgrade-Insecure-Requests", "1")
+	//request.Header.Set("Cookie", "")
 	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
 	resp, err := client.Do(request)
 	if err != nil {
