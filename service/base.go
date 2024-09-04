@@ -18,6 +18,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	sqlite "github.com/wxw9868/video/initialize/db"
 	gofoundClient "github.com/wxw9868/video/initialize/gofound"
+	redis "github.com/wxw9868/video/initialize/rdb"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
@@ -26,6 +27,7 @@ import (
 var avatarDir = "assets/image/avatar"
 var posterDir = "assets/image/poster"
 var db = sqlite.DB()
+var rdb = redis.Rdb()
 var gofoundCount = 0
 var mutex = new(sync.Mutex)
 
