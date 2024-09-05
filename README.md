@@ -46,14 +46,14 @@ go get && go build
 * Docker命令部署
 ```sh
 docker build -t gofound .
-docker run -d --name gofound -p 5678:5678 -v /mnt/data/gofound:/usr/local/go_found/data gofound:latest
+docker run -d --name gofound -p 5678:5678 -v D:/database/gofound/data:/usr/local/go_found/data gofound:latest
 ```
 ###  1.4. <a name='Redis'></a>1. 安装和启动 Redis
 ```sh
 # 拉取官方的最新版本的镜像
 docker pull redis:latest
 # 运行 redis 容器
-docker run -d -p 6379:6379 --name my-video-redis -v E:/video/database/redis:/data -v E:/video/config/redis.conf:/etc/redis/redis.conf redis redis-server /etc/redis/redis.conf redis-server --appendonly yes
+docker run -d -p 6379:6379 --name my-video-redis -v D:/database/redis/data:/data -v D:/database/redis/redis.conf:/etc/redis/redis.conf redis redis-server /etc/redis/redis.conf
 # 通过 redis-cli 连接测试使用 redis 服务
 $ docker exec -it my-video-redis /bin/bash
 ```

@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/wxw9868/util"
-	"github.com/wxw9868/util/pagination"
 	"github.com/wxw9868/video/service"
 	"github.com/wxw9868/video/utils"
 )
@@ -70,28 +69,13 @@ func VideoListApi(c *gin.Context) {
 		return
 	}
 
-	videos, count, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
+	data, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
-	if bind.Size <= 0 {
-		bind.Size = 16
-	}
-	pages := pagination.NewPaginator(int(count), bind.Size)
-	pages.SetCurrentPage(bind.Page)
-
-	c.JSON(http.StatusOK, util.Success("视频列表", map[string]interface{}{
-		"list": videos,
-		"page": map[string]interface{}{
-			"totalPage":   pages.TotalPage(),
-			"prePage":     pages.PrePage(),
-			"currentPage": pages.CurrentPage(),
-			"nextPage":    pages.NextPage(),
-			"pages":       pages.Pages(),
-		},
-	}))
+	c.JSON(http.StatusOK, util.Success("视频列表", data))
 }
 
 type Play struct {

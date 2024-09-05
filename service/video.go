@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/redis/go-redis/v9"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/wxw9868/video/model"
@@ -13,126 +16,6 @@ import (
 )
 
 type VideoService struct{}
-
-type Video struct {
-	ID       uint   `json:"id"`
-	Title    string `json:"title"`
-	Poster   string `json:"poster"`
-	Duration string `json:"duration"`
-	Browse   uint   `json:"browse"`
-	Watch    uint   `json:"watch"`
-	//Actress       string  `json:"actress"`
-	//Size          float64 `json:"size"`
-	//ModTime       string  `json:"mod_time"`
-	//Width         int     `json:"width"`
-	//Height        int     `json:"height"`
-	//CodecName     string  `json:"codec_name"`
-	//ChannelLayout string  `json:"channel_layout"`
-	//Collect       uint    `json:"collect"`
-	//Zan           uint    `json:"zan"`
-	//Cai           uint    `json:"cai"`
-}
-
-func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, int64, error) {
-	dbVideo := db.Table("video_Video as v")
-
-	if actressID != 0 {
-		var list []model.VideoActress
-		if err := db.Select("video_id").Where("actress_id = ?", actressID).Find(&list).Error; err != nil {
-			return nil, 0, err
-		}
-		var ids []uint
-		for _, v := range list {
-			ids = append(ids, v.VideoId)
-		}
-		dbVideo = dbVideo.Where("v.id in ?", ids)
-	}
-
-	var count int64
-	if err := dbVideo.Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-
-	dbVideo = dbVideo.Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
-		Joins("left join video_VideoLog l on l.video_id = v.id")
-
-	if action == "null" || sort == "null" {
-		action = ""
-		sort = ""
-	}
-	if action != "" && sort != "" {
-		dbVideo = dbVideo.Order(action + " " + sort)
-	}
-
-	rows, err := dbVideo.Scopes(Paginate(page, pageSize, int(count))).Rows()
-	if err != nil {
-		return nil, 0, err
-	}
-	defer rows.Close()
-
-	var indexBatch []Index
-	var videos []Video
-	for rows.Next() {
-		var videoInfo VideoInfo
-		db.ScanRows(rows, &videoInfo)
-
-		//f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
-
-		video := Video{
-			ID:       videoInfo.ID,
-			Title:    videoInfo.Title,
-			Poster:   videoInfo.Poster,
-			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
-			Browse:   videoInfo.Browse,
-			Watch:    videoInfo.Watch,
-			//Actress:       videoInfo.Actress,
-			//Size:          f / 1024 / 1024,
-			//ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			//Width:         videoInfo.Width,
-			//Height:        videoInfo.Height,
-			//CodecName:     videoInfo.CodecName,
-			//ChannelLayout: videoInfo.ChannelLayout,
-			//Collect:       videoInfo.Collect,
-			//Zan:           videoInfo.Zan,
-			//Cai:           videoInfo.Cai,
-		}
-		videos = append(videos, video)
-
-		indexBatch = append(indexBatch, Index{
-			Id:       uint32(videoInfo.ID),
-			Text:     videoInfo.Title,
-			Document: video,
-		})
-	}
-
-	if gofoundCount != len(indexBatch) {
-		gofoundCount = len(indexBatch)
-
-		b, err := json.Marshal(&indexBatch)
-		if err != nil {
-			return nil, 0, err
-		}
-		if err := Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b)); err != nil {
-			return nil, 0, err
-		}
-	}
-
-	return videos, count, nil
-}
-
-type Index struct {
-	Id       uint32      `json:"id" binding:"required"`
-	Text     string      `json:"text" binding:"required"`
-	Document interface{} `json:"document" binding:"required"`
-}
-
-func (vs *VideoService) First(id string) (model.Video, error) {
-	var video model.Video
-	if err := db.Where("id = ?", id).First(&video).Error; err != nil {
-		return video, err
-	}
-	return video, nil
-}
 
 type VideoInfo struct {
 	ID            uint      `json:"id"`
@@ -153,6 +36,186 @@ type VideoInfo struct {
 	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
 	ActressStr    string    `json:"actress_str" gorm:"column:actress_str;type:varchar(255);comment:演员"`
 	ActressIds    string    `json:"actress_ids" gorm:"column:actress_ids;type:varchar(255);comment:演员"`
+}
+type Video struct {
+	ID       uint   `json:"id"`
+	Title    string `json:"title"`
+	Poster   string `json:"poster"`
+	Duration string `json:"duration"`
+	Browse   uint   `json:"browse"`
+	Watch    uint   `json:"watch"`
+	//Actress       string  `json:"actress"`
+	//Size          float64 `json:"size"`
+	//ModTime       string  `json:"mod_time"`
+	//Width         int     `json:"width"`
+	//Height        int     `json:"height"`
+	//CodecName     string  `json:"codec_name"`
+	//ChannelLayout string  `json:"channel_layout"`
+	//Collect       uint    `json:"collect"`
+	//Zan           uint    `json:"zan"`
+	//Cai           uint    `json:"cai"`
+}
+
+func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, error) {
+	var videos []Video
+	var ids []uint
+
+	f := func(ids []uint) ([]Video, error) {
+		for _, id := range ids {
+			data := rdb.HGetAll(ctx, utils.Join("video_video_", strconv.Itoa(int(id)))).Val()
+			browse, _ := strconv.Atoi(data["browse"])
+			watch, _ := strconv.Atoi(data["watch"])
+			videos = append(videos, Video{
+				ID:       id,
+				Title:    data["title"],
+				Poster:   data["poster"],
+				Duration: data["duration"],
+				Browse:   uint(browse),
+				Watch:    uint(watch),
+			})
+		}
+		return videos, nil
+	}
+
+	if actressID != 0 {
+		if err := db.Model(&model.VideoActress{}).Where("actress_id = ?", actressID).Pluck("video_id", &ids).Error; err != nil {
+			return nil, err
+		}
+		return f(ids)
+	}
+
+	var key string
+	switch action {
+	case "v.CreatedAt":
+		key = "video_video_createdAt"
+	case "l.browse":
+		key = "video_video_browse"
+	case "l.collect":
+		key = "video_video_collect"
+	default:
+		key = "video_video"
+	}
+
+	var vdb = db.Table("video_Video as v")
+	vdb = vdb.Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog l on l.video_id = v.id")
+	if action != "" && sort != "" {
+		vdb = vdb.Order(utils.Join(action, " ", sort))
+	}
+	if err := db.Table("(?)", vdb).Pluck("id", &ids).Error; err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	bts, err := json.Marshal(ids)
+	if err != nil {
+		return nil, err
+	}
+	result, _ := rdb.HGet(ctx, key, "ids").Result()
+	//fmt.Println(strings.Compare(string(bts), result))
+	if strings.Compare(string(bts), result) == 0 && result != "" {
+		return f(ids)
+	}
+
+	var count int64
+	if err = vdb.Count(&count).Error; err != nil {
+		return nil, err
+	}
+	rows, err := vdb.Scopes(Paginate(page, pageSize, int(count))).Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var indexBatch []Index
+	var keys []string
+	keys = append(keys, key)
+	for rows.Next() {
+		var videoInfo VideoInfo
+		db.ScanRows(rows, &videoInfo)
+
+		//f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
+		video := Video{
+			ID:       videoInfo.ID,
+			Title:    videoInfo.Title,
+			Poster:   videoInfo.Poster,
+			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
+			Browse:   videoInfo.Browse,
+			Watch:    videoInfo.Watch,
+			//Actress:       videoInfo.Actress,
+			//Size:          f / 1024 / 1024,
+			//ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
+			//Width:         videoInfo.Width,
+			//Height:        videoInfo.Height,
+			//CodecName:     videoInfo.CodecName,
+			//ChannelLayout: videoInfo.ChannelLayout,
+			//Collect:       videoInfo.Collect,
+			//Zan:           videoInfo.Zan,
+			//Cai:           videoInfo.Cai,
+		}
+		videos = append(videos, video)
+
+		keys = append(keys, utils.Join("video_video_", strconv.Itoa(int(videoInfo.ID))))
+
+		indexBatch = append(indexBatch, Index{
+			Id:       uint32(videoInfo.ID),
+			Text:     videoInfo.Title,
+			Document: video,
+		})
+	}
+
+	if gofoundCount != len(indexBatch) {
+		gofoundCount = len(indexBatch)
+
+		b, err := json.Marshal(&indexBatch)
+		if err != nil {
+			return nil, err
+		}
+		if err := Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b)); err != nil {
+			return nil, err
+		}
+	}
+
+	txf := func(tx *redis.Tx) error {
+		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+			pipe.HSet(ctx, key, "len", len(ids), "ids", string(bts))
+			for _, a := range videos {
+				pipe.HSet(ctx, utils.Join("video_video_", strconv.Itoa(int(a.ID))), "id", a.ID, "title", a.Title, "poster", a.Poster, "duration", a.Duration, "browse", a.Browse, "watch", a.Watch)
+			}
+			return nil
+		})
+		return err
+	}
+	if err = rdb.Watch(ctx, txf, keys...); err == redis.TxFailedErr {
+		return nil, err
+	}
+
+	//pages := pagination.NewPaginator(int(count), pageSize)
+	//pages.SetCurrentPage(page)
+	//data := map[string]interface{}{
+	//	"list": videos,
+	//	"page": map[string]interface{}{
+	//		"totalPage":   pages.TotalPage(),
+	//		"prePage":     pages.PrePage(),
+	//		"currentPage": pages.CurrentPage(),
+	//		"nextPage":    pages.NextPage(),
+	//		"pages":       pages.Pages(),
+	//	},
+	//}
+
+	return videos, nil
+}
+
+type Index struct {
+	Id       uint32      `json:"id" binding:"required"`
+	Text     string      `json:"text" binding:"required"`
+	Document interface{} `json:"document" binding:"required"`
+}
+
+func (vs *VideoService) First(id string) (model.Video, error) {
+	var video model.Video
+	if err := db.Where("id = ?", id).First(&video).Error; err != nil {
+		return video, err
+	}
+	return video, nil
 }
 
 func (vs *VideoService) Info(id uint) (VideoInfo, error) {

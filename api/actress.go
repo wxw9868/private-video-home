@@ -1,9 +1,10 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
-	"net/http"
 )
 
 type ActressAdd struct {
@@ -75,8 +76,8 @@ func ActressDeleteApi(c *gin.Context) {
 type ActressList struct {
 	Page    int    `uri:"page" form:"page" json:"page"`
 	Size    int    `uri:"size" form:"size" json:"size"`
-	Action  string `uri:"action" form:"action" json:"action"`
-	Sort    string `uri:"sort" form:"sort" json:"sort"`
+	Action  string `uri:"action" form:"action" json:"action" binding:"oneof=a.CreatedAt a.actress count"`
+	Sort    string `uri:"sort" form:"sort" json:"sort" binding:"oneof=asc desc"`
 	Actress string `uri:"actress"  form:"actress"  json:"actress"`
 }
 
