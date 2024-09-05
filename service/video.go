@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/wxw9868/video/model"
@@ -16,22 +15,22 @@ import (
 type VideoService struct{}
 
 type Video struct {
-	ID            uint    `json:"id"`
-	Title         string  `json:"title"`
-	Actress       string  `json:"actress"`
-	Size          float64 `json:"size"`
-	Duration      string  `json:"duration"`
-	ModTime       string  `json:"mod_time"`
-	Poster        string  `json:"poster"`
-	Width         int     `json:"width"`
-	Height        int     `json:"height"`
-	CodecName     string  `json:"codec_name"`
-	ChannelLayout string  `json:"channel_layout"`
-	Collect       uint    `json:"collect"`
-	Browse        uint    `json:"browse"`
-	Zan           uint    `json:"zan"`
-	Cai           uint    `json:"cai"`
-	Watch         uint    `json:"watch"`
+	ID       uint   `json:"id"`
+	Title    string `json:"title"`
+	Poster   string `json:"poster"`
+	Duration string `json:"duration"`
+	Browse   uint   `json:"browse"`
+	Watch    uint   `json:"watch"`
+	//Actress       string  `json:"actress"`
+	//Size          float64 `json:"size"`
+	//ModTime       string  `json:"mod_time"`
+	//Width         int     `json:"width"`
+	//Height        int     `json:"height"`
+	//CodecName     string  `json:"codec_name"`
+	//ChannelLayout string  `json:"channel_layout"`
+	//Collect       uint    `json:"collect"`
+	//Zan           uint    `json:"zan"`
+	//Cai           uint    `json:"cai"`
 }
 
 func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, int64, error) {
@@ -77,25 +76,25 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		var videoInfo VideoInfo
 		db.ScanRows(rows, &videoInfo)
 
-		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
+		//f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
 
 		video := Video{
-			ID:            videoInfo.ID,
-			Title:         videoInfo.Title,
-			Actress:       videoInfo.Actress,
-			Size:          f / 1024 / 1024,
-			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
-			ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			Poster:        videoInfo.Poster,
-			Width:         videoInfo.Width,
-			Height:        videoInfo.Height,
-			CodecName:     videoInfo.CodecName,
-			ChannelLayout: videoInfo.ChannelLayout,
-			Collect:       videoInfo.Collect,
-			Browse:        videoInfo.Browse,
-			Zan:           videoInfo.Zan,
-			Cai:           videoInfo.Cai,
-			Watch:         videoInfo.Watch,
+			ID:       videoInfo.ID,
+			Title:    videoInfo.Title,
+			Poster:   videoInfo.Poster,
+			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
+			Browse:   videoInfo.Browse,
+			Watch:    videoInfo.Watch,
+			//Actress:       videoInfo.Actress,
+			//Size:          f / 1024 / 1024,
+			//ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
+			//Width:         videoInfo.Width,
+			//Height:        videoInfo.Height,
+			//CodecName:     videoInfo.CodecName,
+			//ChannelLayout: videoInfo.ChannelLayout,
+			//Collect:       videoInfo.Collect,
+			//Zan:           videoInfo.Zan,
+			//Cai:           videoInfo.Cai,
 		}
 		videos = append(videos, video)
 

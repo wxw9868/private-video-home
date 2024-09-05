@@ -8,9 +8,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
+<<<<<<< HEAD
 	"github.com/wxw9868/video/initialize/rdb"
 	"github.com/wxw9868/video/service"
 	"github.com/wxw9868/video/utils"
+=======
+	"net/http"
+>>>>>>> 9c6a35725565a7fc1d818c654d0eafcb60b1ae3f
 )
 
 type ActressAdd struct {
@@ -94,6 +98,7 @@ func ActressListApi(c *gin.Context) {
 		return
 	}
 
+<<<<<<< HEAD
 	var actresss []service.Actress
 	var err error
 
@@ -123,6 +128,9 @@ func ActressListApi(c *gin.Context) {
 	}
 
 	actresss, err = as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
+=======
+	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
+>>>>>>> 9c6a35725565a7fc1d818c654d0eafcb60b1ae3f
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

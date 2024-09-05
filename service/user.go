@@ -3,8 +3,6 @@ package service
 import (
 	"errors"
 	"fmt"
-	"strconv"
-
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/util/randomname"
 	"github.com/wxw9868/video/model"
@@ -172,24 +170,24 @@ func (us *UserService) CollectList(userID uint) ([]Video, error) {
 		var videoInfo VideoInfo
 		db.ScanRows(rows, &videoInfo)
 
-		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
+		//f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
 		video := Video{
-			ID:            videoInfo.ID,
-			Title:         videoInfo.Title,
-			Actress:       videoInfo.Actress,
-			Size:          f / 1024 / 1024,
-			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
-			ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			Poster:        videoInfo.Poster,
-			Width:         videoInfo.Width,
-			Height:        videoInfo.Height,
-			CodecName:     videoInfo.CodecName,
-			ChannelLayout: videoInfo.ChannelLayout,
-			Collect:       videoInfo.Collect,
-			Browse:        videoInfo.Browse,
-			Zan:           videoInfo.Zan,
-			Cai:           videoInfo.Cai,
-			Watch:         videoInfo.Watch,
+			ID:       videoInfo.ID,
+			Title:    videoInfo.Title,
+			Poster:   videoInfo.Poster,
+			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
+			Browse:   videoInfo.Browse,
+			Watch:    videoInfo.Watch,
+			//Actress:       videoInfo.Actress,
+			//Size:          f / 1024 / 1024,
+			//ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
+			//Width:         videoInfo.Width,
+			//Height:        videoInfo.Height,
+			//CodecName:     videoInfo.CodecName,
+			//ChannelLayout: videoInfo.ChannelLayout,
+			//Collect:       videoInfo.Collect,
+			//Zan:           videoInfo.Zan,
+			//Cai:           videoInfo.Cai,
 		}
 		videos = append(videos, video)
 	}
