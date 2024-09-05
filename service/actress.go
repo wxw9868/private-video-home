@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strconv"
+
 	"github.com/wxw9868/video/initialize/rdb"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
-	"strconv"
 )
 
 type ActressService struct{}
@@ -67,9 +68,11 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		return nil, err
 	}
 
-	var ids []uint
-	for _, a := range actresss {
-		ids = append(ids, a.ID)
+	// slice 比较
+
+	var ids = make([]uint, len(actresss))
+	for i, a := range actresss {
+		ids[i] = a.ID
 		rdb.Rdb().HSet(context.Background(), utils.Join("video_actress_", strconv.Itoa(int(a.ID))), "id", a.ID, "actress", a.Actress, "avatar", a.Avatar, "count", a.Count)
 	}
 	bytes, err := json.Marshal(ids)
@@ -80,6 +83,6 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return actresss, nil
 }
