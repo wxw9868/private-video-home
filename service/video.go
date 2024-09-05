@@ -57,7 +57,7 @@ type Video struct {
 }
 
 func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, error) {
-	var videos []Video
+	var videos = make([]Video, 0)
 	var ids []uint
 
 	f := func(ids []uint) ([]Video, error) {

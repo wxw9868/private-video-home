@@ -45,7 +45,7 @@ type Actress struct {
 }
 
 func (as *ActressService) List(page, pageSize int, action, sort, actress string) ([]Actress, error) {
-	var actresss []Actress
+	var actresss = make([]Actress, 0)
 	var ids []uint
 
 	f := func(ids []uint) ([]Actress, error) {

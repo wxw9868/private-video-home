@@ -46,11 +46,11 @@ func TestVideoFileRename(t *testing.T) {
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "081424_001 マンコからあふれ出た中出しザーメンを精飲 ！  #紗霧ひなた",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "071424-001 この女、ふしだら。 ～紗霧ひなたの場合～  #紗霧ひなた",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-1171 アラサー独女は肉棒好き  #長内和美",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "010216_004 溢れるフェロモンで隣人を誘う純和風美人  #長内和美",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "121419_220 寝取られた人妻  #長内和美",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
