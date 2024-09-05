@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/wxw9868/util/pagination"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
@@ -14,6 +15,26 @@ import (
 
 type VideoService struct{}
 
+type VideoInfo struct {
+	ID            uint      `json:"id"`
+	Title         string    `json:"title" gorm:"column:title;type:varchar(255);comment:标题"`
+	Actress       string    `json:"actress" gorm:"column:actress;type:varchar(100);comment:演员"`
+	Size          int64     `json:"size" gorm:"column:size;type:bigint;comment:大小"`
+	Duration      float64   `json:"duration" gorm:"column:duration;type:float;default:0;comment:时长"`
+	Poster        string    `json:"poster" gorm:"column:poster;type:varchar(255);comment:封面"`
+	Width         int       `json:"width" gorm:"column:width;type:int;default:0;comment:宽"`
+	Height        int       `json:"height" gorm:"column:height;type:int;default:0;comment:高"`
+	CodecName     string    `json:"codec_name" gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
+	ChannelLayout string    `json:"channel_layout" gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
+	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
+	Collect       uint      `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
+	Browse        uint      `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
+	Zan           uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
+	Cai           uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
+	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
+	ActressStr    string    `json:"actress_str" gorm:"column:actress_str;type:varchar(255);comment:演员"`
+	ActressIds    string    `json:"actress_ids" gorm:"column:actress_ids;type:varchar(255);comment:演员"`
+}
 type Video struct {
 	ID       uint   `json:"id"`
 	Title    string `json:"title"`
@@ -33,40 +54,30 @@ type Video struct {
 	//Cai           uint    `json:"cai"`
 }
 
-func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, int64, error) {
-	dbVideo := db.Table("video_Video as v")
+func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) (map[string]interface{}, error) {
+	vdb := db.Table("video_Video as v")
 
 	if actressID != 0 {
-		var list []model.VideoActress
-		if err := db.Select("video_id").Where("actress_id = ?", actressID).Find(&list).Error; err != nil {
-			return nil, 0, err
-		}
 		var ids []uint
-		for _, v := range list {
-			ids = append(ids, v.VideoId)
+		if err := db.Model(&model.VideoActress{}).Where("actress_id = ?", actressID).Pluck("video_id", &ids).Error; err != nil {
+			return nil, err
 		}
-		dbVideo = dbVideo.Where("v.id in ?", ids)
+		vdb = vdb.Where("v.id in ?", ids)
 	}
 
 	var count int64
-	if err := dbVideo.Count(&count).Error; err != nil {
-		return nil, 0, err
+	if err := vdb.Count(&count).Error; err != nil {
+		return nil, err
 	}
 
-	dbVideo = dbVideo.Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
-		Joins("left join video_VideoLog l on l.video_id = v.id")
-
-	if action == "null" || sort == "null" {
-		action = ""
-		sort = ""
-	}
+	vdb = vdb.Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").Joins("left join video_VideoLog l on l.video_id = v.id")
 	if action != "" && sort != "" {
-		dbVideo = dbVideo.Order(action + " " + sort)
+		vdb = vdb.Order(utils.Join(action, " ", sort))
 	}
 
-	rows, err := dbVideo.Scopes(Paginate(page, pageSize, int(count))).Rows()
+	rows, err := vdb.Scopes(Paginate(page, pageSize, int(count))).Rows()
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -77,7 +88,6 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		db.ScanRows(rows, &videoInfo)
 
 		//f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
-
 		video := Video{
 			ID:       videoInfo.ID,
 			Title:    videoInfo.Title,
@@ -110,14 +120,29 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 
 		b, err := json.Marshal(&indexBatch)
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		if err := Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b)); err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 	}
 
-	return videos, count, nil
+	fmt.Println("pageSize: ", pageSize)
+
+	pages := pagination.NewPaginator(int(count), pageSize)
+	pages.SetCurrentPage(page)
+	data := map[string]interface{}{
+		"list": videos,
+		"page": map[string]interface{}{
+			"totalPage":   pages.TotalPage(),
+			"prePage":     pages.PrePage(),
+			"currentPage": pages.CurrentPage(),
+			"nextPage":    pages.NextPage(),
+			"pages":       pages.Pages(),
+		},
+	}
+
+	return data, nil
 }
 
 type Index struct {
@@ -132,27 +157,6 @@ func (vs *VideoService) First(id string) (model.Video, error) {
 		return video, err
 	}
 	return video, nil
-}
-
-type VideoInfo struct {
-	ID            uint      `json:"id"`
-	Title         string    `json:"title" gorm:"column:title;type:varchar(255);comment:标题"`
-	Actress       string    `json:"actress" gorm:"column:actress;type:varchar(100);comment:演员"`
-	Size          int64     `json:"size" gorm:"column:size;type:bigint;comment:大小"`
-	Duration      float64   `json:"duration" gorm:"column:duration;type:float;default:0;comment:时长"`
-	Poster        string    `json:"poster" gorm:"column:poster;type:varchar(255);comment:封面"`
-	Width         int       `json:"width" gorm:"column:width;type:int;default:0;comment:宽"`
-	Height        int       `json:"height" gorm:"column:height;type:int;default:0;comment:高"`
-	CodecName     string    `json:"codec_name" gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
-	ChannelLayout string    `json:"channel_layout" gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
-	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
-	Collect       uint      `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
-	Browse        uint      `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
-	Zan           uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
-	Cai           uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
-	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
-	ActressStr    string    `json:"actress_str" gorm:"column:actress_str;type:varchar(255);comment:演员"`
-	ActressIds    string    `json:"actress_ids" gorm:"column:actress_ids;type:varchar(255);comment:演员"`
 }
 
 func (vs *VideoService) Info(id uint) (VideoInfo, error) {

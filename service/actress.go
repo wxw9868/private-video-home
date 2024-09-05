@@ -1,13 +1,12 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 )
@@ -48,27 +47,30 @@ type Actress struct {
 func (as *ActressService) List(page, pageSize int, action, sort, actress string) ([]Actress, error) {
 	var actresss []Actress
 	var ids []uint
-	var key string
-	var sql string
-	ctx := context.Background()
 
-	selectSQL := "SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id"
-	groupSQL := " group by 1,2,3"
-
-	if actress != "" {
-		sql = utils.Join(" where a.actress = ", "'", actress, "'")
-		if err := db.Raw(utils.Join(selectSQL, sql, groupSQL)).Scan(&actresss).Error; err != nil {
-			return nil, err
+	f := func(ids []uint) ([]Actress, error) {
+		for _, id := range ids {
+			data := rdb.HGetAll(ctx, utils.Join("video_actress_", strconv.Itoa(int(id)))).Val()
+			count, _ := strconv.Atoi(data["count"])
+			actresss = append(actresss, Actress{
+				ID:      id,
+				Actress: data["actress"],
+				Avatar:  data["avatar"],
+				Count:   uint32(count),
+			})
 		}
 		return actresss, nil
 	}
 
-	if action == "null" || sort == "null" {
-		action = ""
-		sort = ""
+	if actress != "" {
+		db.Model(&model.Actress{}).Where("actress = ?", actress).Pluck("id", &ids)
+		return f(ids)
 	}
+
+	var key string
+	var sql = "SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id group by 1,2,3"
 	if action != "" && sort != "" {
-		sql = utils.Join(" order by ", action, " ", sort)
+		sql += utils.Join(" order by ", action, " ", sort)
 	}
 
 	switch action {
@@ -83,7 +85,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		}
 		key = "video_actress_actress"
 	case "count":
-		if err := db.Table("(?)", db.Raw(utils.Join(selectSQL, groupSQL, sql))).Pluck("id", &ids).Error; err != nil {
+		if err := db.Table("(?)", db.Raw(sql)).Pluck("id", &ids).Error; err != nil {
 			return nil, err
 		}
 		key = "video_actress_count"
@@ -99,19 +101,8 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		return nil, err
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
-	//fmt.Println("compare: ", strings.Compare(string(bytes), result))
 	if strings.Compare(string(bytes), result) == 0 && result != "" {
-		for _, id := range ids {
-			data := rdb.HGetAll(ctx, utils.Join("video_actress_", strconv.Itoa(int(id)))).Val()
-			count, _ := strconv.Atoi(data["count"])
-			actresss = append(actresss, Actress{
-				ID:      id,
-				Actress: data["actress"],
-				Avatar:  data["avatar"],
-				Count:   uint32(count),
-			})
-		}
-		return actresss, nil
+		return f(ids)
 	}
 
 	var count int64
@@ -119,19 +110,28 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		return nil, err
 	}
 
-	if err = db.Raw(utils.Join(selectSQL, groupSQL, sql)).Scopes(Paginate(page, pageSize, int(count))).Scan(&actresss).Error; err != nil {
-		fmt.Println(err)
+	if err = db.Raw(sql).Scopes(Paginate(page, pageSize, int(count))).Scan(&actresss).Error; err != nil {
 		return nil, err
 	}
 
-	err = rdb.HSet(ctx, key, "len", len(ids), "ids", string(bytes)).Err()
-	if err != nil {
+	keys := make([]string, len(actresss)+1)
+	keys[0] = key
+	for i, a := range actresss {
+		keys[i+1] = utils.Join("video_actress_", strconv.Itoa(int(a.ID)))
+	}
+
+	txf := func(tx *redis.Tx) error {
+		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+			pipe.HSet(ctx, key, "len", len(ids), "ids", string(bytes))
+			for _, a := range actresss {
+				pipe.HSet(ctx, utils.Join("video_actress_", strconv.Itoa(int(a.ID))), "id", a.ID, "actress", a.Actress, "avatar", a.Avatar, "count", a.Count)
+			}
+			return nil
+		})
+		return err
+	}
+	if err = rdb.Watch(ctx, txf, keys...); err == redis.TxFailedErr {
 		return nil, err
 	}
-
-	for _, a := range actresss {
-		rdb.HSet(ctx, utils.Join("video_actress_", strconv.Itoa(int(a.ID))), "id", a.ID, "actress", a.Actress, "avatar", a.Avatar, "count", a.Count)
-	}
-
 	return actresss, nil
 }

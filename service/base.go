@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -24,10 +25,11 @@ import (
 	"gorm.io/gorm"
 )
 
-var avatarDir = "assets/image/avatar"
-var posterDir = "assets/image/poster"
 var db = sqlite.DB()
 var rdb = redis.Rdb()
+var ctx = context.Background()
+var avatarDir = "assets/image/avatar"
+var posterDir = "assets/image/poster"
 var gofoundCount = 0
 var mutex = new(sync.Mutex)
 

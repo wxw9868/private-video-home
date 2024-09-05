@@ -1,20 +1,10 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
-<<<<<<< HEAD
-	"github.com/wxw9868/video/initialize/rdb"
-	"github.com/wxw9868/video/service"
-	"github.com/wxw9868/video/utils"
-=======
-	"net/http"
->>>>>>> 9c6a35725565a7fc1d818c654d0eafcb60b1ae3f
 )
 
 type ActressAdd struct {
@@ -86,8 +76,8 @@ func ActressDeleteApi(c *gin.Context) {
 type ActressList struct {
 	Page    int    `uri:"page" form:"page" json:"page"`
 	Size    int    `uri:"size" form:"size" json:"size"`
-	Action  string `uri:"action" form:"action" json:"action"`
-	Sort    string `uri:"sort" form:"sort" json:"sort"`
+	Action  string `uri:"action" form:"action" json:"action" binding:"oneof=a.CreatedAt a.actress count"`
+	Sort    string `uri:"sort" form:"sort" json:"sort" binding:"oneof=asc desc"`
 	Actress string `uri:"actress"  form:"actress"  json:"actress"`
 }
 
@@ -98,39 +88,7 @@ func ActressListApi(c *gin.Context) {
 		return
 	}
 
-<<<<<<< HEAD
-	var actresss []service.Actress
-	var err error
-
-	result, err := rdb.Rdb().HGetAll(c, "video_actress").Result()
-	if bind.Actress == "" && err == nil {
-		ids := strings.Replace(strings.Replace(result["ids"], "[", "", -1), "]", "", -1)
-
-		fmt.Println(ids)
-		for _, id := range strings.Split(ids, ",") {
-			data := rdb.Rdb().HGetAll(c, utils.Join("video_actress_", id)).Val()
-
-			i, _ := strconv.Atoi(data["id"])
-			count, _ := strconv.Atoi(data["count"])
-			actresss = append(actresss, service.Actress{
-				ID:      uint(i),
-				Actress: data["actress"],
-				Avatar:  data["avatar"],
-				Count:   uint32(count),
-			})
-		}
-	} else {
-		actresss, err = as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-			return
-		}
-	}
-
-	actresss, err = as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
-=======
 	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
->>>>>>> 9c6a35725565a7fc1d818c654d0eafcb60b1ae3f
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
