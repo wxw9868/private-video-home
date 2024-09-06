@@ -2,16 +2,23 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-colorable"
 	"github.com/wxw9868/video/config"
 	"github.com/wxw9868/video/middleware"
 	"github.com/wxw9868/video/router"
-	"net/http"
 )
 
 func main() {
+	var ids []uint
+	fmt.Println(len(ids))
+	actresss := make([]string, len(ids))
+	fmt.Println(actresss)
+	return
+
 	gin.SetMode(gin.ReleaseMode)
 
 	// 强制日志颜色化
