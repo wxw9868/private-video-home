@@ -427,7 +427,7 @@ const docTemplate = `{
                 "summary": "用户注册",
                 "parameters": [
                     {
-                        "description": "login",
+                        "description": "Register",
                         "name": "data",
                         "in": "body",
                         "required": true,

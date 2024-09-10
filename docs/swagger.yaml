@@ -357,7 +357,7 @@ paths:
       - application/json
       description: 用户注册
       parameters:
-      - description: login
+      - description: Register
         in: body
         name: data
         required: true

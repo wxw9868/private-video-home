@@ -25,7 +25,7 @@ type Register struct {
 // @Tags         user
 // @Accept       json
 // @Produce      json
-// @Param        data  body      Register  true  "login"
+// @Param        data  body      Register  true  "请求参数"
 // @Success      200   {object}  Message
 // @Router       /user/register [post]
 func RegisterApi(c *gin.Context) {
@@ -59,7 +59,7 @@ type Login struct {
 // @Tags         user
 // @Accept       json
 // @Produce      json
-// @Param        data  body      Login  true  "login"
+// @Param        data  body      Login  true  "Login"
 // @Success      200   {object}  Message
 // @Router       /user/login [post]
 func LoginApi(c *gin.Context) {
