@@ -45,19 +45,22 @@ type Actress struct {
 }
 
 func (as *ActressService) List(page, pageSize int, action, sort, actress string) ([]Actress, error) {
-	var actresss = make([]Actress, 0)
 	var ids []uint
 
 	f := func(ids []uint) ([]Actress, error) {
-		for _, id := range ids {
+		actresss := make([]Actress, len(ids))
+		for i, id := range ids {
 			data := rdb.HGetAll(ctx, utils.Join("video_actress_", strconv.Itoa(int(id)))).Val()
-			count, _ := strconv.Atoi(data["count"])
-			actresss = append(actresss, Actress{
+			count, err := strconv.Atoi(data["count"])
+			if err != nil {
+				return nil, err
+			}
+			actresss[i] = Actress{
 				ID:      id,
 				Actress: data["actress"],
 				Avatar:  data["avatar"],
 				Count:   uint32(count),
-			})
+			}
 		}
 		return actresss, nil
 	}
@@ -110,6 +113,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		return nil, err
 	}
 
+	var actresss []Actress
 	if err = db.Raw(sql).Scopes(Paginate(page, pageSize, int(count))).Scan(&actresss).Error; err != nil {
 		return nil, err
 	}

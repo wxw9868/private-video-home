@@ -2,17 +2,35 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-colorable"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/wxw9868/video/config"
+	"github.com/wxw9868/video/docs"
 	"github.com/wxw9868/video/middleware"
 	"github.com/wxw9868/video/router"
-	"net/http"
 )
 
+// @title Score Admin API
+// @version 1.0
+// @description This is a score home server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host 192.168.0.9:8080
+// @BasePath /
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)
 
 	// 强制日志颜色化
 	gin.ForceConsoleColor()
@@ -38,6 +56,12 @@ func main() {
 	router.Router(r)
 
 	conf := config.Config().System
+	docs.SwaggerInfo.BasePath = "/"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler,
+		ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", "192.168.0.9", conf.Port)),
+		ginSwagger.DefaultModelsExpandDepth(-1)),
+	)
+
 	if err := r.Run(fmt.Sprintf("%s:%d", conf.Host, conf.Port)); err != nil {
 		panic(err)
 	}

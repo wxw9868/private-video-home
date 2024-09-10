@@ -25,7 +25,7 @@ func InitSession() gin.HandlerFunc {
 func AuthSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
-		_, ok := session.Get("userID").(uint)
+		_, ok := session.Get("user_id").(uint)
 		if !ok {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, util.Fail("没有访问权限"))
 			return
@@ -39,7 +39,8 @@ func GinCors() gin.HandlerFunc {
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = false
 	config.AllowCredentials = true
-	config.AllowOrigins = []string{"http://127.0.0.1:3000", "http://192.168.0.9", "http://192.168.0.9:80"}
+	config.AllowOrigins = []string{"http://127.0.0.1:80", "http://127.0.0.1:8080", "http://192.168.0.9:80", "http://192.168.0.9:8080"}
+
 	return cors.New(config)
 }
 

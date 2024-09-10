@@ -72,14 +72,14 @@ func Router(r *gin.Engine) {
 	tag.GET("/list", api.TagListApi)
 
 	stock := auth.Group("/stock")
-	stock.POST("/import_trading_records", api.ImportTradingRecordsApi)
+	stock.POST("/importTradingRecords", api.ImportTradingRecordsApi)
 	stock.GET("/liquidation", api.LiquidationApi)
-	stock.GET("/trading_records", api.TradingRecordsApi)
+	stock.GET("/tradingRecords", api.TradingRecordsApi)
 
 	auth.GET("/resetTable", api.ResetTableApi)
 
-	// Setup Security Headers
-	// router.Use(func(c *gin.Context) {
+	// // Setup Security Headers
+	// r.Use(func(c *gin.Context) {
 	// 	if c.Request.Host != addr {
 	// 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
 	// 		return

@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/redis/go-redis/v9"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
@@ -57,22 +58,22 @@ type Video struct {
 }
 
 func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, error) {
-	var videos = make([]Video, 0)
 	var ids []uint
 
 	f := func(ids []uint) ([]Video, error) {
-		for _, id := range ids {
+		videos := make([]Video, len(ids))
+		for i, id := range ids {
 			data := rdb.HGetAll(ctx, utils.Join("video_video_", strconv.Itoa(int(id)))).Val()
 			browse, _ := strconv.Atoi(data["browse"])
 			watch, _ := strconv.Atoi(data["watch"])
-			videos = append(videos, Video{
+			videos[i] = Video{
 				ID:       id,
 				Title:    data["title"],
 				Poster:   data["poster"],
 				Duration: data["duration"],
 				Browse:   uint(browse),
 				Watch:    uint(watch),
-			})
+			}
 		}
 		return videos, nil
 	}
@@ -102,7 +103,6 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		vdb = vdb.Order(utils.Join(action, " ", sort))
 	}
 	if err := db.Table("(?)", vdb).Pluck("id", &ids).Error; err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	bts, err := json.Marshal(ids)
@@ -110,7 +110,6 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		return nil, err
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
-	//fmt.Println(strings.Compare(string(bts), result))
 	if strings.Compare(string(bts), result) == 0 && result != "" {
 		return f(ids)
 	}
@@ -125,6 +124,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	}
 	defer rows.Close()
 
+	var videos []Video
 	var indexBatch []Index
 	var keys []string
 	keys = append(keys, key)

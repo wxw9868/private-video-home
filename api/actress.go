@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -76,17 +77,33 @@ func ActressDeleteApi(c *gin.Context) {
 type ActressList struct {
 	Page    int    `uri:"page" form:"page" json:"page"`
 	Size    int    `uri:"size" form:"size" json:"size"`
-	Action  string `uri:"action" form:"action" json:"action" binding:"oneof=a.CreatedAt a.actress count"`
-	Sort    string `uri:"sort" form:"sort" json:"sort" binding:"oneof=asc desc"`
+	Action  string `uri:"action" form:"action" json:"action"`
+	Sort    string `uri:"sort" form:"sort" json:"sort"`
 	Actress string `uri:"actress"  form:"actress"  json:"actress"`
 }
 
+// ActressListApi godoc
+//
+//	@Summary		演员列表
+//	@Description	演员列表
+//	@Tags			actress
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	formData	ActressList	true	"演员列表"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/actress/list [post]
 func ActressListApi(c *gin.Context) {
 	var bind ActressList
 	if err := c.Bind(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
+
+	fmt.Printf("a: %+v \n", c.Request.Header)
+	fmt.Printf("b: %+v \n", c.ContentType())
 
 	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
 	if err != nil {

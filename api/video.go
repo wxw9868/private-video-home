@@ -62,6 +62,19 @@ type Video struct {
 	Sort      string `uri:"sort" form:"sort" json:"sort"`
 }
 
+// VideoListApi godoc
+//
+//	@Summary		视频列表
+//	@Description	视频列表
+//	@Tags			video
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	formData	Video	true	"视频列表"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/video/list [post]
 func VideoListApi(c *gin.Context) {
 	var bind Video
 	if err := c.Bind(&bind); err != nil {
@@ -143,7 +156,7 @@ func VideoPlayApi(c *gin.Context) {
 		"Watch":         vi.Watch,
 		"CollectID":     collectID,
 		"IsCollect":     isCollect,
-		"Avatar":        sessions.Default(c).Get("userAvatar").(string),
+		"Avatar":        sessions.Default(c).Get("user_avatar").(string),
 	})
 }
 

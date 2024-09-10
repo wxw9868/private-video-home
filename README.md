@@ -110,6 +110,7 @@ chmod 755 myvideo
 * [zap](https://github.com/uber-go/zap.git)
 * [ffmpeg-go](https://github.com/u2takey/ffmpeg-go)
 * [air](https://github.com/cosmtrek/air/blob/master/README-zh_cn.md)
+* [gin-swagger](https://github.com/swaggo/gin-swagger)
 
 ##  5. <a name='-1'></a>数据库操作命令
 ```sql
