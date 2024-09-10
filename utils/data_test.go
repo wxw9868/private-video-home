@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/jpeg"
 	"image/png"
 	"log"
 	"net/url"
@@ -18,31 +17,9 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
+	"gocv.io/x/gocv"
 	"golang.org/x/image/draw"
 )
-
-func TestVideoFileRename(t *testing.T) {
-	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
-	}
-	var nameSlice = []string{"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
-		"_一本道_无码AV_無碼AV", "_一本道_无码AV", "_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV",
-		"_天然素人_无码AV", "_#Heyzo_无码AV", "#", " "}
-	var actressSlice = []string{"佐々木かな", "Heyzo-", "Vol.", "File."}
-	if err := VideoFileRename(nameMap, nameSlice, actressSlice); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("SUCCESS")
-}
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
@@ -62,7 +39,7 @@ func TestVideoRename(t *testing.T) {
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "#", " ", "_茂野美嘉_片平美嘉"}
-	var actressSlice = []string{"青山茉悠", "杉浦花音", "本宮あすか", "Heyzo-", "Vol.", "File.", "No."}
+	var actressSlice = []string{"", "", "", "Heyzo-", "Vol.", "File.", "No."}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
@@ -98,8 +75,7 @@ func TestDownloadImage(t *testing.T) {
 	t.Logf("err is %s\n", err)
 }
 
-func TestPachong(t *testing.T) {
-	//Pachong1()
+func TestGetWebDocument(t *testing.T) {
 	//url := Join("https://920share.com/?s=", "衣吹かのん")
 	//url := Join("https://ggjav.com/main/search?string=", "小泉真希")
 	//url := Join("https://netflav.com/search?type=title&keyword=", "杉浦花音")
@@ -116,13 +92,9 @@ func TestPachong(t *testing.T) {
 		log.Fatal(err)
 	}
 	fmt.Println(doc)
-	return
-
-	av6kCom()
-	av1688Cc()
 }
 
-func av6kCom() {
+func TestAv6kCom(t *testing.T) {
 	param := url.Values{"q": {"小泉真希"}}
 	doc, err := GetWebDocument("POST", "https://av6k.com/plus/search.php", strings.NewReader(param.Encode()))
 	if err != nil {
@@ -187,7 +159,7 @@ func av6kCom() {
 	fmt.Printf("%+v\n", data)
 }
 
-func av1688Cc() {
+func TestAv1688Cc(t *testing.T) {
 	url := Join("https://av1688.cc/?s=", "小泉真希")
 	doc, err := GetWebDocument("GET", url, nil)
 	if err != nil {
@@ -258,7 +230,7 @@ func av1688Cc() {
 	fmt.Printf("%+v\n", data)
 }
 
-func Pachong1() {
+func TestXslist(t *testing.T) {
 	url := Join("https://xslist.org/search?query=", "小野寺梨紗", "&lg=zh")
 	doc, err := GetWebDocument("GET", url, nil)
 	if err != nil {
@@ -332,37 +304,6 @@ func removeWatermark(inputPath, outputPath string) error {
 	return nil
 }
 
-// 修复水印
-// func fixWatermark(inputPath, watermarkPath, outputPath string) error {
-// 	// 读取原始图片和水印图片
-// 	file, err := os.Open(inputPath)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer file.Close()
-
-// 	img, _, err := image.Decode(file)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	watermark, err := imaging.Open(watermarkPath)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// 修复水印
-// 	img = imaging.OverlayCenter(img, watermark, 1.0)
-
-// 	// 保存处理后的图片
-// 	err = imaging.Save(img, outputPath)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
 // https://www.cnblogs.com/Finley/p/16589798.html
 func TestShuiyin(t *testing.T) {
 	savePath := "E:/video/assets/image/thumbnail/"
@@ -385,8 +326,6 @@ func TestShuiyin(t *testing.T) {
 	fmt.Println("Watermark removed and fixed successfully!")
 
 	removeImg(savePath + inputPath)
-
-	removeImg1(savePath + inputPath)
 }
 
 func removeWatermark1(img image.Image, watermark image.Image) image.Image {
@@ -401,47 +340,6 @@ func removeWatermark1(img image.Image, watermark image.Image) image.Image {
 	// 使用遮罩去除水印
 	watermark = imaging.Paste(img, mask, image.Point{X: 667, Y: 418})
 	return watermark
-}
-
-func removeImg1(inputPath string) {
-	// 打开原始图片和水印图片
-	src, err := os.Open(inputPath)
-	if err != nil {
-		log.Fatalf("os.Open: %v", err)
-	}
-	defer src.Close()
-
-	watermark, err := os.Open("logo2.png")
-	if err != nil {
-		log.Fatalf("os.Open: %v", err)
-	}
-	defer watermark.Close()
-
-	// 解码图片
-	img, err := jpeg.Decode(src)
-	if err != nil {
-		log.Fatalf("jpeg.Decode: %v", err)
-	}
-
-	watermarkImg, err := png.Decode(watermark)
-	if err != nil {
-		log.Fatalf("png.Decode: %v", err)
-	}
-
-	// 去除水印
-	result := removeWatermark1(img, watermarkImg)
-
-	// 保存结果
-	output, err := os.Create("result.jpg")
-	if err != nil {
-		log.Fatalf("os.Create: %v", err)
-	}
-	defer output.Close()
-
-	err = jpeg.Encode(output, result, nil)
-	if err != nil {
-		log.Fatalf("jpeg.Encode: %v", err)
-	}
 }
 
 func removeImg(inputPath string) {
@@ -479,4 +377,22 @@ func removeImg(inputPath string) {
 	defer outFile.Close()
 	png.Encode(outFile, canvas)
 	fmt.Println("图片去除成功！")
+}
+
+func TestMain(T *testing.T) {
+	// 加载图像
+	img := gocv.IMRead("watermarked.jpg", gocv.IMReadColor)
+	defer img.Close()
+
+	// 检查图像是否成功加载
+	if img.Empty() {
+		fmt.Printf("Error reading image\n")
+		return
+	}
+
+	// 在这里添加你的图像处理代码来尝试去除水印
+	// ...
+
+	// 保存处理后的图像
+	gocv.IMWrite("output.jpg", img)
 }

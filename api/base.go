@@ -50,3 +50,10 @@ var (
 func GetUserID(c *gin.Context) uint {
 	return sessions.Default(c).Get("userID").(uint)
 }
+
+type Message struct {
+	Code   int         `json:"code"`
+	Status bool        `json:"status"`
+	Msg    string      `json:"message"`
+	Data   interface{} `json:"data"`
+}

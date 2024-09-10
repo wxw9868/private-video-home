@@ -1,0 +1,413 @@
+basePath: /
+definitions:
+  api.ChangePassword:
+    properties:
+      confirm_password:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - confirm_password
+    - new_password
+    - old_password
+    type: object
+  api.ForgotPassword:
+    properties:
+      confirm_password:
+        type: string
+      password:
+        type: string
+      reset_password_token:
+        type: string
+    required:
+    - confirm_password
+    - password
+    - reset_password_token
+    type: object
+  api.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  api.Message:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      status:
+        type: boolean
+    type: object
+  api.Register:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      repeat_password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - repeat_password
+    - username
+    type: object
+  api.UserUpdate:
+    properties:
+      address:
+        type: string
+      designation:
+        type: string
+      email:
+        type: string
+      mobile:
+        type: string
+      nickname:
+        type: string
+      note:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - mobile
+    - nickname
+    - username
+    type: object
+host: 0.0.0.0:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a score home server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Score Admin API
+  version: "1.0"
+paths:
+  /stock/importExcel:
+    post:
+      consumes:
+      - application/json
+      description: 用于导入数据
+      parameters:
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Message'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 导入数据
+      tags:
+      - stock
+  /stock/liquidation:
+    get:
+      consumes:
+      - application/json
+      description: 用于已清仓股票
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: string
+      - description: 每页条数
+        in: query
+        name: page_size
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Message'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 已清仓股票
+      tags:
+      - stock
+  /stock/tradingRecords:
+    get:
+      consumes:
+      - application/json
+      description: 历史成交数据
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: string
+      - description: 每页条数
+        in: query
+        name: page_size
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Message'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 历史成交
+      tags:
+      - stock
+  /user/avatar:
+    post:
+      consumes:
+      - application/json
+      description: 用户修改信息
+      parameters:
+      - description: login
+        in: body
+        name: avatar
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户修改信息
+      tags:
+      - user
+  /user/browse:
+    get:
+      consumes:
+      - application/json
+      description: 用户浏览记录
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户浏览记录
+      tags:
+      - user
+  /user/changePassword:
+    post:
+      consumes:
+      - application/json
+      description: 用户修改密码
+      parameters:
+      - description: login
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户修改密码
+      tags:
+      - user
+  /user/collect:
+    get:
+      consumes:
+      - application/json
+      description: 用户信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户信息
+      tags:
+      - user
+  /user/forgotPassword:
+    post:
+      consumes:
+      - application/json
+      description: 用户忘记密码
+      parameters:
+      - description: login
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.ForgotPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户忘记密码
+      tags:
+      - user
+  /user/info:
+    get:
+      consumes:
+      - application/json
+      description: 用户信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户信息
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录
+      parameters:
+      - description: login
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户登录
+      tags:
+      - user
+  /user/logout:
+    get:
+      consumes:
+      - application/json
+      description: 用户登出
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户登出
+      tags:
+      - user
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: 用户注册
+      parameters:
+      - description: login
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Register'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户注册
+      tags:
+      - user
+  /user/save:
+    post:
+      consumes:
+      - application/json
+      description: 用户修改信息
+      parameters:
+      - description: login
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: 用户修改信息
+      tags:
+      - user
+  /user/session:
+    get:
+      consumes:
+      - application/json
+      description: session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Message'
+      summary: session
+      tags:
+      - user
+swagger: "2.0"
