@@ -1,5 +1,21 @@
 basePath: /
 definitions:
+  api.ActressList:
+    properties:
+      action:
+        example: a.CreatedAt
+        type: string
+      actress:
+        example: ""
+        type: string
+      page:
+        type: integer
+      size:
+        type: integer
+      sort:
+        example: desc
+        type: string
+    type: object
   api.ChangePassword:
     properties:
       confirm_password:
@@ -12,6 +28,27 @@ definitions:
     - confirm_password
     - new_password
     - old_password
+    type: object
+  api.DanmuSave:
+    properties:
+      border:
+        type: boolean
+      color:
+        type: string
+      mode:
+        type: integer
+      style:
+        type: string
+      text:
+        type: string
+      time:
+        type: number
+      video_id:
+        type: integer
+    required:
+    - color
+    - text
+    - video_id
     type: object
   api.Fail:
     properties:
@@ -135,18 +172,46 @@ definitions:
     - nickname
     - username
     type: object
+  api.Video:
+    properties:
+      action:
+        example: v.CreatedAt
+        type: string
+      actress_id:
+        type: integer
+      page:
+        type: integer
+      size:
+        type: integer
+      sort:
+        example: desc
+        type: string
+    type: object
+  api.VideoCollect:
+    properties:
+      collect:
+        enum:
+        - 1
+        - -1
+        type: integer
+      video_id:
+        type: integer
+    required:
+    - collect
+    - video_id
+    type: object
 host: 192.168.0.9:8080
 info:
   contact:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a score home server.
+  description: This is a video server.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Score Admin API
+  title: Video API
   version: "1.0"
 paths:
   /actress/list:
@@ -155,21 +220,12 @@ paths:
       - application/json
       description: 演员列表
       parameters:
-      - in: formData
-        name: action
-        type: string
-      - in: formData
-        name: actress
-        type: string
-      - in: formData
-        name: page
-        type: integer
-      - in: formData
-        name: size
-        type: integer
-      - in: formData
-        name: sort
-        type: string
+      - description: 演员列表
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActressList'
       produces:
       - application/json
       responses:
@@ -192,6 +248,73 @@ paths:
       summary: 演员列表
       tags:
       - actress
+  /danmu/list/{video_id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频弹幕列表
+      tags:
+      - video
+  /danmu/save:
+    post:
+      consumes:
+      - application/json
+      description: 视频弹幕
+      parameters:
+      - description: 视频弹幕
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.DanmuSave'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频弹幕
+      tags:
+      - danmu
   /stock/importExcel:
     post:
       consumes:
@@ -588,26 +711,83 @@ paths:
       summary: 用户信息
       tags:
       - user
-  /video/list:
+  /video/browse/{video_id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频浏览记录
+      tags:
+      - video
+  /video/collect:
     post:
       consumes:
       - application/json
-      description: 视频列表
+      description: 视频收藏
       parameters:
-      - in: formData
-        name: action
-        type: string
-      - in: formData
-        name: actress_id
-        type: integer
-      - in: formData
-        name: page
-        type: integer
-      - in: formData
-        name: size
-        type: integer
-      - in: formData
-        name: sort
+      - description: 视频收藏
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.VideoCollect'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频收藏
+      tags:
+      - video
+  /video/import:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: dir
+        in: query
+        name: dir
+        required: true
         type: string
       produces:
       - application/json
@@ -628,7 +808,107 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ServerError'
+      summary: 视频导入
+      tags:
+      - video
+  /video/list:
+    post:
+      consumes:
+      - application/json
+      description: 视频列表
+      parameters:
+      - description: 视频列表
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Video'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
       summary: 视频列表
+      tags:
+      - video
+  /video/play/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频信息
+      tags:
+      - video
+  /video/search:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: 关键词
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频搜索
       tags:
       - video
 swagger: "2.0"

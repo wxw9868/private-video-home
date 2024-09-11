@@ -39,29 +39,115 @@ const docTemplate = `{
                 "summary": "演员列表",
                 "parameters": [
                     {
-                        "type": "string",
-                        "name": "action",
-                        "in": "formData"
+                        "description": "演员列表",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ActressList"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
                     },
-                    {
-                        "type": "string",
-                        "name": "actress",
-                        "in": "formData"
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/danmu/list/{video_id}": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "video"
+                ],
+                "summary": "视频弹幕列表",
+                "parameters": [
                     {
                         "type": "integer",
-                        "name": "page",
-                        "in": "formData"
+                        "description": "Video ID",
+                        "name": "video_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
                     },
-                    {
-                        "type": "integer",
-                        "name": "size",
-                        "in": "formData"
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/danmu/save": {
+            "post": {
+                "description": "视频弹幕",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "danmu"
+                ],
+                "summary": "视频弹幕",
+                "parameters": [
                     {
-                        "type": "string",
-                        "name": "sort",
-                        "in": "formData"
+                        "description": "视频弹幕",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DanmuSave"
+                        }
                     }
                 ],
                 "responses": {
@@ -696,6 +782,158 @@ const docTemplate = `{
                 }
             }
         },
+        "/video/browse/{video_id}": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "video"
+                ],
+                "summary": "视频浏览记录",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Video ID",
+                        "name": "video_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/video/collect": {
+            "post": {
+                "description": "视频收藏",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "video"
+                ],
+                "summary": "视频收藏",
+                "parameters": [
+                    {
+                        "description": "视频收藏",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.VideoCollect"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/video/import": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "video"
+                ],
+                "summary": "视频导入",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "dir",
+                        "name": "dir",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/video/list": {
             "post": {
                 "description": "视频列表",
@@ -711,29 +949,113 @@ const docTemplate = `{
                 "summary": "视频列表",
                 "parameters": [
                     {
+                        "description": "视频列表",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.Video"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/video/play/{id}": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "video"
+                ],
+                "summary": "视频信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Video ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/video/search": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "video"
+                ],
+                "summary": "视频搜索",
+                "parameters": [
+                    {
                         "type": "string",
-                        "name": "action",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "actress_id",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "page",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "size",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "name": "sort",
-                        "in": "formData"
+                        "description": "关键词",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -766,6 +1088,29 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.ActressList": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "a.CreatedAt"
+                },
+                "actress": {
+                    "type": "string",
+                    "example": ""
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "sort": {
+                    "type": "string",
+                    "example": "desc"
+                }
+            }
+        },
         "api.ChangePassword": {
             "type": "object",
             "required": [
@@ -782,6 +1127,37 @@ const docTemplate = `{
                 },
                 "old_password": {
                     "type": "string"
+                }
+            }
+        },
+        "api.DanmuSave": {
+            "type": "object",
+            "required": [
+                "color",
+                "text",
+                "video_id"
+            ],
+            "properties": {
+                "border": {
+                    "type": "boolean"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "integer"
+                },
+                "style": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "number"
+                },
+                "video_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -959,6 +1335,47 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "api.Video": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "v.CreatedAt"
+                },
+                "actress_id": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "sort": {
+                    "type": "string",
+                    "example": "desc"
+                }
+            }
+        },
+        "api.VideoCollect": {
+            "type": "object",
+            "required": [
+                "collect",
+                "video_id"
+            ],
+            "properties": {
+                "collect": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        -1
+                    ]
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`
@@ -969,8 +1386,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "192.168.0.9:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Score Admin API",
-	Description:      "This is a score home server.",
+	Title:            "Video API",
+	Description:      "This is a video server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -17,20 +17,32 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
-	"gocv.io/x/gocv"
 	"golang.org/x/image/draw"
 )
 
+var nameMap = map[string]string{
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+}
+
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "081424_001 マンコからあふれ出た中出しザーメンを精飲 ！  #紗霧ひなた",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "071424-001 この女、ふしだら。 ～紗霧ひなたの場合～  #紗霧ひなた",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-1171 アラサー独女は肉棒好き  #長内和美",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "010216_004 溢れるフェロモンで隣人を誘う純和風美人  #長内和美",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "121419_220 寝取られた人妻  #長内和美",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "011124_969 奥さん、今はいてる下着を買い取らせて下さい！～Gカップ爆乳妻のマン汁の染み込んだ柄物下着～  #久山香",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "111823_940 DMを送ってきた欲求不満の人妻とパコパコ！  #久山香",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "090923_907 素人奥様初撮りドキュメント 125  #久山香",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "082724_01 メイドコスプレでハメ撮りさせてくれるロリ巨乳デリヘル嬢  #小内山かよ",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "Heyzo-3434 アジハメ！！Vol.6～Eカップ巨乳女医を責める！～  #チーチー",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "080824_100 間男を求めて  #高嶋祥子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "Heyzo-1336 痴熟女達の午後～今日の獲物は配達員～  #高嶋祥子 #福山香織",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "011724-001  着物美人x2と熟々３P乱れ打ち！   #高嶋祥子 #保坂友利子",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 	}
@@ -39,8 +51,8 @@ func TestVideoRename(t *testing.T) {
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "#", " ", "_茂野美嘉_片平美嘉"}
-	var actressSlice = []string{"", "", "", "Heyzo-", "Vol.", "File.", "No."}
-	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
+	var actressSlice = []string{"利七葉", "久山香", "小内山かよ", "チーチー", "高嶋祥子", "保坂友利子", "福山香織", "Heyzo-", "Vol.", "File.", "No."}
+	if err := VideoRename("C:/Users/wxw9868/Downloads/Telegram Desktop", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("SUCCESS")
@@ -379,20 +391,20 @@ func removeImg(inputPath string) {
 	fmt.Println("图片去除成功！")
 }
 
-func TestMain(T *testing.T) {
-	// 加载图像
-	img := gocv.IMRead("watermarked.jpg", gocv.IMReadColor)
-	defer img.Close()
-
-	// 检查图像是否成功加载
-	if img.Empty() {
-		fmt.Printf("Error reading image\n")
-		return
-	}
-
-	// 在这里添加你的图像处理代码来尝试去除水印
-	// ...
-
-	// 保存处理后的图像
-	gocv.IMWrite("output.jpg", img)
-}
+//func TestMain(T *testing.T) {
+//	// 加载图像
+//	img := gocv.IMRead("watermarked.jpg", gocv.IMReadColor)
+//	defer img.Close()
+//
+//	// 检查图像是否成功加载
+//	if img.Empty() {
+//		fmt.Printf("Error reading image\n")
+//		return
+//	}
+//
+//	// 在这里添加你的图像处理代码来尝试去除水印
+//	// ...
+//
+//	// 保存处理后的图像
+//	gocv.IMWrite("output.jpg", img)
+//}

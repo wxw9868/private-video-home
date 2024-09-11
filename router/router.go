@@ -31,15 +31,15 @@ func Router(r *gin.Engine) {
 	actress.POST("/add", api.ActressAddApi)
 	actress.POST("/edit", api.ActressEditApi)
 	actress.GET("/delete", api.ActressDeleteApi)
-	actress.GET("/list", api.ActressListApi)
+	actress.POST("/list", api.ActressListApi)
 	actress.GET("/OneAddInfo", api.OneAddInfoToActress)
 	actress.GET("/AllAddInfo", api.AllAddInfoToActress)
 
 	video := auth.Group("/video")
 	video.GET("/search", api.VideoSearchApi)
-	video.GET("/list", api.VideoListApi)
-	video.GET("/play", api.VideoPlayApi)
-	video.GET("/browse", api.VideoBrowseApi)
+	video.POST("/list", api.VideoListApi)
+	video.GET("/play/:id", api.VideoPlayApi)
+	video.GET("/browse/:video_id", api.VideoBrowseApi)
 	video.POST("/collect", api.VideoCollectApi)
 	video.GET("/import", api.VideoImportApi)
 	video.GET("/getVideoPic", api.GetVideoPic)
@@ -53,7 +53,7 @@ func Router(r *gin.Engine) {
 	comment.POST("/cai", api.CommentCaiApi)
 
 	danmu := auth.Group("/danmu")
-	danmu.GET("/list", api.DanmuListApi)
+	danmu.GET("/list/:video_id", api.DanmuListApi)
 	danmu.POST("/save", api.DanmuSaveApi)
 
 	search := auth.Group("/search")
