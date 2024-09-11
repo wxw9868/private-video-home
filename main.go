@@ -15,9 +15,9 @@ import (
 	"github.com/wxw9868/video/router"
 )
 
-// @title Score Admin API
+// @title Video API
 // @version 1.0
-// @description This is a score home server.
+// @description This is a video server.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
@@ -28,6 +28,7 @@ import (
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host 192.168.0.9:8080
+// @host 127.0.0.1:8080
 // @BasePath /
 func main() {
 	// gin.SetMode(gin.ReleaseMode)
@@ -58,7 +59,7 @@ func main() {
 	conf := config.Config().System
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler,
-		ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", "192.168.0.9", conf.Port)),
+		ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", conf.Host, conf.Port)),
 		ginSwagger.DefaultModelsExpandDepth(-1)),
 	)
 

@@ -25,6 +25,19 @@ type Search struct {
 	ScoreExp  string      `json:"scoreExp"`
 }
 
+// VideoSearchApi godoc
+//
+//	@Summary		视频搜索
+//	@Description	get string by ID
+//	@Tags			video
+//	@Accept			json
+//	@Produce		json
+//	@Param			query	query		string	true	"关键词"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/video/search [get]
 func VideoSearchApi(c *gin.Context) {
 	query := c.Query("query")
 
@@ -58,8 +71,8 @@ type Video struct {
 	ActressID int    `uri:"actress_id" form:"actress_id" json:"actress_id"`
 	Page      int    `uri:"page" form:"page" json:"page"`
 	Size      int    `uri:"size" form:"size" json:"size"`
-	Action    string `uri:"action" form:"action" json:"action"`
-	Sort      string `uri:"sort" form:"sort" json:"sort"`
+	Action    string `uri:"action" form:"action" json:"action" example:"v.CreatedAt"`
+	Sort      string `uri:"sort" form:"sort" json:"sort" example:"desc"`
 }
 
 // VideoListApi godoc
@@ -69,7 +82,7 @@ type Video struct {
 //	@Tags			video
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	formData	Video	true	"视频列表"
+//	@Param			data	body		Video	true	"视频列表"
 //	@Success		200		{object}	Success
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
@@ -77,7 +90,7 @@ type Video struct {
 //	@Router			/video/list [post]
 func VideoListApi(c *gin.Context) {
 	var bind Video
-	if err := c.Bind(&bind); err != nil {
+	if err := c.BindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
@@ -91,18 +104,32 @@ func VideoListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("视频列表", data))
 }
 
-type Play struct {
-	ID string `form:"id" binding:"required"`
-}
-
+// VideoPlayApi godoc
+//
+//	@Summary		视频信息
+//	@Description	get string by ID
+//	@Tags			video
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Video ID"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/video/play/{id} [get]
 func VideoPlayApi(c *gin.Context) {
-	var play Play
-	if err := c.Bind(&play); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+	id := c.Param("id")
+	aid, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	if aid == 0 {
+		c.JSON(http.StatusBadRequest, util.Fail("id must be greater than 0"))
 		return
 	}
 
-	vi, err := vs.Info(cast.ToUint(play.ID))
+	vi, err := vs.Info(cast.ToUint(aid))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -127,16 +154,7 @@ func VideoPlayApi(c *gin.Context) {
 	}
 
 	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
-
-	poster := vi.Poster
-	//previewPath := "E:/video/assets/image/preview/"
-	//previewFile := vi.Title + ".jpg"
-	//_, err = os.Stat(path.Join(previewPath, previewFile))
-	//if !os.IsNotExist(err) {
-	//	poster = "./assets/image/preview/" + previewFile
-	//}
-
-	c.JSON(http.StatusOK, gin.H{
+	data := gin.H{
 		"videoID":       vi.ID,
 		"videoTitle":    vi.Title,
 		"videoActress":  actressSlice,
@@ -144,7 +162,7 @@ func VideoPlayApi(c *gin.Context) {
 		"Size":          size / 1024 / 1024,
 		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
 		"ModTime":       vi.CreationTime.Format("2006-01-02 15:04:05"),
-		"Poster":        poster,
+		"Poster":        vi.Poster,
 		"Width":         vi.Width,
 		"Height":        vi.Height,
 		"CodecName":     vi.CodecName,
@@ -157,7 +175,8 @@ func VideoPlayApi(c *gin.Context) {
 		"CollectID":     collectID,
 		"IsCollect":     isCollect,
 		"Avatar":        sessions.Default(c).Get("user_avatar").(string),
-	})
+	}
+	c.JSON(http.StatusOK, util.Success("视频信息", data))
 }
 
 type VideoCollect struct {
@@ -165,7 +184,19 @@ type VideoCollect struct {
 	Collect int  `form:"collect" json:"collect" binding:"required,oneof=1 -1"`
 }
 
-// VideoCollectApi 收藏
+// VideoCollectApi godoc
+//
+//	@Summary		视频收藏
+//	@Description	视频收藏
+//	@Tags			video
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		VideoCollect	true	"视频收藏"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/video/collect [post]
 func VideoCollectApi(c *gin.Context) {
 	var bind VideoCollect
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -191,17 +222,33 @@ type VideoBrowse struct {
 	VideoID uint `form:"video_id" json:"video_id" binding:"required"`
 }
 
-// VideoBrowseApi 浏览
+// VideoBrowseApi godoc
+//
+//	@Summary		视频浏览
+//	@Description	get string by ID
+//	@Tags			video
+//	@Accept			json
+//	@Produce		json
+//	@Param			video_id		path		int	true	"Video ID"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/video/browse/{video_id} [get]
 func VideoBrowseApi(c *gin.Context) {
-	var bind VideoBrowse
-	if err := c.ShouldBind(&bind); err != nil {
+	id := c.Param("video_id")
+	aid, err := strconv.Atoi(id)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	if aid == 0 {
+		c.JSON(http.StatusBadRequest, util.Fail("video_id must be greater than 0"))
 		return
 	}
 
 	userID := GetUserID(c)
-
-	if err := vs.Browse(bind.VideoID, userID); err != nil {
+	if err := vs.Browse(uint(aid), userID); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -347,10 +394,32 @@ func CommentCaiApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
+// DanmuListApi godoc
+//
+//	@Summary		视频弹幕列表
+//	@Description	get string by ID
+//	@Tags			video
+//	@Accept			json
+//	@Produce		json
+//	@Param			video_id		path		int	true	"Video ID"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/video/browse/{video_id} [get]
 func DanmuListApi(c *gin.Context) {
-	id := c.Query("video_id")
+	id := c.Param("video_id")
+	aid, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	if aid == 0 {
+		c.JSON(http.StatusBadRequest, util.Fail("video_id must be greater than 0"))
+		return
+	}
 
-	list, err := vs.DanmuList(cast.ToUint(id))
+	list, err := vs.DanmuList(cast.ToUint(aid))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -368,6 +437,19 @@ type DanmuSave struct {
 	Style   string  `form:"style" json:"style"`
 }
 
+// DanmuSaveApi godoc
+//
+//	@Summary		视频弹幕
+//	@Description	视频弹幕
+//	@Tags			danmu
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		DanmuSave	true	"视频弹幕"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/danmu/save [post]
 func DanmuSaveApi(c *gin.Context) {
 	var bind DanmuSave
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -376,7 +458,6 @@ func DanmuSaveApi(c *gin.Context) {
 	}
 
 	userID := GetUserID(c)
-
 	if err := vs.DanmuSave(bind.VideoID, userID, bind.Text, bind.Time, bind.Mode, bind.Color, bind.Border, bind.Style); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
