@@ -2,9 +2,11 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
+	"github.com/wxw9868/video/service"
 )
 
 type ActressAdd struct {
@@ -22,6 +24,19 @@ type ActressAdd struct {
 	Introduction string `form:"introduction" json:"introduction"`
 }
 
+// ActressAddApi godoc
+//
+//	@Summary		添加演员
+//	@Description	添加演员
+//	@Tags			actress
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		ActressAdd	true	"Actress Add"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/actress/add [post]
 func ActressAddApi(c *gin.Context) {
 	var bind ActressAdd
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -41,6 +56,19 @@ type ActressEdit struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
+// ActressEditApi godoc
+//
+//	@Summary		编辑演员信息
+//	@Description	编辑演员信息
+//	@Tags			actress
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		ActressEdit	true	"Actress Edit"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/actress/edit [post]
 func ActressEditApi(c *gin.Context) {
 	var bind ActressEdit
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -55,18 +83,32 @@ func ActressEditApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("修改成功", nil))
 }
 
-type ActressDelete struct {
-	ID uint `form:"id" json:"id" binding:"required"`
-}
-
+// ActressDeleteApi godoc
+//
+//	@Summary		删除演员
+//	@Description	get string by ID
+//	@Tags			actress
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Actress ID"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/actress/delete/{id} [get]
 func ActressDeleteApi(c *gin.Context) {
-	var bind ActressDelete
-	if err := c.Bind(&bind); err != nil {
+	id := c.Param("id")
+	aid, err := strconv.Atoi(id)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
+	if aid == 0 {
+		c.JSON(http.StatusBadRequest, util.Fail("id must be greater than 0"))
+		return
+	}
 
-	if err := as.Delete(bind.ID); err != nil {
+	if err := as.Delete(uint(aid)); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -110,4 +152,46 @@ func ActressListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("演员列表", map[string]interface{}{
 		"list": actresss,
 	}))
+}
+
+// OneAddInfoToActress godoc
+//
+//	@Summary		获取演员信息
+//	@Description	获取演员信息
+//	@Tags			actress
+//	@Accept			json
+//	@Produce		json
+//	@Param			actress	query		string	true	"actress"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/actress/oneAddInfo [get]
+func OneAddInfoToActress(c *gin.Context) {
+	var actress = c.Query("actress")
+	if err := service.OneAddlInfoToActress(actress); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
+
+// AllAddInfoToActress godoc
+//
+//	@Summary		获取所有演员信息
+//	@Description	获取所有演员信息
+//	@Tags			actress
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/actress/allAddInfo [get]
+func AllAddInfoToActress(c *gin.Context) {
+	if err := service.AllAddlInfoToActress(); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }

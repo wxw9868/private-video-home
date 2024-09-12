@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	gofoundClient "github.com/wxw9868/video/initialize/gofound"
 	"github.com/wxw9868/video/service"
 )
 
@@ -45,6 +46,7 @@ var (
 	actresss        []actress
 	actressList     = make(map[string][]int)
 	actressListSort []string
+	client          = gofoundClient.GofoundClient()
 )
 
 func GetUserID(c *gin.Context) uint {

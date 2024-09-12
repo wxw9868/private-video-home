@@ -103,6 +103,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 	if err != nil {
 		return nil, err
 	}
+	//bytes = []byte{}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bytes), result) == 0 && result != "" {
 		return f(ids)

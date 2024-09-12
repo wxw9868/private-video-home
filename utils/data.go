@@ -350,7 +350,7 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 			}
 		}
 
-		//filename = strings.Replace(filename, "_亀井ひとみ", "_杉浦花音", -1)
+		//filename = strings.Replace(filename, "友_利七葉", "友利七葉", -1)
 
 		oldPath := videoDir + "/" + oldFilename
 		newPath := videoDir + "/" + filename

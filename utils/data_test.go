@@ -35,15 +35,15 @@ var nameMap = map[string]string{
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "011124_969 奥さん、今はいてる下着を買い取らせて下さい！～Gカップ爆乳妻のマン汁の染み込んだ柄物下着～  #久山香",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "111823_940 DMを送ってきた欲求不満の人妻とパコパコ！  #久山香",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "090923_907 素人奥様初撮りドキュメント 125  #久山香",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "082724_01 メイドコスプレでハメ撮りさせてくれるロリ巨乳デリヘル嬢  #小内山かよ",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "Heyzo-3434 アジハメ！！Vol.6～Eカップ巨乳女医を責める！～  #チーチー",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "080824_100 間男を求めて  #高嶋祥子",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "Heyzo-1336 痴熟女達の午後～今日の獲物は配達員～  #高嶋祥子 #福山香織",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "011724-001  着物美人x2と熟々３P乱れ打ち！   #高嶋祥子 #保坂友利子",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "093023_01 すっぴん素人 ～お泊りのエッチの日も化粧は落とさないのに～  #矢吹宇蘭",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "Heyzo-1244 他人妻味～長身美人妻の淫らな欲望～  #西岡奈央",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-1276  敏感熟女にエッチなくすぐり特訓  #西岡奈央",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "051117_526 CLUB ONE  #三浦春佳",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "010316-062 今年のお正月はCAL航空で夢のハワイ航路  #三浦春佳",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "120815_203 スカイエンジェル 194 パート2  #三浦春佳",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "110515_184 スカイエンジェル 194 パート1  #三浦春佳",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-1002 性処理課に左遷された淫乱女  #三浦春佳",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "091015-968 いいなり露出徘徊 ～従順すぎる飛びっこグジュグジュ女～  #三浦春佳",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 	}
 	var nameSlice = []string{
@@ -51,8 +51,8 @@ func TestVideoRename(t *testing.T) {
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "#", " ", "_茂野美嘉_片平美嘉"}
-	var actressSlice = []string{"利七葉", "久山香", "小内山かよ", "チーチー", "高嶋祥子", "保坂友利子", "福山香織", "Heyzo-", "Vol.", "File.", "No."}
-	if err := VideoRename("C:/Users/wxw9868/Downloads/Telegram Desktop", nameMap, nameSlice, actressSlice); err != nil {
+	var actressSlice = []string{"矢吹宇蘭", "西岡奈央", "三浦春佳", "高島かな", "愛乃なみ", "沙藤ユリ", "瑠奈", "みなみ愛梨", "彩夏", "浅之美波", "一ノ瀬ルカ", "新山かえで", "滝川ソフィア", "Heyzo-", "Vol.", "File.", "No."}
+	if err := VideoRename("C:/Users/wxw9868/Downloads/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("SUCCESS")

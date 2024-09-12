@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
@@ -11,6 +12,19 @@ type TagAdd struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
+// TagAddApi godoc
+//
+//	@Summary		Tag Add
+//	@Description	Tag Add
+//	@Tags			tag
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		TagAdd	true	"Tag Add"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/tag/add [post]
 func TagAddApi(c *gin.Context) {
 	var bind TagAdd
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -30,6 +44,19 @@ type TagEdit struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
+// TagAddApi godoc
+//
+//	@Summary		Tag Edit
+//	@Description	Tag Edit
+//	@Tags			tag
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		TagEdit	true	"Tag Edit"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/tag/edit [post]
 func TagEditApi(c *gin.Context) {
 	var bind TagEdit
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -44,18 +71,32 @@ func TagEditApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("修改成功", nil))
 }
 
-type TagDelete struct {
-	ID uint `form:"id" json:"id" binding:"required"`
-}
-
+// TagDeleteApi godoc
+//
+//	@Summary		Tag Delete
+//	@Description	Tag Delete
+//	@Tags			tag
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int	true	"Tag Delete"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/tag/delete/{id} [get]
 func TagDeleteApi(c *gin.Context) {
-	var bind TagDelete
-	if err := c.Bind(&bind); err != nil {
+	id := c.Param("video_id")
+	aid, err := strconv.Atoi(id)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
+	if aid == 0 {
+		c.JSON(http.StatusBadRequest, util.Fail("video_id must be greater than 0"))
+		return
+	}
 
-	if err := ts.Delete(bind.ID); err != nil {
+	if err := ts.Delete(uint(aid)); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -69,6 +110,19 @@ type TagList struct {
 	Sort   string `uri:"sort" form:"sort" json:"sort"`
 }
 
+// TagListApi godoc
+//
+//	@Summary		Tag List
+//	@Description	Tag List
+//	@Tags			tag
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		TagList	true	"Tag List"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/tag/list [post]
 func TagListApi(c *gin.Context) {
 	var bind TagList
 	if err := c.Bind(&bind); err != nil {

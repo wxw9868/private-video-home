@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -125,7 +124,6 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	defer rows.Close()
 
 	var videos []Video
-	var indexBatch []Index
 	var keys []string
 	keys = append(keys, key)
 	for rows.Next() {
@@ -152,26 +150,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 			//Cai:           videoInfo.Cai,
 		}
 		videos = append(videos, video)
-
 		keys = append(keys, utils.Join("video_video_", strconv.Itoa(int(videoInfo.ID))))
-
-		indexBatch = append(indexBatch, Index{
-			Id:       uint32(videoInfo.ID),
-			Text:     videoInfo.Title,
-			Document: video,
-		})
-	}
-
-	if gofoundCount != len(indexBatch) {
-		gofoundCount = len(indexBatch)
-
-		b, err := json.Marshal(&indexBatch)
-		if err != nil {
-			return nil, err
-		}
-		if err := Post(utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b)); err != nil {
-			return nil, err
-		}
 	}
 
 	txf := func(tx *redis.Tx) error {
@@ -202,12 +181,6 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	//}
 
 	return videos, nil
-}
-
-type Index struct {
-	Id       uint32      `json:"id" binding:"required"`
-	Text     string      `json:"text" binding:"required"`
-	Document interface{} `json:"document" binding:"required"`
 }
 
 func (vs *VideoService) First(id string) (model.Video, error) {
