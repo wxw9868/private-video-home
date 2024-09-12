@@ -14,6 +14,19 @@ type SendMail struct {
 	Email string `form:"email" json:"email" binding:"required,email"`
 }
 
+// SendMailApi godoc
+//
+//	@Summary		发送邮件
+//	@Description	通过邮件发送验证码
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		SendMail	true	"发送邮件"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/user/sendMail [post]
 func SendMailApi(c *gin.Context) {
 	var bind SendMail
 	if err := c.ShouldBind(&bind); err != nil {
@@ -43,6 +56,19 @@ type SendUrl struct {
 	Email string `form:"email" json:"email" binding:"required,email"`
 }
 
+// SendUrlApi godoc
+//
+//	@Summary		发送URL
+//	@Description	通过邮件发送重置密码连接
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		SendMail	true	"SendUrl"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/user/sendUrl [post]
 func SendUrlApi(c *gin.Context) {
 	var bind SendUrl
 	if err := c.ShouldBind(&bind); err != nil {
@@ -75,6 +101,19 @@ type Captcha struct {
 	CaptchaType string `from:"captcha_type" json:"captcha_type" binding:"oneof=audio string math chinese"`
 }
 
+// CaptchaApi godoc
+//
+//	@Summary		验证码
+//	@Description	验证码
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		Captcha	true	"验证码"
+//	@Success		200		{object}	Success
+//	@Failure		400		{object}	Fail
+//	@Failure		404		{object}	NotFound
+//	@Failure		500		{object}	ServerError
+//	@Router			/user/captcha [post]
 func CaptchaApi(c *gin.Context) {
 	var bind Captcha
 	if err := c.ShouldBind(&bind); err != nil {

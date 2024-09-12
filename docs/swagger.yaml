@@ -1,5 +1,44 @@
 basePath: /
 definitions:
+  api.ActressAdd:
+    properties:
+      alias:
+        type: string
+      avatar:
+        type: string
+      birth:
+        type: string
+      blood_group:
+        type: string
+      cup_size:
+        type: string
+      debut_date:
+        type: string
+      introduction:
+        type: string
+      measurements:
+        type: string
+      name:
+        type: string
+      nationality:
+        type: string
+      star_sign:
+        type: string
+      stature:
+        type: string
+    required:
+    - name
+    type: object
+  api.ActressEdit:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
   api.ActressList:
     properties:
       action:
@@ -16,6 +55,16 @@ definitions:
         example: desc
         type: string
     type: object
+  api.Captcha:
+    properties:
+      captcha_type:
+        enum:
+        - audio
+        - string
+        - math
+        - chinese
+        type: string
+    type: object
   api.ChangePassword:
     properties:
       confirm_password:
@@ -28,6 +77,32 @@ definitions:
     - confirm_password
     - new_password
     - old_password
+    type: object
+  api.CommentCai:
+    properties:
+      cai:
+        enum:
+        - 1
+        - -1
+        type: integer
+      comment_id:
+        type: integer
+    required:
+    - cai
+    - comment_id
+    type: object
+  api.CommentZan:
+    properties:
+      comment_id:
+        type: integer
+      zan:
+        enum:
+        - 1
+        - -1
+        type: integer
+    required:
+    - comment_id
+    - zan
     type: object
   api.DanmuSave:
     properties:
@@ -75,6 +150,25 @@ definitions:
     - password
     - reset_password_token
     type: object
+  api.Index:
+    properties:
+      document: {}
+      id:
+        type: integer
+      text:
+        type: string
+    required:
+    - document
+    - id
+    - text
+    type: object
+  api.IndexRemove:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
   api.Login:
     properties:
       email:
@@ -109,6 +203,22 @@ definitions:
         example: false
         type: boolean
     type: object
+  api.Query:
+    properties:
+      highlight: {}
+      limit:
+        type: integer
+      order:
+        type: string
+      page:
+        type: integer
+      query:
+        type: string
+      scoreExp:
+        type: string
+    required:
+    - query
+    type: object
   api.Register:
     properties:
       email:
@@ -124,6 +234,13 @@ definitions:
     - password
     - repeat_password
     - username
+    type: object
+  api.SendMail:
+    properties:
+      email:
+        type: string
+    required:
+    - email
     type: object
   api.ServerError:
     properties:
@@ -149,6 +266,34 @@ definitions:
       status:
         example: true
         type: boolean
+    type: object
+  api.TagAdd:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  api.TagEdit:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  api.TagList:
+    properties:
+      action:
+        type: string
+      page:
+        type: integer
+      size:
+        type: integer
+      sort:
+        type: string
     type: object
   api.UserUpdate:
     properties:
@@ -200,20 +345,164 @@ definitions:
     - collect
     - video_id
     type: object
-host: 192.168.0.9:8080
+  api.VideoComment:
+    properties:
+      content:
+        type: string
+      video_id:
+        type: integer
+    required:
+    - content
+    - video_id
+    type: object
+  api.VideoReply:
+    properties:
+      content:
+        type: string
+      parent_id:
+        type: integer
+      video_id:
+        type: integer
+    required:
+    - content
+    - parent_id
+    - video_id
+    type: object
+host: 127.0.0.1:8080
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
+  contact: {}
   description: This is a video server.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
   title: Video API
   version: "1.0"
 paths:
+  /actress/add:
+    post:
+      consumes:
+      - application/json
+      description: 添加演员
+      parameters:
+      - description: Actress Add
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActressAdd'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 添加演员
+      tags:
+      - actress
+  /actress/allAddInfo:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有演员信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 获取所有演员信息
+      tags:
+      - actress
+  /actress/delete/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Actress ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 删除演员
+      tags:
+      - actress
+  /actress/edit:
+    post:
+      consumes:
+      - application/json
+      description: 编辑演员信息
+      parameters:
+      - description: Actress Edit
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActressEdit'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 编辑演员信息
+      tags:
+      - actress
   /actress/list:
     post:
       consumes:
@@ -248,6 +537,208 @@ paths:
       summary: 演员列表
       tags:
       - actress
+  /actress/oneAddInfo:
+    get:
+      consumes:
+      - application/json
+      description: 获取演员信息
+      parameters:
+      - description: actress
+        in: query
+        name: actress
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 获取演员信息
+      tags:
+      - actress
+  /comment/cai:
+    post:
+      consumes:
+      - application/json
+      description: 视频评论回复踩
+      parameters:
+      - description: 视频评论回复踩
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CommentCai'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频评论回复踩
+      tags:
+      - comment
+  /comment/comment:
+    post:
+      consumes:
+      - application/json
+      description: 视频评论
+      parameters:
+      - description: 视频评论
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.VideoComment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频评论
+      tags:
+      - comment
+  /comment/list/{video_id}:
+    get:
+      consumes:
+      - application/json
+      description: 视频弹幕列表
+      parameters:
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频弹幕列表
+      tags:
+      - comment
+  /comment/reply:
+    post:
+      consumes:
+      - application/json
+      description: 视频评论回复
+      parameters:
+      - description: 视频评论回复
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.VideoReply'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频评论回复
+      tags:
+      - comment
+  /comment/zan:
+    post:
+      consumes:
+      - application/json
+      description: 视频评论回复赞
+      parameters:
+      - description: 视频评论回复赞
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CommentZan'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频评论回复赞
+      tags:
+      - comment
   /danmu/list/{video_id}:
     get:
       consumes:
@@ -280,7 +771,7 @@ paths:
             $ref: '#/definitions/api.ServerError'
       summary: 视频弹幕列表
       tags:
-      - video
+      - danmu
   /danmu/save:
     post:
       consumes:
@@ -315,6 +806,237 @@ paths:
       summary: 视频弹幕
       tags:
       - danmu
+  /search/api/db/drop:
+    get:
+      consumes:
+      - application/json
+      description: 删除数据库
+      parameters:
+      - description: 删除数据库
+        in: query
+        name: database
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 删除数据库
+      tags:
+      - search
+  /search/api/index:
+    post:
+      consumes:
+      - application/json
+      description: 增加/修改索引
+      parameters:
+      - description: 增加/修改索引
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Index'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 增加/修改索引
+      tags:
+      - search
+  /search/api/index/batch:
+    post:
+      consumes:
+      - application/json
+      description: 批量增加/修改索引
+      parameters:
+      - description: 批量增加/修改索引
+        in: body
+        name: data
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/api.Index'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 批量增加/修改索引
+      tags:
+      - search
+  /search/api/index/remove:
+    post:
+      consumes:
+      - application/json
+      description: 删除索引
+      parameters:
+      - description: 删除索引
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.IndexRemove'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 删除索引
+      tags:
+      - search
+  /search/api/query:
+    post:
+      consumes:
+      - application/json
+      description: 查询索引
+      parameters:
+      - description: 查询索引
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 查询索引
+      tags:
+      - search
+  /search/api/status:
+    get:
+      consumes:
+      - application/json
+      description: 查询状态
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 查询状态
+      tags:
+      - search
+  /search/api/word/cut:
+    get:
+      consumes:
+      - application/json
+      description: 在线分词
+      parameters:
+      - description: 在线分词
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 在线分词
+      tags:
+      - search
   /stock/importExcel:
     post:
       consumes:
@@ -420,6 +1142,141 @@ paths:
       summary: 历史成交
       tags:
       - stock
+  /tag/add:
+    post:
+      consumes:
+      - application/json
+      description: Tag Add
+      parameters:
+      - description: Tag Add
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.TagAdd'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: Tag Add
+      tags:
+      - tag
+  /tag/delete/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Tag Delete
+      parameters:
+      - description: Tag Delete
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: Tag Delete
+      tags:
+      - tag
+  /tag/edit:
+    post:
+      consumes:
+      - application/json
+      description: Tag Edit
+      parameters:
+      - description: Tag Edit
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.TagEdit'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: Tag Edit
+      tags:
+      - tag
+  /tag/list:
+    post:
+      consumes:
+      - application/json
+      description: Tag List
+      parameters:
+      - description: Tag List
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.TagList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: Tag List
+      tags:
+      - tag
   /user/avatar:
     post:
       consumes:
@@ -474,6 +1331,40 @@ paths:
           schema:
             $ref: '#/definitions/api.ServerError'
       summary: 用户浏览记录
+      tags:
+      - user
+  /user/captcha:
+    post:
+      consumes:
+      - application/json
+      description: 验证码
+      parameters:
+      - description: 验证码
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Captcha'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 验证码
       tags:
       - user
   /user/changePassword:
@@ -690,6 +1581,74 @@ paths:
           schema:
             $ref: '#/definitions/api.ServerError'
       summary: 用户修改信息
+      tags:
+      - user
+  /user/sendMail:
+    post:
+      consumes:
+      - application/json
+      description: 通过邮件发送验证码
+      parameters:
+      - description: 发送邮件
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.SendMail'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 发送邮件
+      tags:
+      - user
+  /user/sendUrl:
+    post:
+      consumes:
+      - application/json
+      description: 通过邮件发送重置密码连接
+      parameters:
+      - description: SendUrl
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.SendMail'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 发送URL
       tags:
       - user
   /user/session:

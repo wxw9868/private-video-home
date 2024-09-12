@@ -3,21 +3,207 @@
     "info": {
         "description": "This is a video server.",
         "title": "Video API",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
+        "contact": {},
         "version": "1.0"
     },
-    "host": "192.168.0.9:8080",
+    "host": "127.0.0.1:8080",
     "basePath": "/",
     "paths": {
+        "/actress/add": {
+            "post": {
+                "description": "添加演员",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "actress"
+                ],
+                "summary": "添加演员",
+                "parameters": [
+                    {
+                        "description": "Actress Add",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ActressAdd"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/actress/allAddInfo": {
+            "get": {
+                "description": "获取所有演员信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "actress"
+                ],
+                "summary": "获取所有演员信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/actress/delete/{id}": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "actress"
+                ],
+                "summary": "删除演员",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Actress ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/actress/edit": {
+            "post": {
+                "description": "编辑演员信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "actress"
+                ],
+                "summary": "编辑演员信息",
+                "parameters": [
+                    {
+                        "description": "Actress Edit",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ActressEdit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/actress/list": {
             "post": {
                 "description": "演员列表",
@@ -70,6 +256,314 @@
                 }
             }
         },
+        "/actress/oneAddInfo": {
+            "get": {
+                "description": "获取演员信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "actress"
+                ],
+                "summary": "获取演员信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "actress",
+                        "name": "actress",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/cai": {
+            "post": {
+                "description": "视频评论回复踩",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "视频评论回复踩",
+                "parameters": [
+                    {
+                        "description": "视频评论回复踩",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.CommentCai"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/comment": {
+            "post": {
+                "description": "视频评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "视频评论",
+                "parameters": [
+                    {
+                        "description": "视频评论",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.VideoComment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/list/{video_id}": {
+            "get": {
+                "description": "视频弹幕列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "视频弹幕列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Video ID",
+                        "name": "video_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/reply": {
+            "post": {
+                "description": "视频评论回复",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "视频评论回复",
+                "parameters": [
+                    {
+                        "description": "视频评论回复",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.VideoReply"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/zan": {
+            "post": {
+                "description": "视频评论回复赞",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "视频评论回复赞",
+                "parameters": [
+                    {
+                        "description": "视频评论回复赞",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.CommentZan"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/danmu/list/{video_id}": {
             "get": {
                 "description": "get string by ID",
@@ -80,7 +574,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "video"
+                    "danmu"
                 ],
                 "summary": "视频弹幕列表",
                 "parameters": [
@@ -142,6 +636,358 @@
                         "schema": {
                             "$ref": "#/definitions/api.DanmuSave"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/api/db/drop": {
+            "get": {
+                "description": "删除数据库",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "删除数据库",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "删除数据库",
+                        "name": "database",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/api/index": {
+            "post": {
+                "description": "增加/修改索引",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "增加/修改索引",
+                "parameters": [
+                    {
+                        "description": "增加/修改索引",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.Index"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/api/index/batch": {
+            "post": {
+                "description": "批量增加/修改索引",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "批量增加/修改索引",
+                "parameters": [
+                    {
+                        "description": "批量增加/修改索引",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/api.Index"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/api/index/remove": {
+            "post": {
+                "description": "删除索引",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "删除索引",
+                "parameters": [
+                    {
+                        "description": "删除索引",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.IndexRemove"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/api/query": {
+            "post": {
+                "description": "查询索引",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "查询索引",
+                "parameters": [
+                    {
+                        "description": "查询索引",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.Query"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/api/status": {
+            "get": {
+                "description": "查询状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "查询状态",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search/api/word/cut": {
+            "get": {
+                "description": "在线分词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "在线分词",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "在线分词",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -332,6 +1178,212 @@
                 }
             }
         },
+        "/tag/add": {
+            "post": {
+                "description": "Tag Add",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Tag Add",
+                "parameters": [
+                    {
+                        "description": "Tag Add",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.TagAdd"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/delete/{id}": {
+            "get": {
+                "description": "Tag Delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Tag Delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag Delete",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/edit": {
+            "post": {
+                "description": "Tag Edit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Tag Edit",
+                "parameters": [
+                    {
+                        "description": "Tag Edit",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.TagEdit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/list": {
+            "post": {
+                "description": "Tag List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Tag List",
+                "parameters": [
+                    {
+                        "description": "Tag List",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.TagList"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/user/avatar": {
             "post": {
                 "description": "Upload file",
@@ -400,6 +1452,58 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/captcha": {
+            "post": {
+                "description": "验证码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "验证码",
+                "parameters": [
+                    {
+                        "description": "验证码",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.Captcha"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
                         }
                     },
                     "404": {
@@ -716,6 +1820,110 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/api.UserUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/sendMail": {
+            "post": {
+                "description": "通过邮件发送验证码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "发送邮件",
+                "parameters": [
+                    {
+                        "description": "发送邮件",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.SendMail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/sendUrl": {
+            "post": {
+                "description": "通过邮件发送重置密码连接",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "发送URL",
+                "parameters": [
+                    {
+                        "description": "SendUrl",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.SendMail"
                         }
                     }
                 ],
@@ -1082,6 +2290,65 @@
         }
     },
     "definitions": {
+        "api.ActressAdd": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "birth": {
+                    "type": "string"
+                },
+                "blood_group": {
+                    "type": "string"
+                },
+                "cup_size": {
+                    "type": "string"
+                },
+                "debut_date": {
+                    "type": "string"
+                },
+                "introduction": {
+                    "type": "string"
+                },
+                "measurements": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nationality": {
+                    "type": "string"
+                },
+                "star_sign": {
+                    "type": "string"
+                },
+                "stature": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.ActressEdit": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ActressList": {
             "type": "object",
             "properties": {
@@ -1105,6 +2372,20 @@
                 }
             }
         },
+        "api.Captcha": {
+            "type": "object",
+            "properties": {
+                "captcha_type": {
+                    "type": "string",
+                    "enum": [
+                        "audio",
+                        "string",
+                        "math",
+                        "chinese"
+                    ]
+                }
+            }
+        },
         "api.ChangePassword": {
             "type": "object",
             "required": [
@@ -1121,6 +2402,44 @@
                 },
                 "old_password": {
                     "type": "string"
+                }
+            }
+        },
+        "api.CommentCai": {
+            "type": "object",
+            "required": [
+                "cai",
+                "comment_id"
+            ],
+            "properties": {
+                "cai": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        -1
+                    ]
+                },
+                "comment_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api.CommentZan": {
+            "type": "object",
+            "required": [
+                "comment_id",
+                "zan"
+            ],
+            "properties": {
+                "comment_id": {
+                    "type": "integer"
+                },
+                "zan": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        -1
+                    ]
                 }
             }
         },
@@ -1191,6 +2510,34 @@
                 }
             }
         },
+        "api.Index": {
+            "type": "object",
+            "required": [
+                "document",
+                "id",
+                "text"
+            ],
+            "properties": {
+                "document": {},
+                "id": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.IndexRemove": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "api.Login": {
             "type": "object",
             "required": [
@@ -1240,6 +2587,30 @@
                 }
             }
         },
+        "api.Query": {
+            "type": "object",
+            "required": [
+                "query"
+            ],
+            "properties": {
+                "highlight": {},
+                "limit": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "scoreExp": {
+                    "type": "string"
+                }
+            }
+        },
         "api.Register": {
             "type": "object",
             "required": [
@@ -1259,6 +2630,17 @@
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.SendMail": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
                     "type": "string"
                 }
             }
@@ -1295,6 +2677,49 @@
                 "status": {
                     "type": "boolean",
                     "example": true
+                }
+            }
+        },
+        "api.TagAdd": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.TagEdit": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.TagList": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "sort": {
+                    "type": "string"
                 }
             }
         },
@@ -1365,6 +2790,40 @@
                         1,
                         -1
                     ]
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api.VideoComment": {
+            "type": "object",
+            "required": [
+                "content",
+                "video_id"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api.VideoReply": {
+            "type": "object",
+            "required": [
+                "content",
+                "parent_id",
+                "video_id"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
                 },
                 "video_id": {
                     "type": "integer"
