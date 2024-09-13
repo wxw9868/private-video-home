@@ -2344,40 +2344,52 @@ const docTemplate = `{
             ],
             "properties": {
                 "alias": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "avatar": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "birth": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "blood_group": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "cup_size": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "debut_date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "introduction": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "measurements": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "nationality": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "star_sign": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "stature": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 }
             }
         },
@@ -2883,7 +2895,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "192.168.0.9:8080",
+	Host:             "127.0.0.1:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Video API",

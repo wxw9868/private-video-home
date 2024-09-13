@@ -3,28 +3,40 @@ definitions:
   api.ActressAdd:
     properties:
       alias:
+        example: ""
         type: string
       avatar:
+        example: ""
         type: string
       birth:
+        example: ""
         type: string
       blood_group:
+        example: ""
         type: string
       cup_size:
+        example: ""
         type: string
       debut_date:
+        example: ""
         type: string
       introduction:
+        example: ""
         type: string
       measurements:
+        example: ""
         type: string
       name:
+        example: ""
         type: string
       nationality:
+        example: ""
         type: string
       star_sign:
+        example: ""
         type: string
       stature:
+        example: ""
         type: string
     required:
     - name
@@ -368,7 +380,7 @@ definitions:
     - parent_id
     - video_id
     type: object
-host: 192.168.0.9:8080
+host: 127.0.0.1:8080
 info:
   contact: {}
   description: This is a video server.

@@ -73,6 +73,7 @@ func VideoImport(videoDir string) error {
 	}
 
 	var actressMap = make(map[string]struct{})
+	actressMap = map[string]struct{}{"矢吹宇蘭": {}, "西岡奈央": {}, "三浦春佳": {}, "高島かな": {}, "愛乃なみ": {}, "沙藤ユリ": {}, "瑠奈": {}, "みなみ愛梨": {}, "彩夏": {}, "浅之美波": {}, "一ノ瀬ルカ": {}, "新山かえで": {}, "滝川ソフィア": {}}
 	var videoSQL = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
 	for _, file := range files {
 		filename := file.Name()
@@ -82,11 +83,11 @@ func VideoImport(videoDir string) error {
 			array := strings.Split(title, "_")
 			actress := array[len(array)-1]
 
-			mutex.Lock()
-			if _, ok := actressMap[actress]; !ok {
-				actressMap[actress] = struct{}{}
-			}
-			mutex.Unlock()
+			//mutex.Lock()
+			//if _, ok := actressMap[actress]; !ok {
+			//	actressMap[actress] = struct{}{}
+			//}
+			//mutex.Unlock()
 
 			filePath := videoDir + "/" + filename
 			posterPath := posterDir + "/" + title + ".jpg"
@@ -109,45 +110,52 @@ func VideoImport(videoDir string) error {
 	videoSqlBytes := []byte(videoSQL)
 	videoSQL = string(videoSqlBytes[:len(videoSqlBytes)-2])
 
-	var actressSQL = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-	if len(actressMap) > 0 {
-		for actress := range actressMap {
-			avatarPath := avatarDir + "/" + actress + ".png"
-			_, err = os.Stat(avatarPath)
-			if os.IsNotExist(err) {
-				nameSlice := []rune(actress)
-				if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
-					return err
-				}
-			}
-			actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
-		}
-
-		actressSqlBytes := []byte(actressSQL)
-		actressSQL = string(actressSqlBytes[:len(actressSqlBytes)-2])
-	}
+	//var actressSQL = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	//if len(actressMap) > 0 {
+	//	for actress := range actressMap {
+	//		var data model.Actress
+	//		if errors.Is(db.Model(&model.Actress{}).Where("actress = ?", actress).First(&data).Error, gorm.ErrRecordNotFound) {
+	//			avatarPath := avatarDir + "/" + actress + ".jpg"
+	//			avatarPath := avatarDir + "/" + actress + ".png"
+	//			_, err = os.Stat(avatarPath)
+	//			if os.IsNotExist(err) {
+	//				nameSlice := []rune(actress)
+	//				if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
+	//					return err
+	//				}
+	//			}
+	//			actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
+	//		}
+	//	}
+	//
+	//	actressSqlBytes := []byte(actressSQL)
+	//	actressSQL = string(actressSqlBytes[:len(actressSqlBytes)-2])
+	//}
 
 	err = db.Transaction(func(tx *gorm.DB) error {
 		if err = tx.Exec(videoSQL).Error; err != nil {
 			return err
 		}
 
-		if len(actressMap) > 0 {
-			if err = tx.Exec(actressSQL).Error; err != nil {
-				return err
-			}
-		}
+		//if len(actressMap) > 0 {
+		//	if err = tx.Exec(actressSQL).Error; err != nil {
+		//		return err
+		//	}
+		//}
 
 		var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
 		for key := range actressMap {
+			//fmt.Printf("key:%s\n", key)
 			var actress model.Actress
 			if err = tx.Where("actress = ?", key).First(&actress).Error; err != nil {
 				return err
 			}
+			//fmt.Printf("actress:%+v\n", actress)
 			var videos []model.Video
 			if err = tx.Where("title LIKE ?", "%"+key+"%").Find(&videos).Error; err != nil {
 				return err
 			}
+			//fmt.Printf("videos:%+v\n", videos)
 			if len(videos) > 0 {
 				for _, video := range videos {
 					sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())

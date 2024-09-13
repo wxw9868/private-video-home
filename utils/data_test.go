@@ -35,16 +35,23 @@ var nameMap = map[string]string{
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "093023_01 すっぴん素人 ～お泊りのエッチの日も化粧は落とさないのに～  #矢吹宇蘭",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "Heyzo-1244 他人妻味～長身美人妻の淫らな欲望～  #西岡奈央",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-1276  敏感熟女にエッチなくすぐり特訓  #西岡奈央",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "051117_526 CLUB ONE  #三浦春佳",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "010316-062 今年のお正月はCAL航空で夢のハワイ航路  #三浦春佳",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "120815_203 スカイエンジェル 194 パート2  #三浦春佳",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "110515_184 スカイエンジェル 194 パート1  #三浦春佳",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-1002 性処理課に左遷された淫乱女  #三浦春佳",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "091015-968 いいなり露出徘徊 ～従順すぎる飛びっこグジュグジュ女～  #三浦春佳",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "082424_100 スッピン熟女 ~ 玉木さんの素顔 ~  #玉木らら",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "042724_100 浮気盛りのあざと可愛い人妻  #玉木らら",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-3447 傷心娘と一発ヤッちゃいました！  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "Heyzo-1999  突然、AVデビュー！？  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "121115_205 放課後中出しクラブ  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "112416_433 グラマラス  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "090618_739 M痴女  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "073015_124 超絶悶絶即ハメ4P連続中出し  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "070315_108 盛り上がっちゃうドスケベ美乳美女  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "040718_668 極射  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "022319_815 高級ソープへようこそ  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "021216_244 超絶ウブな彼女のどスケベ過ぎる妄想  #美星るか",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "080623_01 巨乳ならではの悩みを持つ女子が３Pで親睦を深める会！  #堀越ありす  #花咲胡桃",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "072216_344 お前のカミさんやらせろ  #小嶋ひより",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "Heyzo-1293  勝負に勝ったら私をアゲル！巨乳すぎる女棋士  #小嶋ひより",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (16)": "Heyzo-1235  他人妻味～程良く熟れた食べごろボディ～  #小嶋ひより",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (17)": "022418_650 友達のママと秘密の関係  #小嶋ひより",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",

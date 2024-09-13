@@ -10,18 +10,18 @@ import (
 )
 
 type ActressAdd struct {
-	Name         string `form:"name" json:"name" binding:"required"`
-	Alias        string `form:"alias" json:"alias"`
-	Avatar       string `form:"avatar" json:"avatar"`
-	Birth        string `form:"birth" json:"birth"`
-	Measurements string `form:"measurements" json:"measurements"`
-	CupSize      string `form:"cup_size" json:"cup_size"`
-	DebutDate    string `form:"debut_date" json:"debut_date"`
-	StarSign     string `form:"star_sign" json:"star_sign"`
-	BloodGroup   string `form:"blood_group" json:"blood_group"`
-	Stature      string `form:"stature" json:"stature"`
-	Nationality  string `form:"nationality" json:"nationality"`
-	Introduction string `form:"introduction" json:"introduction"`
+	Name         string `form:"name" json:"name" binding:"required" example:""`
+	Alias        string `form:"alias" json:"alias" example:""`
+	Avatar       string `form:"avatar" json:"avatar" example:""`
+	Birth        string `form:"birth" json:"birth" example:""`
+	Measurements string `form:"measurements" json:"measurements" example:""`
+	CupSize      string `form:"cup_size" json:"cup_size" example:""`
+	DebutDate    string `form:"debut_date" json:"debut_date" example:""`
+	StarSign     string `form:"star_sign" json:"star_sign" example:""`
+	BloodGroup   string `form:"blood_group" json:"blood_group" example:""`
+	Stature      string `form:"stature" json:"stature" example:""`
+	Nationality  string `form:"nationality" json:"nationality" example:""`
+	Introduction string `form:"introduction" json:"introduction" example:""`
 }
 
 // ActressAddApi godoc

@@ -14,11 +14,11 @@ import (
 type ActressService struct{}
 
 func (as *ActressService) Add(name string) error {
-	result := db.Where(model.Actress{Actress: name}).FirstOrCreate(&model.Actress{Actress: name})
+	result := db.Where(model.Actress{Actress: name, Avatar: "assets/image/avatar/anonymous.png"}).FirstOrCreate(&model.Actress{Actress: name})
 	if result.RowsAffected == 1 {
 		return nil
 	}
-	return errors.New("头像已存在")
+	return errors.New("演员存在")
 }
 
 func (as *ActressService) Edit(id uint, name string) error {

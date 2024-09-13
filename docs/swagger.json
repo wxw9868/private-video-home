@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "192.168.0.9:8080",
+    "host": "127.0.0.1:8080",
     "basePath": "/",
     "paths": {
         "/actress/add": {
@@ -2338,40 +2338,52 @@
             ],
             "properties": {
                 "alias": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "avatar": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "birth": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "blood_group": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "cup_size": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "debut_date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "introduction": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "measurements": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "nationality": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "star_sign": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "stature": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 }
             }
         },

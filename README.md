@@ -41,7 +41,7 @@ go get && go build
 ```
 * 命令启动
 ```sh
-./gofound --addr=:8080 --data=./data
+./gofound --addr=:5678 --data=./data --auth=admin:123456
 ```
 * Docker命令部署
 ```sh
@@ -56,6 +56,8 @@ docker pull redis:latest
 docker run -d -p 6379:6379 --name my-video-redis -v D:/database/redis/data:/data -v D:/database/redis/redis.conf:/etc/redis/redis.conf redis redis-server /etc/redis/redis.conf
 # 通过 redis-cli 连接测试使用 redis 服务
 $ docker exec -it my-video-redis /bin/bash
+
+redis-server /Users/v_weixiongwei/go/src/video/config/redis.conf
 ```
 ## 安装和启动 Video
 ```sh
