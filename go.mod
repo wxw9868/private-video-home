@@ -23,7 +23,6 @@ require (
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/wxw9868/util v0.0.0-20240528085236-c08630affd31
 	github.com/xuri/excelize/v2 v2.8.1
-	gocv.io/x/gocv v0.37.0
 	gorm.io/driver/sqlite v1.5.5
 	gorm.io/gorm v1.25.8
 )
