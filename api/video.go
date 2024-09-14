@@ -17,12 +17,12 @@ import (
 )
 
 type Search struct {
-	Query     string      `json:"query" binding:"required"`
+	Query     string      `json:"query" binding:"required" example:""`
 	Page      int         `json:"page"`
 	Limit     int         `json:"limit"`
-	Order     string      `json:"order"`
+	Order     string      `json:"order" example:""`
 	Highlight interface{} `json:"highlight"`
-	ScoreExp  string      `json:"scoreExp"`
+	ScoreExp  string      `json:"scoreExp" example:""`
 }
 
 // VideoSearchApi godoc
@@ -537,7 +537,8 @@ func DanmuSaveApi(c *gin.Context) {
 //	@Tags			video
 //	@Accept			json
 //	@Produce		json
-//	@Param			dir	query		string	true	"dir"
+//	@Param			dir			query		string		true	"dir"
+//	@Param			actresss	query		[]string	true	"actresss"
 //	@Success		200	{object}	Success
 //	@Failure		400	{object}	Fail
 //	@Failure		404	{object}	NotFound
@@ -545,7 +546,8 @@ func DanmuSaveApi(c *gin.Context) {
 //	@Router			/video/import [get]
 func VideoImportApi(c *gin.Context) {
 	var videoDir = c.Query("dir")
-	if err := service.VideoImport(videoDir); err != nil {
+	var actresss = c.QueryArray("actresss")
+	if err := service.VideoImport(videoDir, actresss); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}

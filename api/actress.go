@@ -12,7 +12,7 @@ import (
 type ActressAdd struct {
 	Name         string `form:"name" json:"name" binding:"required" example:""`
 	Alias        string `form:"alias" json:"alias" example:""`
-	Avatar       string `form:"avatar" json:"avatar" example:""`
+	Avatar       string `form:"avatar" json:"avatar" example:"assets/image/avatar/anonymous.png"`
 	Birth        string `form:"birth" json:"birth" example:""`
 	Measurements string `form:"measurements" json:"measurements" example:""`
 	CupSize      string `form:"cup_size" json:"cup_size" example:""`
@@ -52,8 +52,19 @@ func ActressAddApi(c *gin.Context) {
 }
 
 type ActressEdit struct {
-	Id   uint   `json:"id" binding:"required"`
-	Name string `form:"name" json:"name" binding:"required"`
+	Id           uint   `json:"id" binding:"required" example:""`
+	Name         string `form:"name" json:"name" binding:"required" example:""`
+	Alias        string `form:"alias" json:"alias" example:""`
+	Avatar       string `form:"avatar" json:"avatar" example:""`
+	Birth        string `form:"birth" json:"birth" example:""`
+	Measurements string `form:"measurements" json:"measurements" example:""`
+	CupSize      string `form:"cup_size" json:"cup_size" example:""`
+	DebutDate    string `form:"debut_date" json:"debut_date" example:""`
+	StarSign     string `form:"star_sign" json:"star_sign" example:""`
+	BloodGroup   string `form:"blood_group" json:"blood_group" example:""`
+	Stature      string `form:"stature" json:"stature" example:""`
+	Nationality  string `form:"nationality" json:"nationality" example:""`
+	Introduction string `form:"introduction" json:"introduction" example:""`
 }
 
 // ActressEditApi godoc
@@ -152,6 +163,39 @@ func ActressListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("演员列表", map[string]interface{}{
 		"list": actresss,
 	}))
+}
+
+// ActressInfoApi godoc
+//
+//	@Summary		演员信息
+//	@Description	get string by ID
+//	@Tags			actress
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Actress ID"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/actress/info/{id} [get]
+func ActressInfoApi(c *gin.Context) {
+	id := c.Param("id")
+	aid, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	if aid == 0 {
+		c.JSON(http.StatusBadRequest, util.Fail("id must be greater than 0"))
+		return
+	}
+
+	actress, err := as.Info(uint(aid))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("演员信息", actress))
 }
 
 // OneAddInfoToActress godoc

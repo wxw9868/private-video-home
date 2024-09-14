@@ -66,14 +66,12 @@ func Post(url string, body io.Reader) error {
 	return nil
 }
 
-func VideoImport(videoDir string) error {
+func VideoImport(videoDir string, actresss []string) error {
 	files, err := os.ReadDir(videoDir)
 	if err != nil {
 		return err
 	}
 
-	var actressMap = make(map[string]struct{})
-	actressMap = map[string]struct{}{"矢吹宇蘭": {}, "西岡奈央": {}, "三浦春佳": {}, "高島かな": {}, "愛乃なみ": {}, "沙藤ユリ": {}, "瑠奈": {}, "みなみ愛梨": {}, "彩夏": {}, "浅之美波": {}, "一ノ瀬ルカ": {}, "新山かえで": {}, "滝川ソフィア": {}}
 	var videoSQL = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
 	for _, file := range files {
 		filename := file.Name()
@@ -137,31 +135,43 @@ func VideoImport(videoDir string) error {
 			return err
 		}
 
-		//if len(actressMap) > 0 {
-		//	if err = tx.Exec(actressSQL).Error; err != nil {
-		//		return err
-		//	}
-		//}
-
 		var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
-		for key := range actressMap {
-			//fmt.Printf("key:%s\n", key)
+		for _, v := range actresss {
 			var actress model.Actress
-			if err = tx.Where("actress = ?", key).First(&actress).Error; err != nil {
+			if err = tx.Where("actress = ?", v).First(&actress).Error; err != nil {
 				return err
 			}
-			//fmt.Printf("actress:%+v\n", actress)
 			var videos []model.Video
-			if err = tx.Where("title LIKE ?", "%"+key+"%").Find(&videos).Error; err != nil {
+			if err = tx.Where("title LIKE ?", "%"+v+"%").Find(&videos).Error; err != nil {
 				return err
 			}
-			//fmt.Printf("videos:%+v\n", videos)
 			if len(videos) > 0 {
 				for _, video := range videos {
 					sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
 				}
 			}
 		}
+
+		//if len(actressMap) > 0 {
+		//	if err = tx.Exec(actressSQL).Error; err != nil {
+		//		return err
+		//	}
+		//}
+		// for key := range actressMap {
+		// 	var actress model.Actress
+		// 	if err = tx.Where("actress = ?", key).First(&actress).Error; err != nil {
+		// 		return err
+		// 	}
+		// 	var videos []model.Video
+		// 	if err = tx.Where("title LIKE ?", "%"+key+"%").Find(&videos).Error; err != nil {
+		// 		return err
+		// 	}
+		// 	if len(videos) > 0 {
+		// 		for _, video := range videos {
+		// 			sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
+		// 		}
+		// 	}
+		// }
 
 		sqlBytes := []byte(sql)
 		sql = string(sqlBytes[:len(sqlBytes)-2])

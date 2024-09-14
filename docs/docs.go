@@ -210,6 +210,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/actress/info/{id}": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "actress"
+                ],
+                "summary": "演员信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Actress ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/actress/list": {
             "post": {
                 "description": "演员列表",
@@ -2112,6 +2162,17 @@ const docTemplate = `{
                         "name": "dir",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "actresss",
+                        "name": "actresss",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -2349,7 +2410,7 @@ const docTemplate = `{
                 },
                 "avatar": {
                     "type": "string",
-                    "example": ""
+                    "example": "assets/image/avatar/anonymous.png"
                 },
                 "birth": {
                     "type": "string",
@@ -2394,19 +2455,7 @@ const docTemplate = `{
             }
         },
         "api.ActressEdit": {
-            "type": "object",
-            "required": [
-                "id",
-                "name"
-            ],
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "api.ActressList": {
             "type": "object",
