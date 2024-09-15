@@ -32,6 +32,7 @@ func Router(r *gin.Engine) {
 	actress.POST("/edit", api.ActressEditApi)
 	actress.GET("/delete/:id", api.ActressDeleteApi)
 	actress.POST("/list", api.ActressListApi)
+	actress.GET("/info/:id", api.ActressInfoApi)
 	actress.GET("/oneAddInfo", api.OneAddInfoToActress)
 	actress.GET("/allAddInfo", api.AllAddInfoToActress)
 

@@ -14,7 +14,7 @@ import (
 type ActressService struct{}
 
 func (as *ActressService) Add(name string) error {
-	result := db.Where(model.Actress{Actress: name, Avatar: "assets/image/avatar/anonymous.png"}).FirstOrCreate(&model.Actress{Actress: name})
+	result := db.Where(model.Actress{Actress: name}).FirstOrCreate(&model.Actress{Actress: name, Avatar: "assets/image/avatar/anonymous.png"})
 	if result.RowsAffected == 1 {
 		return nil
 	}
@@ -103,7 +103,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 	if err != nil {
 		return nil, err
 	}
-	//bytes = []byte{}
+	bytes = []byte{}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bytes), result) == 0 && result != "" {
 		return f(ids)
@@ -139,4 +139,12 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		return nil, err
 	}
 	return actresss, nil
+}
+
+func (as *ActressService) Info(id uint) (*model.Actress, error) {
+	var actress model.Actress
+	if err := db.First(&actress, id).Error; err != nil {
+		return nil, err
+	}
+	return &actress, nil
 }

@@ -6,7 +6,7 @@ definitions:
         example: ""
         type: string
       avatar:
-        example: ""
+        example: assets/image/avatar/anonymous.png
         type: string
       birth:
         example: ""
@@ -42,14 +42,6 @@ definitions:
     - name
     type: object
   api.ActressEdit:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    required:
-    - id
-    - name
     type: object
   api.ActressList:
     properties:
@@ -380,7 +372,7 @@ definitions:
     - parent_id
     - video_id
     type: object
-host: 127.0.0.1:8080
+host: 192.168.0.9:8080
 info:
   contact: {}
   description: This is a video server.
@@ -513,6 +505,39 @@ paths:
           schema:
             $ref: '#/definitions/api.ServerError'
       summary: 编辑演员信息
+      tags:
+      - actress
+  /actress/info/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Actress ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 演员信息
       tags:
       - actress
   /actress/list:
@@ -1758,6 +1783,11 @@ paths:
       - description: dir
         in: query
         name: dir
+        required: true
+        type: string
+      - description: actresss
+        in: query
+        name: actresss
         required: true
         type: string
       produces:

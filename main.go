@@ -19,8 +19,8 @@ import (
 // @version 1.0
 // @description This is a video server.
 
-// @host 192.168.0.9:8080
 // @host 127.0.0.1:8080
+// @host 192.168.0.9:8080
 // @BasePath /
 func main() {
 	// gin.SetMode(gin.ReleaseMode)

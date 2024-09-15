@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -17,12 +18,12 @@ import (
 )
 
 type Search struct {
-	Query     string      `json:"query" binding:"required"`
+	Query     string      `json:"query" binding:"required" example:""`
 	Page      int         `json:"page"`
 	Limit     int         `json:"limit"`
-	Order     string      `json:"order"`
+	Order     string      `json:"order" example:""`
 	Highlight interface{} `json:"highlight"`
-	ScoreExp  string      `json:"scoreExp"`
+	ScoreExp  string      `json:"scoreExp" example:""`
 }
 
 // VideoSearchApi godoc
@@ -95,6 +96,8 @@ func VideoListApi(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("bind: %+v\n", bind)
+
 	data, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
@@ -135,15 +138,17 @@ func VideoPlayApi(c *gin.Context) {
 		return
 	}
 
-	actressArr := strings.Split(vi.ActressStr, ",")
 	idsArr := strings.Split(vi.ActressIds, ",")
+	actressArr := strings.Split(vi.ActressNames, ",")
+	avatarArr := strings.Split(vi.ActressAvatars, ",")
 	type actress struct {
 		ID      string `json:"id"`
 		Actress string `json:"actress"`
+		Avatar  string `json:"avatar"`
 	}
 	actressSlice := make([]actress, len(actressArr))
 	for i := 0; i < len(actressArr); i++ {
-		actressSlice[i] = actress{ID: idsArr[i], Actress: actressArr[i]}
+		actressSlice[i] = actress{ID: idsArr[i], Actress: actressArr[i], Avatar: avatarArr[i]}
 	}
 	var collectID uint = 0
 	var isCollect = false
@@ -537,7 +542,8 @@ func DanmuSaveApi(c *gin.Context) {
 //	@Tags			video
 //	@Accept			json
 //	@Produce		json
-//	@Param			dir	query		string	true	"dir"
+//	@Param			dir			query		string		true	"dir"
+//	@Param			actresss	query		string		true	"actresss"
 //	@Success		200	{object}	Success
 //	@Failure		400	{object}	Fail
 //	@Failure		404	{object}	NotFound
@@ -545,7 +551,8 @@ func DanmuSaveApi(c *gin.Context) {
 //	@Router			/video/import [get]
 func VideoImportApi(c *gin.Context) {
 	var videoDir = c.Query("dir")
-	if err := service.VideoImport(videoDir); err != nil {
+	var actresss = c.Query("actresss")
+	if err := service.VideoImport(videoDir, strings.Split(actresss, ",")); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}

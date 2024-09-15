@@ -18,24 +18,25 @@ import (
 type VideoService struct{}
 
 type VideoInfo struct {
-	ID            uint      `json:"id"`
-	Title         string    `json:"title" gorm:"column:title;type:varchar(255);comment:标题"`
-	Actress       string    `json:"actress" gorm:"column:actress;type:varchar(100);comment:演员"`
-	Size          int64     `json:"size" gorm:"column:size;type:bigint;comment:大小"`
-	Duration      float64   `json:"duration" gorm:"column:duration;type:float;default:0;comment:时长"`
-	Poster        string    `json:"poster" gorm:"column:poster;type:varchar(255);comment:封面"`
-	Width         int       `json:"width" gorm:"column:width;type:int;default:0;comment:宽"`
-	Height        int       `json:"height" gorm:"column:height;type:int;default:0;comment:高"`
-	CodecName     string    `json:"codec_name" gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
-	ChannelLayout string    `json:"channel_layout" gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
-	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
-	Collect       uint      `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
-	Browse        uint      `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
-	Zan           uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
-	Cai           uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
-	Watch         uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
-	ActressStr    string    `json:"actress_str" gorm:"column:actress_str;type:varchar(255);comment:演员"`
-	ActressIds    string    `json:"actress_ids" gorm:"column:actress_ids;type:varchar(255);comment:演员"`
+	ID             uint      `json:"id"`
+	Title          string    `json:"title" gorm:"column:title;type:varchar(255);comment:标题"`
+	Actress        string    `json:"actress" gorm:"column:actress;type:varchar(100);comment:演员"`
+	Size           int64     `json:"size" gorm:"column:size;type:bigint;comment:大小"`
+	Duration       float64   `json:"duration" gorm:"column:duration;type:float;default:0;comment:时长"`
+	Poster         string    `json:"poster" gorm:"column:poster;type:varchar(255);comment:封面"`
+	Width          int       `json:"width" gorm:"column:width;type:int;default:0;comment:宽"`
+	Height         int       `json:"height" gorm:"column:height;type:int;default:0;comment:高"`
+	CodecName      string    `json:"codec_name" gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
+	ChannelLayout  string    `json:"channel_layout" gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
+	CreationTime   time.Time `gorm:"column:creation_time;type:date;comment:时间"`
+	Collect        uint      `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
+	Browse         uint      `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
+	Zan            uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
+	Cai            uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
+	Watch          uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
+	ActressIds     string    `json:"actress_ids" gorm:"column:actress_ids;type:varchar(255);comment:演员ID"`
+	ActressNames   string    `json:"actress_names" gorm:"column:actress_names;type:varchar(255);comment:演员名称"`
+	ActressAvatars string    `json:"actress_avatars" gorm:"column:actress_avatars;type:varchar(2550);comment:演员头像"`
 }
 type Video struct {
 	ID       uint   `json:"id"`
@@ -110,6 +111,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bts), result) == 0 && result != "" {
+		fmt.Println("f")
 		return f(ids)
 	}
 
@@ -194,7 +196,7 @@ func (vs *VideoService) First(id string) (model.Video, error) {
 func (vs *VideoService) Info(id uint) (VideoInfo, error) {
 	var videoInfo VideoInfo
 	if err := db.Table("video_Video as v").
-		Select("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch, group_concat(a.id,',') as actress_ids, group_concat(a.actress,',') as actress_str").
+		Select("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch, group_concat(a.id,',') as actress_ids, group_concat(a.actress,',') as actress_names, group_concat(a.avatar,',') as actress_avatars").
 		Joins("left join video_VideoLog as l on l.video_id = v.id").
 		Joins("left join video_VideoActress as va on va.video_id = v.id").
 		Joins("left join video_Actress as a on a.id = va.actress_id").

@@ -35,30 +35,23 @@ var nameMap = map[string]string{
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "082424_100 スッピン熟女 ~ 玉木さんの素顔 ~  #玉木らら",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "042724_100 浮気盛りのあざと可愛い人妻  #玉木らら",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-3447 傷心娘と一発ヤッちゃいました！  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "Heyzo-1999  突然、AVデビュー！？  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "121115_205 放課後中出しクラブ  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "112416_433 グラマラス  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "090618_739 M痴女  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "073015_124 超絶悶絶即ハメ4P連続中出し  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "070315_108 盛り上がっちゃうドスケベ美乳美女  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "040718_668 極射  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "022319_815 高級ソープへようこそ  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "021216_244 超絶ウブな彼女のどスケベ過ぎる妄想  #美星るか",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "080623_01 巨乳ならではの悩みを持つ女子が３Pで親睦を深める会！  #堀越ありす  #花咲胡桃",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "072216_344 お前のカミさんやらせろ  #小嶋ひより",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "Heyzo-1293  勝負に勝ったら私をアゲル！巨乳すぎる女棋士  #小嶋ひより",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (16)": "Heyzo-1235  他人妻味～程良く熟れた食べごろボディ～  #小嶋ひより",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (17)": "022418_650 友達のママと秘密の関係  #小嶋ひより",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
-		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "#", " ", "_茂野美嘉_片平美嘉"}
-	var actressSlice = []string{"矢吹宇蘭", "西岡奈央", "三浦春佳", "高島かな", "愛乃なみ", "沙藤ユリ", "瑠奈", "みなみ愛梨", "彩夏", "浅之美波", "一ノ瀬ルカ", "新山かえで", "滝川ソフィア", "Heyzo-", "Vol.", "File.", "No."}
+		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "#", " "}
+	var actressSlice = []string{"", "", "堀越ありす", "花咲胡桃", "小嶋ひより", "美波ゆさ", "夏目なな", "三花れな", "Heyzo-", "Vol.", "File.", "No."}
 	if err := VideoRename("C:/Users/wxw9868/Downloads/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
@@ -104,7 +97,9 @@ func TestGetWebDocument(t *testing.T) {
 	//url := Join("https://dgaqp.com/search/", "杉浦花音")
 	//url := Join("https://supjav.com/zh/?s=", "杉浦花音")
 	//url := Join("https://ggjav.com/main/search?string", "杉浦花音")
-
+	//Nanako Asahina, まーちゃん, 今井花菜, 小池愛菜, 恋乃みくる, 朝比奈京子, 朝比奈恭子, 浅野麻衣, 野々村あいり, 陽菜子,上岡流留香,冴島みのり,ななこ,せりな・愛・ちひろ,モカ
+	//朝
+	//
 	url := Join("https://nowav.tv/?s=", "亀井ひとみ")
 	doc, err := GetWebDocument("GET", url, nil)
 	if err != nil {
