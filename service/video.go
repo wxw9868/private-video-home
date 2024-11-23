@@ -111,7 +111,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bts), result) == 0 && result != "" {
-		fmt.Println("f")
+		//fmt.Println("f")
 		return f(ids)
 	}
 

@@ -28,10 +28,7 @@ import (
 var db = sqlite.DB()
 var rdb = redis.Rdb()
 var ctx = context.Background()
-var avatarDir = "assets/image/avatar"
 var posterDir = "assets/image/poster"
-var gofoundCount = 0
-var mutex = new(sync.Mutex)
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -108,41 +105,51 @@ func VideoImport(videoDir string, actresss []string) error {
 	videoSqlBytes := []byte(videoSQL)
 	videoSQL = string(videoSqlBytes[:len(videoSqlBytes)-2])
 
-	//var actressSQL = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-	//if len(actressMap) > 0 {
-	//	for actress := range actressMap {
-	//		var data model.Actress
-	//		if errors.Is(db.Model(&model.Actress{}).Where("actress = ?", actress).First(&data).Error, gorm.ErrRecordNotFound) {
-	//			avatarPath := avatarDir + "/" + actress + ".jpg"
-	//			avatarPath := avatarDir + "/" + actress + ".png"
-	//			_, err = os.Stat(avatarPath)
-	//			if os.IsNotExist(err) {
-	//				nameSlice := []rune(actress)
-	//				if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
-	//					return err
-	//				}
-	//			}
-	//			actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
-	//		}
-	//	}
-	//
-	//	actressSqlBytes := []byte(actressSQL)
-	//	actressSQL = string(actressSqlBytes[:len(actressSqlBytes)-2])
-	//}
+	var actressSQL = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	var actressStatus = false
+	if len(actresss) > 0 {
+		for _, v := range actresss {
+			var data model.Actress
+			if errors.Is(db.Model(&model.Actress{}).Where("actress = ?", v).First(&data).Error, gorm.ErrRecordNotFound) {
+				//avatarPath := avatarDir + "/" + actress + ".jpg"
+				//avatarPath := avatarDir + "/" + actress + ".png"
+				//_, err = os.Stat(avatarPath)
+				//if os.IsNotExist(err) {
+				//	nameSlice := []rune(actress)
+				//	if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
+				//		return err
+				//	}
+				//}
+				actressStatus = true
+				avatarPath := "assets/image/avatar/defaultgirl.png"
+				actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", v, avatarPath, time.Now().Local(), time.Now().Local())
+			}
+		}
+
+		actressSqlBytes := []byte(actressSQL)
+		actressSQL = string(actressSqlBytes[:len(actressSqlBytes)-2])
+	}
 
 	err = db.Transaction(func(tx *gorm.DB) error {
 		if err = tx.Exec(videoSQL).Error; err != nil {
 			return err
+		}
+		if actressStatus {
+			if err = tx.Exec(actressSQL).Error; err != nil {
+				return err
+			}
 		}
 
 		var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
 		for _, v := range actresss {
 			var actress model.Actress
 			if err = tx.Where("actress = ?", v).First(&actress).Error; err != nil {
+				fmt.Printf("err1: %s\n", err)
 				return err
 			}
 			var videos []model.Video
 			if err = tx.Where("title LIKE ?", "%"+v+"%").Find(&videos).Error; err != nil {
+				fmt.Printf("err2: %s\n", err)
 				return err
 			}
 			if len(videos) > 0 {
@@ -152,30 +159,60 @@ func VideoImport(videoDir string, actresss []string) error {
 			}
 		}
 
-		//if len(actressMap) > 0 {
-		//	if err = tx.Exec(actressSQL).Error; err != nil {
-		//		return err
-		//	}
-		//}
-		// for key := range actressMap {
-		// 	var actress model.Actress
-		// 	if err = tx.Where("actress = ?", key).First(&actress).Error; err != nil {
-		// 		return err
-		// 	}
-		// 	var videos []model.Video
-		// 	if err = tx.Where("title LIKE ?", "%"+key+"%").Find(&videos).Error; err != nil {
-		// 		return err
-		// 	}
-		// 	if len(videos) > 0 {
-		// 		for _, video := range videos {
-		// 			sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
-		// 		}
-		// 	}
-		// }
-
 		sqlBytes := []byte(sql)
 		sql = string(sqlBytes[:len(sqlBytes)-2])
 		if err = tx.Exec(sql).Error; err != nil {
+			fmt.Printf("err3: %s\n", err)
+			return err
+		}
+		return nil
+	})
+	return err
+}
+
+func RepairVideoImport(actresss []string) error {
+	var actressSQL = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	if len(actresss) > 0 {
+		for _, v := range actresss {
+			var data model.Actress
+			if errors.Is(db.Model(&model.Actress{}).Where("actress = ?", v).First(&data).Error, gorm.ErrRecordNotFound) {
+				avatarPath := "assets/image/avatar/defaultgirl.png"
+				actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", v, avatarPath, time.Now().Local(), time.Now().Local())
+			}
+		}
+
+		actressSqlBytes := []byte(actressSQL)
+		actressSQL = string(actressSqlBytes[:len(actressSqlBytes)-2])
+	}
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Exec(actressSQL).Error; err != nil {
+			return err
+		}
+
+		var sql = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
+		for _, v := range actresss {
+			var actress model.Actress
+			if err := tx.Where("actress = ?", v).First(&actress).Error; err != nil {
+				fmt.Printf("actress %s err1: %s\n", v, err)
+				return err
+			}
+			var videos []model.Video
+			if err := tx.Where("title LIKE ?", "%"+v+"%").Find(&videos).Error; err != nil {
+				fmt.Printf("err2: %s\n", err)
+				return err
+			}
+			if len(videos) > 0 {
+				for _, video := range videos {
+					sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
+				}
+			}
+		}
+
+		sqlBytes := []byte(sql)
+		sql = string(sqlBytes[:len(sqlBytes)-2])
+		if err := tx.Exec(sql).Error; err != nil {
+			fmt.Printf("err3: %s\n", err)
 			return err
 		}
 		return nil
@@ -199,9 +236,9 @@ func ResetTable(table string) error {
 	return err
 }
 
-func OneAddlInfoToActress(actress string) error {
-	url := utils.Join("https://xslist.org/search?query=", actress, "&lg=zh")
-	doc, err := utils.GetWebDocument("GET", url, nil)
+func OneAddInfoToActress(actress string) error {
+	url1 := utils.Join("https://xslist.org/search?query=", actress, "&lg=zh")
+	doc, err := utils.GetWebDocument("GET", url1, nil)
 	if err != nil {
 		return err
 	}
@@ -273,7 +310,7 @@ func OneAddlInfoToActress(actress string) error {
 	return nil
 }
 
-func AllAddlInfoToActress() error {
+func AllAddInfoToActress() error {
 	var actresss []model.Actress
 	if err := db.Where("birth is null or birth = ''").Find(&actresss).Error; err != nil {
 		return err
@@ -288,7 +325,7 @@ func AllAddlInfoToActress() error {
 		go func(ch chan string, wg *sync.WaitGroup, i int) {
 			defer wg.Done()
 			for actress := range ch {
-				err := OneAddlInfoToActress(actress)
+				err := OneAddInfoToActress(actress)
 				fmt.Printf("index: %d, actress: %s, error: %s\n", i, actress, err)
 			}
 		}(ch, wg, i)
@@ -350,8 +387,8 @@ func AllVideoPic(page, pageSize int, site string) error {
 
 	wg.Wait()
 
-	//datas := make(map[string]map[string]string)
-	//err := utils.WriteMapToFile("E:/video/assets/data/data.json", datas)
+	//data := make(map[string]map[string]string)
+	//err := utils.WriteMapToFile("E:/video/assets/data/data.json", data)
 	return nil
 }
 
@@ -600,9 +637,9 @@ func njavTv(actress string, videos []model.Video) error {
 		elems[0] = "https://njav.tv/zh/search?keyword="
 		elems[1] = actress
 		elems[2] = "&page=" + strconv.Itoa(i)
-		url := strings.Join(elems, "")
+		url1 := strings.Join(elems, "")
 
-		doc, err := utils.GetWebDocument("GET", url, nil)
+		doc, err := utils.GetWebDocument("GET", url1, nil)
 		if err != nil {
 			time.Sleep(time.Second * 2)
 			goto start
@@ -638,7 +675,7 @@ func njavTv(actress string, videos []model.Video) error {
 		time.Sleep(time.Microsecond * 300)
 	}
 	//fmt.Printf("%+v\n", data)
-	//datas[actress.Actress] = data
+	//data[actress.Actress] = data
 
 	for i := 0; i < len(videos); i++ {
 		video := videos[i]

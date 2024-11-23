@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"log"
 	"path"
 	"path/filepath"
@@ -21,10 +22,9 @@ func init() {
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(path.Join(AbsPath("")))
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+		var configFileNotFoundError viper.ConfigFileNotFoundError
+		if errors.As(err, &configFileNotFoundError) {
 			log.Panic("Fatal error config file: ", err)
-		} else {
-			log.Println("Config file error:", err)
 		}
 	}
 	unmarshal()

@@ -44,7 +44,7 @@ type TagEdit struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
-// TagAddApi godoc
+// TagEditApi godoc
 //
 //	@Summary		Tag Edit
 //	@Description	Tag Edit

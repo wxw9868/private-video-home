@@ -135,7 +135,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		})
 		return err
 	}
-	if err = rdb.Watch(ctx, txf, keys...); err == redis.TxFailedErr {
+	if err = rdb.Watch(ctx, txf, keys...); errors.Is(err, redis.TxFailedErr) {
 		return nil, err
 	}
 	return actresss, nil

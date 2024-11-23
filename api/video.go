@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -96,7 +95,7 @@ func VideoListApi(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("bind: %+v\n", bind)
+	//fmt.Printf("bind: %+v\n", bind)
 
 	data, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
@@ -553,6 +552,29 @@ func VideoImportApi(c *gin.Context) {
 	var videoDir = c.Query("dir")
 	var actresss = c.Query("actresss")
 	if err := service.VideoImport(videoDir, strings.Split(actresss, ",")); err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+}
+
+// RepairVideoImportApi godoc
+//
+//	@Summary		修复视频导入
+//	@Description	get string by ID
+//	@Tags			video
+//	@Accept			json
+//	@Produce		json
+//	@Param			actresss	query		string		true	"actresss"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/video/repairImport [get]
+func RepairVideoImportApi(c *gin.Context) {
+	var actresss = c.Query("actresss")
+	if err := service.RepairVideoImport(strings.Split(actresss, ",")); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}

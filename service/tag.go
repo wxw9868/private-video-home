@@ -20,7 +20,7 @@ func (ts *TagService) Add(name string) error {
 func (ts *TagService) Edit(id uint, name string) error {
 	var tag model.Tag
 	tag.ID = id
-	if err := db.Model(&tag).Updates(model.Tag{Name: "hello"}).Error; err != nil {
+	if err := db.Model(&tag).Updates(model.Tag{Name: name}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -40,7 +40,7 @@ type Tags struct {
 	Count  uint32 `gorm:"column:count" json:"count"`
 }
 
-func (as *TagService) List(page, pageSize int, action, sort string) ([]Actress, error) {
+func (ts *TagService) List(page, pageSize int, action, sort string) ([]Actress, error) {
 	var actresss []Actress
 	sql := "SELECT t.id, t.name, t.avatar, count(vt.video_id) as count FROM video_Tag t left join video_VideoTag vt on t.id = vt.tag_id group by 1,2,3"
 	if action != "" && sort != "" {

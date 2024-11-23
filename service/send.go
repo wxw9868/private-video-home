@@ -141,7 +141,7 @@ func (ss *SendService) SendMail(emails []string, content, code string) error {
 	return nil
 }
 
-// SendMail 发送一个唯一的、有时效性的密码重置链接
+// SendUrl 发送一个唯一的、有时效性的密码重置链接
 func (ss *SendService) SendUrl(emails []string, code string) error {
 	conf := `{"username":"986845663@qq.com","password":"emtpyouqirhebfij","host":"smtp.qq.com","port":587}`
 	m := mail.NewEmail(conf)

@@ -213,7 +213,7 @@ func ActressInfoApi(c *gin.Context) {
 //	@Router			/actress/oneAddInfo [get]
 func OneAddInfoToActress(c *gin.Context) {
 	var actress = c.Query("actress")
-	if err := service.OneAddlInfoToActress(actress); err != nil {
+	if err := service.OneAddInfoToActress(actress); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -233,7 +233,7 @@ func OneAddInfoToActress(c *gin.Context) {
 //	@Failure		500		{object}	ServerError
 //	@Router			/actress/allAddInfo [get]
 func AllAddInfoToActress(c *gin.Context) {
-	if err := service.AllAddlInfoToActress(); err != nil {
+	if err := service.AllAddInfoToActress(); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}

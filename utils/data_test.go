@@ -20,7 +20,26 @@ import (
 	"golang.org/x/image/draw"
 )
 
-var nameMap = map[string]string{
+func TestNowTime(t *testing.T) {
+	NowTime()
+}
+
+func TestGetLocalIP(t *testing.T) {
+	ip, err := GetLocalIP()
+	t.Logf("ip: %s err: %s\n", ip, err)
+}
+
+func TestAppendContentToFile(t *testing.T) {
+	err := AppendContentToFile("test.log", []byte("test"))
+	t.Log(err)
+}
+
+func TestWriteFile(t *testing.T) {
+	err := WriteFile("test.log", "test")
+	t.Log(err)
+}
+
+var _ = map[string]string{
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
@@ -31,6 +50,11 @@ var nameMap = map[string]string{
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
 }
 
 func TestVideoRename(t *testing.T) {
@@ -45,16 +69,24 @@ func TestVideoRename(t *testing.T) {
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
 	}
+
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "#", " "}
-	var actressSlice = []string{"", "", "堀越ありす", "花咲胡桃", "小嶋ひより", "美波ゆさ", "夏目なな", "三花れな", "Heyzo-", "Vol.", "File.", "No."}
-	if err := VideoRename("C:/Users/wxw9868/Downloads/ta", nameMap, nameSlice, actressSlice); err != nil {
+	var actressSlice = []string{"篠原なぎさ", "Heyzo-", "Vol.", "File.", "No."}
+	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
+
+	//篠原なぎさ,朝比奈菜々子
 	fmt.Println("SUCCESS")
 }
 
@@ -98,10 +130,10 @@ func TestGetWebDocument(t *testing.T) {
 	//url := Join("https://supjav.com/zh/?s=", "杉浦花音")
 	//url := Join("https://ggjav.com/main/search?string", "杉浦花音")
 	//Nanako Asahina, まーちゃん, 今井花菜, 小池愛菜, 恋乃みくる, 朝比奈京子, 朝比奈恭子, 浅野麻衣, 野々村あいり, 陽菜子,上岡流留香,冴島みのり,ななこ,せりな・愛・ちひろ,モカ
-	//朝
+
 	//
-	url := Join("https://nowav.tv/?s=", "亀井ひとみ")
-	doc, err := GetWebDocument("GET", url, nil)
+	var url1 = Join("https://nowav.tv/?s=", "亀井ひとみ")
+	doc, err := GetWebDocument("GET", url1, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -174,8 +206,8 @@ func TestAv6kCom(t *testing.T) {
 }
 
 func TestAv1688Cc(t *testing.T) {
-	url := Join("https://av1688.cc/?s=", "小泉真希")
-	doc, err := GetWebDocument("GET", url, nil)
+	url1 := Join("https://av1688.cc/?s=", "小泉真希")
+	doc, err := GetWebDocument("GET", url1, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -191,8 +223,8 @@ func TestAv1688Cc(t *testing.T) {
 
 	for i := 1; i <= page; i++ {
 		if i > 1 {
-			url = Join("https://av1688.cc/page/", strconv.Itoa(i), "?s=", "小泉真希")
-			doc, err = GetWebDocument("GET", url, nil)
+			url1 = Join("https://av1688.cc/page/", strconv.Itoa(i), "?s=", "小泉真希")
+			doc, err = GetWebDocument("GET", url1, nil)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -245,8 +277,9 @@ func TestAv1688Cc(t *testing.T) {
 }
 
 func TestXslist(t *testing.T) {
-	url := Join("https://xslist.org/search?query=", "小野寺梨紗", "&lg=zh")
-	doc, err := GetWebDocument("GET", url, nil)
+	//瀬戸レイカ,目々澤めぐ,さおり,優希まこと,和泉紫乃,柏木もも,大久保ゆう,広瀬里香,上野真奈美,小鳥遊つばさ,川越ゆい,早坂咲重,海野真凜,翼みさき,桜田桃羽,榊原ひとみ,須間あいり,高田伸子,三花れな,美波ゆさ,小嶋ひより,花咲胡桃
+	url1 := Join("https://xslist.org/search?query=", "優希まこと", "&lg=zh")
+	doc, err := GetWebDocument("GET", url1, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -342,19 +375,19 @@ func TestShuiyin(t *testing.T) {
 	removeImg(savePath + inputPath)
 }
 
-func removeWatermark1(img image.Image, watermark image.Image) image.Image {
-	b := watermark.Bounds()
-	// 确保水印在图片内
-	if !b.In(img.Bounds()) {
-		return img
-	}
-	// 创建水印遮罩
-	mask := image.NewNRGBA(b)
-	draw.Draw(mask, mask.Bounds(), image.NewUniform(color.Transparent), image.ZP, draw.Src)
-	// 使用遮罩去除水印
-	watermark = imaging.Paste(img, mask, image.Point{X: 667, Y: 418})
-	return watermark
-}
+//func removeWatermark1(img image.Image, watermark image.Image) image.Image {
+//	b := watermark.Bounds()
+//	// 确保水印在图片内
+//	if !b.In(img.Bounds()) {
+//		return img
+//	}
+//	// 创建水印遮罩
+//	mask := image.NewNRGBA(b)
+//	draw.Draw(mask, mask.Bounds(), image.NewUniform(color.Transparent), image.ZP, draw.Src)
+//	// 使用遮罩去除水印
+//	watermark = imaging.Paste(img, mask, image.Point{X: 667, Y: 418})
+//	return watermark
+//}
 
 func removeImg(inputPath string) {
 	// 打开原始图片
@@ -380,7 +413,7 @@ func removeImg(inputPath string) {
 
 	// 在画布上去除某一个对象（这里以一个矩形框为例）
 	rect := image.Rect(667, 418, 800, 450)
-	draw.Draw(canvas, rect, &image.Uniform{color.Transparent}, image.Point{X: 0, Y: 0}, draw.Src)
+	draw.Draw(canvas, rect, &image.Uniform{C: color.Transparent}, image.Point{X: 0, Y: 0}, draw.Src)
 
 	// 存储处理后的图片
 	outFile, err := os.Create("removed.png")

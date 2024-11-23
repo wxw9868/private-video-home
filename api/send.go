@@ -81,15 +81,15 @@ func SendUrlApi(c *gin.Context) {
 		return
 	}
 
-	reset_password_token := uuid.New().String()
-	if err := ss.SendUrl([]string{email}, reset_password_token); err != nil {
+	resetPasswordToken := uuid.New().String()
+	if err := ss.SendUrl([]string{email}, resetPasswordToken); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail("邮件发送失败！"))
 		return
 	}
 
 	session := sessions.Default(c)
-	session.Set("reset_password_token_"+email, reset_password_token)
-	session.Set(reset_password_token, email)
+	session.Set("reset_password_token_"+email, resetPasswordToken)
+	session.Set(resetPasswordToken, email)
 	if err := session.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail("发送失败！"))
 		return

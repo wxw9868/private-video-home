@@ -43,6 +43,7 @@ func Router(r *gin.Engine) {
 	video.GET("/browse/:video_id", api.VideoBrowseApi)
 	video.POST("/collect", api.VideoCollectApi)
 	video.GET("/import", api.VideoImportApi)
+	video.GET("/repairImport", api.RepairVideoImportApi)
 	video.GET("/writeGoFound", api.VideoWriteGoFound)
 	video.GET("/getVideoPic", api.GetVideoPic)
 	video.GET("/oneVideoPic", api.OneVideoPic)

@@ -1,8 +1,8 @@
 #系统配置
 system:
   #host: 127.0.0.1
-  host: 192.168.0.9
-  port: 8080
+  host: '0.0.0.0'
+  port: 9090
 
 #数据库配置
 database:

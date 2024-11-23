@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,17 +29,17 @@ import (
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
-func Format() {
-	// "2006-01-02 15:04:05"
+func NowTime() string {
+	return time.Now().Format("2006-01-02 15:04:05")
 }
 
 // GenerateAvatar 生成头衔
 func GenerateAvatar(name, path string) error {
-	palette := palette.Plan9
-	var bgColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
-	var frontColor color.Color = color.RGBA{0x00, 0x00, 0x00, 0xff}
-	bgColor = palette[randint(len(palette))]
-	frontColor = palette[randint(len(palette))]
+	p := palette.Plan9
+	var bgColor color.Color = color.RGBA{R: 0x00, G: 0x00, B: 0x00, A: 0xff}
+	var frontColor color.Color = color.RGBA{R: 0x00, G: 0x00, B: 0x00, A: 0xff}
+	bgColor = p[randInt(len(p))]
+	frontColor = p[randInt(len(p))]
 	ab := avatarbuilder.NewAvatarBuilder("E:/video/assets/ttf/SourceHanSansSC-Medium.ttf", &calc.SourceHansSansSCMedium{})
 	ab.SetBackgroundColor(bgColor)
 	ab.SetFrontgroundColor(frontColor)
@@ -55,7 +56,7 @@ var (
 	rngMu = new(sync.Mutex)
 )
 
-func randint(n int) int {
+func randInt(n int) int {
 	rngMu.Lock()
 	defer rngMu.Unlock()
 	return rng.Intn(n)
@@ -264,41 +265,41 @@ func Join(s ...string) string {
 	return b.String()
 }
 
-// 读取文件数据到 map
+// ReadFileToMap 读取文件数据到 map
 func ReadFileToMap(name string, v any) error {
-	bytes, err := os.ReadFile(name)
+	data, err := os.ReadFile(name)
 	if err != nil {
 		return err
 	}
-	if err = json.Unmarshal(bytes, &v); err != nil {
+	if err = json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	return nil
 }
 
-// 将内容追加到文件
+// AppendContentToFile 将内容追加到文件
 func AppendContentToFile(filename string, b []byte) error {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		return err
 	}
-	if _, err := f.Write(b); err != nil {
-		f.Close()
+	if _, err = f.Write(b); err != nil {
+		_ = f.Close()
 		return err
 	}
-	if err := f.Close(); err != nil {
+	if err = f.Close(); err != nil {
 		return err
 	}
 	return nil
 }
 
-// 将数据写入文件
+// WriteFile 将数据写入文件
 func WriteFile(name string, v any) error {
-	bytes, err := json.Marshal(v)
+	data, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(name, bytes, 0666)
+	err = os.WriteFile(name, data, 0666)
 	if err != nil {
 		return err
 	}
@@ -330,8 +331,16 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 			filename = strings.Replace(filename, filename[6:7], "_", -1)
 		}
 		if len(filename) > 0 && !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
-			filename = strings.Replace(filename, filename[0:10], filename[0:10]+"_", -1)
+			newStr := ""
+			if !strings.Contains(filename, "Heyzo-") {
+				re := regexp.MustCompile(`\d+_\d+`)
+				newStr = re.FindString(filename[0:10])
+			} else {
+				newStr = filename[0:10]
+			}
+			filename = strings.Replace(filename, filename[0:10], newStr+"_", -1)
 		}
+
 		for _, v := range actressSlice {
 			if strings.Contains(filename, v) {
 				if v == "Vol." {
@@ -349,8 +358,7 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 				}
 			}
 		}
-
-		//filename = strings.Replace(filename, "友_利七葉", "友利七葉", -1)
+		filename = strings.Replace(filename, " ", "", -1)
 
 		oldPath := videoDir + "/" + oldFilename
 		newPath := videoDir + "/" + filename
@@ -364,7 +372,10 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 
 func GeneteSQL() string {
 	var data = make(map[string]struct{})
-	ReadFileToMap("data.json", &data)
+	err := ReadFileToMap("data.json", &data)
+	if err != nil {
+		return ""
+	}
 
 	var avatarDir = "./assets/image/avatar"
 	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
