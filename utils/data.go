@@ -210,7 +210,8 @@ func ReadFrameAsJpeg(inFileName, outFileName, ss string) error {
 	return nil
 }
 
-func VideoInfo(inFileName string) (map[string]interface{}, error) {
+// GetVideoInfo 获取视频信息
+func GetVideoInfo(inFileName string) (map[string]interface{}, error) {
 	s, err := ffmpeg.Probe(inFileName)
 	if err != nil {
 		return nil, err

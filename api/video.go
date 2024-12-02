@@ -95,7 +95,7 @@ func VideoListApi(c *gin.Context) {
 		return
 	}
 
-	data, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
+	data, err := videoService.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -129,7 +129,7 @@ func VideoPlayApi(c *gin.Context) {
 		return
 	}
 
-	vi, err := vs.Info(cast.ToUint(aid))
+	vi, err := videoService.Info(cast.ToUint(aid))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -149,7 +149,7 @@ func VideoPlayApi(c *gin.Context) {
 	}
 	var collectID uint = 0
 	var isCollect = false
-	usc, err := us.CollectLog(GetUserID(c), vi.ID)
+	usc, err := userService.CollectLog(GetUserID(c), vi.ID)
 	if err == nil {
 		collectID = usc.ID
 		isCollect = true
@@ -160,7 +160,7 @@ func VideoPlayApi(c *gin.Context) {
 		"videoID":       vi.ID,
 		"videoTitle":    vi.Title,
 		"videoActress":  actressSlice,
-		"videoUrl":      videoDir + "/" + vi.Title + ".mp4",
+		"videoUrl":      "assets/video/" + vi.Title + ".mp4",
 		"Size":          size / 1024 / 1024,
 		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
 		"ModTime":       vi.CreationTime.Format("2006-01-02 15:04:05"),
@@ -208,7 +208,7 @@ func VideoCollectApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	if err := vs.Collect(bind.VideoID, bind.Collect, userID); err != nil {
+	if err := videoService.Collect(bind.VideoID, bind.Collect, userID); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -246,7 +246,7 @@ func VideoBrowseApi(c *gin.Context) {
 	}
 
 	userID := GetUserID(c)
-	if err := vs.Browse(uint(aid), userID); err != nil {
+	if err := videoService.Browse(uint(aid), userID); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -282,7 +282,7 @@ func VideoCommentApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	commentID, err := vs.Comment(bind.VideoID, bind.Content, userID)
+	commentID, err := videoService.Comment(bind.VideoID, bind.Content, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -329,7 +329,7 @@ func VideoReplyApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	commentID, err := vs.Reply(bind.VideoID, bind.ParentID, bind.Content, userID)
+	commentID, err := videoService.Reply(bind.VideoID, bind.ParentID, bind.Content, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -375,7 +375,7 @@ func VideoCommentListApi(c *gin.Context) {
 	}
 
 	userID := GetUserID(c)
-	list, err := vs.CommentList(cast.ToUint(aid), userID)
+	list, err := videoService.CommentList(cast.ToUint(aid), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -410,7 +410,7 @@ func CommentZanApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	if err := vs.Zan(bind.CommentID, userID, bind.Zan); err != nil {
+	if err := videoService.Zan(bind.CommentID, userID, bind.Zan); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -449,7 +449,7 @@ func CommentCaiApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	if err := vs.Cai(bind.CommentID, userID, bind.Cai); err != nil {
+	if err := videoService.Cai(bind.CommentID, userID, bind.Cai); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -486,7 +486,7 @@ func DanmuListApi(c *gin.Context) {
 		return
 	}
 
-	list, err := vs.DanmuList(cast.ToUint(aid))
+	list, err := videoService.DanmuList(cast.ToUint(aid))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -525,7 +525,7 @@ func DanmuSaveApi(c *gin.Context) {
 	}
 
 	userID := GetUserID(c)
-	if err := vs.DanmuSave(bind.VideoID, userID, bind.Text, bind.Time, bind.Mode, bind.Color, bind.Border, bind.Style); err != nil {
+	if err := videoService.DanmuSave(bind.VideoID, userID, bind.Text, bind.Time, bind.Mode, bind.Color, bind.Border, bind.Style); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -549,7 +549,7 @@ func DanmuSaveApi(c *gin.Context) {
 func VideoImportApi(c *gin.Context) {
 	var videoDir = c.Query("dir")
 	var actresss = c.Query("actresss")
-	if err := service.VideoImport(videoDir, strings.Split(actresss, ",")); err != nil {
+	if err := service.VideoImport(videoDir, actresss); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}

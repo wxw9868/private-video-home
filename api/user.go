@@ -44,7 +44,7 @@ func RegisterApi(c *gin.Context) {
 		return
 	}
 
-	err := us.Register(bind.Username, bind.Email, bind.Password)
+	err := userService.Register(bind.Username, bind.Email, bind.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -77,7 +77,7 @@ func LoginApi(c *gin.Context) {
 		return
 	}
 
-	user, err := us.Login(bind.Email, bind.Password)
+	user, err := userService.Login(bind.Email, bind.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -156,7 +156,7 @@ func SessionApi(c *gin.Context) {
 //	@Failure		500		{object}	ServerError
 //	@Router			/user/info [get]
 func UserInfoApi(c *gin.Context) {
-	user, err := us.Info(GetUserID(c))
+	user, err := userService.Info(GetUserID(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -191,7 +191,7 @@ func ChangePasswordApi(c *gin.Context) {
 	}
 
 	userID := GetUserID(c)
-	if err := us.ChangePassword(userID, bind.OldPassword, bind.NewPassword); err != nil {
+	if err := userService.ChangePassword(userID, bind.OldPassword, bind.NewPassword); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -231,7 +231,7 @@ func ForgotPasswordApi(c *gin.Context) {
 		return
 	}
 
-	if err := us.ForgotPassword(email, bind.Password); err != nil {
+	if err := userService.ForgotPassword(email, bind.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -277,7 +277,7 @@ func UserSaveApi(c *gin.Context) {
 		Address:     bind.Address,
 		Note:        bind.Note,
 	}
-	err := us.Updates(GetUserID(c), user)
+	err := userService.Updates(GetUserID(c), user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -314,7 +314,7 @@ func UserUploadAvatarApi(c *gin.Context) {
 	}
 
 	session := sessions.Default(c)
-	if err := us.Update(session.Get("user_id").(uint), "avatar", avatarDir); err != nil {
+	if err := userService.Update(session.Get("user_id").(uint), "avatar", avatarDir); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -339,7 +339,7 @@ func UserUploadAvatarApi(c *gin.Context) {
 //	@Failure		500		{object}	ServerError
 //	@Router			/user/collect [get]
 func UserCollectApi(c *gin.Context) {
-	data, err := us.CollectList(GetUserID(c))
+	data, err := userService.CollectList(GetUserID(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -359,7 +359,7 @@ func UserCollectApi(c *gin.Context) {
 //	@Failure		500		{object}	ServerError
 //	@Router			/user/browse [get]
 func UserBrowseApi(c *gin.Context) {
-	data, err := us.BrowseList(GetUserID(c))
+	data, err := userService.BrowseList(GetUserID(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

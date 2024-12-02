@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"math"
 	"net/url"
 	"os"
@@ -18,17 +17,17 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	sqlite "github.com/wxw9868/video/initialize/db"
-	gofoundClient "github.com/wxw9868/video/initialize/gofound"
 	redis "github.com/wxw9868/video/initialize/rdb"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
 )
 
-var db = sqlite.DB()
-var rdb = redis.Rdb()
-var ctx = context.Background()
-var posterDir = "assets/image/poster"
+var (
+	db  = sqlite.DB()
+	rdb = redis.Rdb()
+	ctx = context.Background()
+)
 
 func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -48,23 +47,8 @@ func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-func Post(url string, body io.Reader) error {
-	resp, err := gofoundClient.GofoundClient().POST(url, "application/json", body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	_, err = io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func VideoImport(videoDir string, actresss []string) error {
-	files, err := os.ReadDir(videoDir)
+func VideoImport(dir string, actresss ...string) error {
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
@@ -72,26 +56,13 @@ func VideoImport(videoDir string, actresss []string) error {
 	var videoSQL = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
 	for _, file := range files {
 		filename := file.Name()
-		ext := filepath.Ext(filename)
-		if ext == ".mp4" {
+		if filepath.Ext(filename) == ".mp4" {
 			title := strings.Split(filename, ".")[0]
 			array := strings.Split(title, "_")
 			actress := array[len(array)-1]
-
-			//mutex.Lock()
-			//if _, ok := actressMap[actress]; !ok {
-			//	actressMap[actress] = struct{}{}
-			//}
-			//mutex.Unlock()
-
-			filePath := videoDir + "/" + filename
-			posterPath := posterDir + "/" + title + ".jpg"
-			videoInfo, err := utils.VideoInfo(filePath)
-			if err != nil {
-				return err
-			}
-
-			nowTime := time.Now().Local()
+			posterPath := "assets/image/poster/" + title + ".jpg"
+			videoPath := dir + "/" + filename
+			videoInfo, _ := utils.GetVideoInfo(videoPath)
 			size := videoInfo["size"].(int64)
 			duration := videoInfo["duration"].(float64)
 			width := videoInfo["width"].(int64)
@@ -99,7 +70,7 @@ func VideoImport(videoDir string, actresss []string) error {
 			codec := fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string))
 			channelLayout := videoInfo["channel_layout"].(string)
 			creationTime := videoInfo["creation_time"].(time.Time)
-			videoSQL += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ", title, actress, size, duration, posterPath, width, height, codec, channelLayout, creationTime, nowTime, nowTime)
+			videoSQL += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ", title, actress, size, duration, posterPath, width, height, codec, channelLayout, creationTime, time.Now().Local(), time.Now().Local())
 		}
 	}
 	videoSqlBytes := []byte(videoSQL)
@@ -125,7 +96,6 @@ func VideoImport(videoDir string, actresss []string) error {
 				actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", v, avatarPath, time.Now().Local(), time.Now().Local())
 			}
 		}
-
 		actressSqlBytes := []byte(actressSQL)
 		actressSQL = string(actressSqlBytes[:len(actressSqlBytes)-2])
 	}
@@ -144,12 +114,10 @@ func VideoImport(videoDir string, actresss []string) error {
 		for _, v := range actresss {
 			var actress model.Actress
 			if err = tx.Where("actress = ?", v).First(&actress).Error; err != nil {
-				fmt.Printf("err1: %s\n", err)
 				return err
 			}
 			var videos []model.Video
 			if err = tx.Where("title LIKE ?", "%"+v+"%").Find(&videos).Error; err != nil {
-				fmt.Printf("err2: %s\n", err)
 				return err
 			}
 			if len(videos) > 0 {
@@ -166,11 +134,17 @@ func VideoImport(videoDir string, actresss []string) error {
 		sqlBytes := []byte(sql)
 		sql = string(sqlBytes[:len(sqlBytes)-2])
 		if err = tx.Exec(sql).Error; err != nil {
-			fmt.Printf("err3: %s\n", err)
 			return err
 		}
 		return nil
 	})
+
+	if err == nil {
+		if err = VideoWriteGoFound(); err != nil {
+			return err
+		}
+	}
+
 	return err
 }
 

@@ -42,7 +42,7 @@ func SearchIndex(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/index", "?", "database=video"), bytes.NewReader(b))
+	Post(c, utils.Join("/index", "?", "database=", "private-video"), bytes.NewReader(b))
 }
 
 // SearchIndexBatch godoc
@@ -70,7 +70,7 @@ func SearchIndexBatch(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/index/batch", "?", "database=video"), bytes.NewReader(b))
+	Post(c, utils.Join("/index/batch", "?", "database=", "private-video"), bytes.NewReader(b))
 }
 
 type IndexRemove struct {
@@ -102,7 +102,7 @@ func SearchIndexRemove(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/index/remove", "?", "database=video"), bytes.NewReader(b))
+	Post(c, utils.Join("/index/remove", "?", "database=", "private-video"), bytes.NewReader(b))
 }
 
 type Query struct {
@@ -139,7 +139,7 @@ func SearchQuery(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	Post(c, utils.Join("/query", "?", "database=video"), bytes.NewReader(b))
+	Post(c, utils.Join("/query", "?", "database=", "private-video"), bytes.NewReader(b))
 }
 
 // SearchStatus godoc

@@ -32,7 +32,7 @@ func TagAddApi(c *gin.Context) {
 		return
 	}
 
-	if err := ts.Add(bind.Name); err != nil {
+	if err := tagService.Add(bind.Name); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -64,7 +64,7 @@ func TagEditApi(c *gin.Context) {
 		return
 	}
 
-	if err := ts.Edit(bind.Id, bind.Name); err != nil {
+	if err := tagService.Edit(bind.Id, bind.Name); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -96,7 +96,7 @@ func TagDeleteApi(c *gin.Context) {
 		return
 	}
 
-	if err := ts.Delete(uint(aid)); err != nil {
+	if err := tagService.Delete(uint(aid)); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -130,7 +130,7 @@ func TagListApi(c *gin.Context) {
 		return
 	}
 
-	tags, err := ts.List(bind.Page, bind.Size, bind.Action, bind.Sort)
+	tags, err := tagService.List(bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
