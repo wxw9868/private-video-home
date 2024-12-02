@@ -94,3 +94,5 @@ DELETE FROM video_UserCommentLog;
 -- 重置主键
 UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'video_UserCommentLog';
 ```
+
+[gofound](http://192.168.0.9:5678/admin)
