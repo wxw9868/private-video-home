@@ -64,7 +64,7 @@ func ImportTradingRecordsApi(c *gin.Context) {
 		return
 	}
 
-	if err := stock.ImportTradingRecords(dst); err != nil {
+	if err := stockService.ImportTradingRecords(dst); err != nil {
 		isFileExist := func(name string) bool {
 			if _, err := os.Lstat(name); err != nil {
 				return os.IsExist(err)
@@ -105,13 +105,13 @@ func LiquidationApi(c *gin.Context) {
 	}
 	pageSize, _ := strconv.Atoi(c.Query("page_size"))
 
-	list, err := stock.Liquidation(page, pageSize)
+	list, err := stockService.Liquidation(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
-	paginator, err := stock.Pagination(&model.Liquidation{}, page, pageSize)
+	paginator, err := stockService.Pagination(&model.Liquidation{}, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -157,13 +157,13 @@ func TradingRecordsApi(c *gin.Context) {
 	}
 	pageSize, _ := strconv.Atoi(c.Query("page_size"))
 
-	list, err := stock.TradingRecords(page, pageSize)
+	list, err := stockService.TradingRecords(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
-	paginator, err := stock.Pagination(&model.TradingRecords{}, page, pageSize)
+	paginator, err := stockService.Pagination(&model.TradingRecords{}, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

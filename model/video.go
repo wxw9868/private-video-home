@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 视频基本信息
 type Video struct {
 	gorm.Model
 	CateID        uint      `gorm:"column:cate_id;type:uint;not null;default:0;comment:视频分类ID"`
@@ -22,6 +23,7 @@ type Video struct {
 	Introduction  string    `gorm:"column:introduction;type:text;comment:简介"`
 }
 
+// 视频剧集信息
 type VideoEpisodes struct {
 	gorm.Model
 	VideoId       uint      `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
@@ -35,6 +37,7 @@ type VideoEpisodes struct {
 	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
 }
 
+// 视频日志信息
 type VideoLog struct {
 	gorm.Model
 	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`

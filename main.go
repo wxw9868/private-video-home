@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-colorable"
@@ -11,17 +13,14 @@ import (
 	"github.com/wxw9868/video/docs"
 	"github.com/wxw9868/video/middleware"
 	"github.com/wxw9868/video/router"
-	"github.com/wxw9868/video/service"
-	"net/http"
-	"strings"
 )
 
 // @title Video API
 // @version 1.0
 // @description This is a video server.
 
-// @host 127.0.0.1:6000
-// @host 192.168.0.9:6000
+// @host 127.0.0.1:8080
+// @host 192.168.0.9:8080
 // @BasePath /
 func main() {
 	// gin.SetMode(gin.ReleaseMode)
@@ -57,9 +56,9 @@ func main() {
 		ginSwagger.DefaultModelsExpandDepth(-1)),
 	)
 
-	actresss := "篠原なぎさ,朝比奈菜々子"
-	err := service.VideoImport("D:/ta", strings.Split(actresss, ","))
-	fmt.Println(err)
+	// actresss := "篠原なぎさ,朝比奈菜々子"
+	// err := service.VideoImport("D:/ta", actresss)
+	// fmt.Println(err)
 	//actresss := "目々澤めぐ,瀬戸レイカ"
 	//service.RepairVideoImport(strings.Split(actresss, ","))
 

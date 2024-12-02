@@ -7,46 +7,21 @@ import (
 	"github.com/wxw9868/video/service"
 )
 
-type video struct {
-	ID            int     `json:"id"`
-	Title         string  `json:"title"`
-	Actress       string  `json:"actress"`
-	Size          float64 `json:"size"`
-	Duration      string  `json:"duration"`
-	ModTime       string  `json:"mod_time"`
-	Poster        string  `json:"poster"`
-	Width         int     `json:"width"`
-	Height        int     `json:"height"`
-	CodecName     string  `json:"codec_name"`
-	ChannelLayout string  `json:"channel_layout"`
-}
-
-type actress struct {
-	ID      int    `json:"id"`
-	Actress string `json:"actress"`
-	Avatar  string `json:"avatar"`
-}
-
-const (
-	videoDir  = "./assets/video"
-	posterDir = "./assets/image/poster"
-	avatarDir = "./assets/image/avatar"
-)
-
 var (
-	ss    = new(service.SendService)
-	us    = new(service.UserService)
-	vs    = new(service.VideoService)
-	as    = new(service.ActressService)
-	ts    = new(service.TagService)
-	stock = new(service.StockService)
+	sendService    = new(service.SendService)
+	userService    = new(service.UserService)
+	videoService   = new(service.VideoService)
+	actressService = new(service.ActressService)
+	tagService     = new(service.TagService)
+	stockService   = new(service.StockService)
 
-	list            []string
-	videos          []video
-	actresss        []actress
-	actressList     = make(map[string][]int)
-	actressListSort []string
-	client          = gofoundClient.GofoundClient()
+	client = gofoundClient.GofoundClient()
+
+	// list            []string
+	// videos          []video
+	// actresss        []actress
+	// actressList     = make(map[string][]int)
+	// actressListSort []string
 )
 
 func GetUserID(c *gin.Context) uint {

@@ -79,21 +79,6 @@ func Router(r *gin.Engine) {
 	stock.GET("/liquidation", api.LiquidationApi)
 	stock.GET("/tradingRecords", api.TradingRecordsApi)
 
-	auth.GET("/resetTable", api.ResetTableApi)
-
-	// // Setup Security Headers
-	// r.Use(func(c *gin.Context) {
-	// 	if c.Request.Host != addr {
-	// 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
-	// 		return
-	// 	}
-	// 	c.Header("X-Frame-Options", "DENY")
-	// 	c.Header("Content-Security-Policy", "default-src 'self'; connect-src *; font-src *; script-src-elem * 'unsafe-inline'; img-src * data:; style-src * 'unsafe-inline';")
-	// 	c.Header("X-XSS-Protection", "1; mode=block")
-	// 	c.Header("Strict-Transport-Security", "max-age=pu31536000; includeSubDomains; preload")
-	// 	c.Header("Referrer-Policy", "strict-origin")
-	// 	c.Header("X-Content-Type-Options", "nosniff")
-	// 	c.Header("Permissions-Policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()")
-	// 	c.Next()
-	// })
+	system := auth.Group("/system")
+	system.GET("/resetTable", api.ResetTableApi)
 }

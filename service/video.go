@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
@@ -45,16 +44,6 @@ type Video struct {
 	Duration string `json:"duration"`
 	Browse   uint   `json:"browse"`
 	Watch    uint   `json:"watch"`
-	//Actress       string  `json:"actress"`
-	//Size          float64 `json:"size"`
-	//ModTime       string  `json:"mod_time"`
-	//Width         int     `json:"width"`
-	//Height        int     `json:"height"`
-	//CodecName     string  `json:"codec_name"`
-	//ChannelLayout string  `json:"channel_layout"`
-	//Collect       uint    `json:"collect"`
-	//Zan           uint    `json:"zan"`
-	//Cai           uint    `json:"cai"`
 }
 
 func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, error) {
@@ -111,7 +100,6 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bts), result) == 0 && result != "" {
-		//fmt.Println("f")
 		return f(ids)
 	}
 

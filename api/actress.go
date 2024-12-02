@@ -44,7 +44,7 @@ func ActressAddApi(c *gin.Context) {
 		return
 	}
 
-	if err := as.Add(bind.Name); err != nil {
+	if err := actressService.Add(bind.Name); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -87,7 +87,7 @@ func ActressEditApi(c *gin.Context) {
 		return
 	}
 
-	if err := as.Edit(bind.Id, bind.Name); err != nil {
+	if err := actressService.Edit(bind.Id, bind.Name); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -119,7 +119,7 @@ func ActressDeleteApi(c *gin.Context) {
 		return
 	}
 
-	if err := as.Delete(uint(aid)); err != nil {
+	if err := actressService.Delete(uint(aid)); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -154,7 +154,7 @@ func ActressListApi(c *gin.Context) {
 		return
 	}
 
-	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
+	actresss, err := actressService.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -190,7 +190,7 @@ func ActressInfoApi(c *gin.Context) {
 		return
 	}
 
-	actress, err := as.Info(uint(aid))
+	actress, err := actressService.Info(uint(aid))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

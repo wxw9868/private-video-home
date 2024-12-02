@@ -39,7 +39,7 @@ func SendMailApi(c *gin.Context) {
 		return
 	}
 	code := util.GenerateCode(6)
-	if err := ss.SendMail([]string{email}, "注册账号", code); err != nil {
+	if err := sendService.SendMail([]string{email}, "注册账号", code); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail("邮件发送失败！"))
 		return
 	}
@@ -82,7 +82,7 @@ func SendUrlApi(c *gin.Context) {
 	}
 
 	resetPasswordToken := uuid.New().String()
-	if err := ss.SendUrl([]string{email}, resetPasswordToken); err != nil {
+	if err := sendService.SendUrl([]string{email}, resetPasswordToken); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail("邮件发送失败！"))
 		return
 	}
