@@ -11,9 +11,7 @@ import (
 	"github.com/wxw9868/video/docs"
 	"github.com/wxw9868/video/middleware"
 	"github.com/wxw9868/video/router"
-	"github.com/wxw9868/video/service"
 	"net/http"
-	"strings"
 )
 
 // @title Video API
@@ -57,9 +55,9 @@ func main() {
 		ginSwagger.DefaultModelsExpandDepth(-1)),
 	)
 
-	actresss := "篠原なぎさ,朝比奈菜々子"
-	err := service.VideoImport("D:/ta", strings.Split(actresss, ","))
-	fmt.Println(err)
+	//actresss := []string{"五月あおい"}
+	//err := service.VideoImport("D:/ta", actresss)
+	//fmt.Println(err)
 	//actresss := "目々澤めぐ,瀬戸レイカ"
 	//service.RepairVideoImport(strings.Split(actresss, ","))
 

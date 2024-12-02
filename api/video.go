@@ -95,8 +95,6 @@ func VideoListApi(c *gin.Context) {
 		return
 	}
 
-	//fmt.Printf("bind: %+v\n", bind)
-
 	data, err := vs.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))

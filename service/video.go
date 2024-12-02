@@ -57,32 +57,41 @@ type Video struct {
 	//Cai           uint    `json:"cai"`
 }
 
-func (as *VideoService) Find(actressID int, page, pageSize int, action, sort string) ([]Video, error) {
+func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort string) (data map[string]interface{}, err error) {
 	var ids []uint
 
-	f := func(ids []uint) ([]Video, error) {
+	f := func(ids []uint, count int) (map[string]interface{}, error) {
 		videos := make([]Video, len(ids))
 		for i, id := range ids {
-			data := rdb.HGetAll(ctx, utils.Join("video_video_", strconv.Itoa(int(id)))).Val()
-			browse, _ := strconv.Atoi(data["browse"])
-			watch, _ := strconv.Atoi(data["watch"])
+			result := rdb.HGetAll(ctx, utils.Join("video_video_", strconv.Itoa(int(id)))).Val()
+			browse, _ := strconv.Atoi(result["browse"])
+			watch, _ := strconv.Atoi(result["watch"])
 			videos[i] = Video{
 				ID:       id,
-				Title:    data["title"],
-				Poster:   data["poster"],
-				Duration: data["duration"],
+				Title:    result["title"],
+				Poster:   result["poster"],
+				Duration: result["duration"],
 				Browse:   uint(browse),
 				Watch:    uint(watch),
 			}
 		}
-		return videos, nil
+		data = map[string]interface{}{
+			"list":  videos,
+			"count": count,
+		}
+		return data, nil
 	}
 
 	if actressID != 0 {
-		if err := db.Model(&model.VideoActress{}).Where("actress_id = ?", actressID).Pluck("video_id", &ids).Error; err != nil {
+		var vadb = db.Model(&model.VideoActress{}).Where("actress_id = ?", actressID)
+		var count int64
+		if err = vadb.Count(&count).Error; err != nil {
 			return nil, err
 		}
-		return f(ids)
+		if err = vadb.Scopes(Paginate(page, pageSize, int(count))).Pluck("video_id", &ids).Error; err != nil {
+			return nil, err
+		}
+		return f(ids, int(count))
 	}
 
 	var key string
@@ -102,23 +111,23 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	if action != "" && sort != "" {
 		vdb = vdb.Order(utils.Join(action, " ", sort))
 	}
-	if err := db.Table("(?)", vdb).Pluck("id", &ids).Error; err != nil {
+	var count int64
+	if err = vdb.Count(&count).Error; err != nil {
 		return nil, err
 	}
+	if err = db.Table("(?)", vdb).Scopes(Paginate(page, pageSize, int(count))).Pluck("id", &ids).Error; err != nil {
+		return nil, err
+	}
+
 	bts, err := json.Marshal(ids)
 	if err != nil {
 		return nil, err
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bts), result) == 0 && result != "" {
-		//fmt.Println("f")
-		return f(ids)
+		return f(ids, int(count))
 	}
 
-	var count int64
-	if err = vdb.Count(&count).Error; err != nil {
-		return nil, err
-	}
 	rows, err := vdb.Scopes(Paginate(page, pageSize, int(count))).Rows()
 	if err != nil {
 		return nil, err
@@ -165,7 +174,7 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		})
 		return err
 	}
-	if err = rdb.Watch(ctx, txf, keys...); err == redis.TxFailedErr {
+	if err = rdb.Watch(ctx, txf, keys...); errors.Is(err, redis.TxFailedErr) {
 		return nil, err
 	}
 
@@ -182,7 +191,11 @@ func (as *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	//	},
 	//}
 
-	return videos, nil
+	data = map[string]interface{}{
+		"list":  videos,
+		"count": count,
+	}
+	return data, nil
 }
 
 func (vs *VideoService) First(id string) (model.Video, error) {

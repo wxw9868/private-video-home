@@ -324,6 +324,7 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 		if ok {
 			filename = strings.Replace(filename, oldName, newName, -1)
 		}
+
 		for _, v := range nameSlice {
 			filename = strings.Replace(filename, v, "", -1)
 		}
@@ -358,7 +359,6 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 				}
 			}
 		}
-		filename = strings.Replace(filename, " ", "", -1)
 
 		oldPath := videoDir + "/" + oldFilename
 		newPath := videoDir + "/" + filename

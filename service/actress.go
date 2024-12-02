@@ -44,30 +44,39 @@ type Actress struct {
 	Count   uint32 `gorm:"column:count" json:"count"`
 }
 
-func (as *ActressService) List(page, pageSize int, action, sort, actress string) ([]Actress, error) {
+func (as *ActressService) List(page, pageSize int, action, sort, actress string) (data map[string]interface{}, err error) {
 	var ids []uint
 
-	f := func(ids []uint) ([]Actress, error) {
+	f := func(ids []uint, totalCount int) (map[string]interface{}, error) {
 		actresss := make([]Actress, len(ids))
 		for i, id := range ids {
-			data := rdb.HGetAll(ctx, utils.Join("video_actress_", strconv.Itoa(int(id)))).Val()
-			count, err := strconv.Atoi(data["count"])
+			result := rdb.HGetAll(ctx, utils.Join("video_actress_", strconv.Itoa(int(id)))).Val()
+			count, err := strconv.Atoi(result["count"])
 			if err != nil {
 				return nil, err
 			}
 			actresss[i] = Actress{
 				ID:      id,
-				Actress: data["actress"],
-				Avatar:  data["avatar"],
+				Actress: result["actress"],
+				Avatar:  result["avatar"],
 				Count:   uint32(count),
 			}
 		}
-		return actresss, nil
+		data = map[string]interface{}{
+			"list":  actresss,
+			"count": totalCount,
+		}
+		return data, nil
 	}
 
 	if actress != "" {
-		db.Model(&model.Actress{}).Where("actress = ?", actress).Pluck("id", &ids)
-		return f(ids)
+		var adb = db.Model(&model.Actress{}).Where("actress like ?", "%"+actress+"%")
+		var count int64
+		if err = adb.Count(&count).Error; err != nil {
+			return nil, err
+		}
+		adb.Pluck("id", &ids)
+		return f(ids, int(count))
 	}
 
 	var key string
@@ -76,27 +85,35 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		sql += utils.Join(" order by ", action, " ", sort)
 	}
 
+	var totalCount int64
+	var adb = db.Model(&model.Actress{})
 	switch action {
 	case "a.CreatedAt":
-		if err := db.Model(&model.Actress{}).Order(utils.Join("CreatedAt", " ", sort)).Pluck("id", &ids).Error; err != nil {
-			return nil, err
-		}
+		adb = adb.Order(utils.Join("CreatedAt", " ", sort))
 		key = "video_actress_createdAt"
 	case "a.actress":
-		if err := db.Model(&model.Actress{}).Order(utils.Join("actress", " ", sort)).Pluck("id", &ids).Error; err != nil {
-			return nil, err
-		}
+		adb = adb.Order(utils.Join("actress", " ", sort))
 		key = "video_actress_actress"
 	case "count":
-		if err := db.Table("(?)", db.Raw(sql)).Pluck("id", &ids).Error; err != nil {
+		adb = db.Table("(?)", db.Raw(sql))
+		if err = adb.Count(&totalCount).Error; err != nil {
+			return nil, err
+		}
+		if err = adb.Pluck("id", &ids).Error; err != nil {
 			return nil, err
 		}
 		key = "video_actress_count"
 	default:
-		if err := db.Model(&model.Actress{}).Pluck("id", &ids).Error; err != nil {
+		key = "video_actress"
+	}
+
+	if action != "count" {
+		if err = adb.Count(&totalCount).Error; err != nil {
 			return nil, err
 		}
-		key = "video_actress"
+		if err = adb.Pluck("id", &ids).Error; err != nil {
+			return nil, err
+		}
 	}
 
 	bytes, err := json.Marshal(ids)
@@ -106,7 +123,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 	bytes = []byte{}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bytes), result) == 0 && result != "" {
-		return f(ids)
+		return f(ids, int(totalCount))
 	}
 
 	var count int64
@@ -138,7 +155,13 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 	if err = rdb.Watch(ctx, txf, keys...); errors.Is(err, redis.TxFailedErr) {
 		return nil, err
 	}
-	return actresss, nil
+
+	data = map[string]interface{}{
+		"list":  actresss,
+		"count": count,
+	}
+
+	return data, nil
 }
 
 func (as *ActressService) Info(id uint) (*model.Actress, error) {

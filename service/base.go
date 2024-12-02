@@ -40,7 +40,7 @@ func Paginate(page, pageSize, count int) func(db *gorm.DB) *gorm.DB {
 		case pageSize > count:
 			pageSize = count
 		case pageSize <= 0:
-			pageSize = 1000
+			pageSize = 20
 		}
 
 		offset := (page - 1) * pageSize
@@ -154,7 +154,11 @@ func VideoImport(videoDir string, actresss []string) error {
 			}
 			if len(videos) > 0 {
 				for _, video := range videos {
-					sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
+					var videoActress model.VideoActress
+					err = tx.Model(&model.VideoActress{}).Where("video_id = ? and actress_id = ?", video.ID, actress.ID).First(&videoActress).Error
+					if errors.Is(err, gorm.ErrRecordNotFound) {
+						sql += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
+					}
 				}
 			}
 		}

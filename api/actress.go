@@ -154,15 +154,13 @@ func ActressListApi(c *gin.Context) {
 		return
 	}
 
-	actresss, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
+	data, err := as.List(bind.Page, bind.Size, bind.Action, bind.Sort, bind.Actress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, util.Success("演员列表", map[string]interface{}{
-		"list": actresss,
-	}))
+	c.JSON(http.StatusOK, util.Success("演员列表", data))
 }
 
 // ActressInfoApi godoc

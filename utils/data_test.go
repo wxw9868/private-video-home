@@ -39,6 +39,25 @@ func TestWriteFile(t *testing.T) {
 	t.Log(err)
 }
 
+func TestGetMP4Duration(t *testing.T) {
+	videoDir := "./assets/video"
+	filePath := videoDir + "/" + "test.mp4"
+	fil, _ := os.Open(filePath)
+	duration, _ := GetMP4Duration(fil)
+	t.Log(duration)
+}
+
+func TestReadFrameAsJpeg(t *testing.T) {
+	videoDir := "./assets/video"
+	posterDir := "./assets/image/poster"
+	filePath := videoDir + "/" + "test.mp4"
+	posterPath := posterDir + "/test.jpg"
+	_, err := os.Stat(posterPath)
+	if os.IsNotExist(err) {
+		_ = ReadFrameAsJpeg(filePath, posterPath, "00:02:30")
+	}
+}
+
 var _ = map[string]string{
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
@@ -57,17 +76,21 @@ var _ = map[string]string{
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
 }
 
+var _ = map[string]string{
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新": "",
+}
+
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "Heyzo-3407 パパ活女子大生とまったりじっくりSEX  #冨樫美緒",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "102524-001 トリック・オア・セックス ～おっぱい丸出しの魔女が現れた～  #冨樫美緒",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "083124_01 デビュー前のAV面接でしれっと即ハメされた素人娘  #冨樫美緒",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "012724_001 星野みきを撮りハメ中出し！  #星野みき",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "Heyzo-3226 結局、感じてしまう人妻  #星野みき",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "030824-001 上品な一流セラピストのマンズリ施術と無防備状態の下半身   #星野みき",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "Heyzo-2681  女教師の背徳～ノーパンで生徒を誘惑する淫乱先生～  #星野みき",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "072123-001 セフレ関係から愛人沼へ ～結婚しても身体の関係を続けています～   #星野みき",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "050423_843 熟女のチングリ返しアナルペロペロ  #星野みき",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
@@ -75,18 +98,18 @@ func TestVideoRename(t *testing.T) {
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
 	}
-
+	// #上原聡美  #さとみ
+	// #大月のの  #中津井加代
+	// 朝桐光    南野あかり
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "#", " "}
-	var actressSlice = []string{"篠原なぎさ", "Heyzo-", "Vol.", "File.", "No."}
+	var actressSlice = []string{"加藤あかり", "翼裕香", "冨樫美緒", "Heyzo-", "Vol.", "File.", "No."}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
-
-	//篠原なぎさ,朝比奈菜々子
 	fmt.Println("SUCCESS")
 }
 
