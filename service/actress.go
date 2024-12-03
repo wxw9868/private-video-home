@@ -21,7 +21,7 @@ func (as *ActressService) Add(name string) error {
 	return errors.New("演员存在")
 }
 
-func (as *ActressService) Edit(id uint, name string) error {
+func (as *ActressService) Updates(id uint, name string) error {
 	var actress model.Actress
 	actress.ID = id
 	if err := db.Model(&actress).Updates(model.Actress{Actress: name}).Error; err != nil {

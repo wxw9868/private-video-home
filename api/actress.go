@@ -6,10 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
-	"github.com/wxw9868/video/service"
 )
 
-type ActressAdd struct {
+type AddActress struct {
 	Name         string `form:"name" json:"name" binding:"required" example:""`
 	Alias        string `form:"alias" json:"alias" example:""`
 	Avatar       string `form:"avatar" json:"avatar" example:"assets/image/avatar/anonymous.png"`
@@ -24,21 +23,20 @@ type ActressAdd struct {
 	Introduction string `form:"introduction" json:"introduction" example:""`
 }
 
-// ActressAddApi godoc
+// AddActressApi godoc
 //
 //	@Summary		添加演员
-//	@Description	添加演员
 //	@Tags			actress
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		ActressAdd	true	"Actress Add"
+//	@Param			data	body		AddActress	true	"演员信息"
 //	@Success		200		{object}	Success
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/actress/add [post]
-func ActressAddApi(c *gin.Context) {
-	var bind ActressAdd
+//	@Router			/actress/addActress [post]
+func AddActressApi(c *gin.Context) {
+	var bind AddActress
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
@@ -51,7 +49,7 @@ func ActressAddApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("添加成功", nil))
 }
 
-type ActressEdit struct {
+type UpdateActress struct {
 	Id           uint   `json:"id" binding:"required" example:""`
 	Name         string `form:"name" json:"name" binding:"required" example:""`
 	Alias        string `form:"alias" json:"alias" example:""`
@@ -67,47 +65,45 @@ type ActressEdit struct {
 	Introduction string `form:"introduction" json:"introduction" example:""`
 }
 
-// ActressEditApi godoc
+// UpdateActressApi godoc
 //
-//	@Summary		编辑演员信息
-//	@Description	编辑演员信息
+//	@Summary		更新演员信息
 //	@Tags			actress
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		ActressEdit	true	"Actress Edit"
+//	@Param			data	body		UpdateActress	true	"演员信息"
 //	@Success		200		{object}	Success
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/actress/edit [post]
-func ActressEditApi(c *gin.Context) {
-	var bind ActressEdit
+//	@Router			/actress/updateActress [post]
+func UpdateActressApi(c *gin.Context) {
+	var bind UpdateActress
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
 
-	if err := actressService.Edit(bind.Id, bind.Name); err != nil {
+	if err := actressService.Updates(bind.Id, bind.Name); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("修改成功", nil))
 }
 
-// ActressDeleteApi godoc
+// DeleteActressApi godoc
 //
 //	@Summary		删除演员
-//	@Description	get string by ID
 //	@Tags			actress
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"Actress ID"
+//	@Param			id	path		int	true	"演员ID"
 //	@Success		200	{object}	Success
 //	@Failure		400	{object}	Fail
 //	@Failure		404	{object}	NotFound
 //	@Failure		500	{object}	ServerError
-//	@Router			/actress/delete/{id} [get]
-func ActressDeleteApi(c *gin.Context) {
+//	@Router			/actress/deleteActress/{id} [get]
+func DeleteActressApi(c *gin.Context) {
 	id := c.Param("id")
 	aid, err := strconv.Atoi(id)
 	if err != nil {
@@ -134,10 +130,9 @@ type ActressList struct {
 	Actress string `uri:"actress"  form:"actress"  json:"actress" example:""`
 }
 
-// ActressListApi godoc
+// GetActressListApi godoc
 //
 //	@Summary		演员列表
-//	@Description	演员列表
 //	@Tags			actress
 //	@Accept			json
 //	@Produce		json
@@ -146,8 +141,8 @@ type ActressList struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/actress/list [post]
-func ActressListApi(c *gin.Context) {
+//	@Router			/actress/getActressList [post]
+func GetActressListApi(c *gin.Context) {
 	var bind ActressList
 	if err := c.BindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -163,20 +158,19 @@ func ActressListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("演员列表", data))
 }
 
-// ActressInfoApi godoc
+// GetActressInfoApi godoc
 //
-//	@Summary		演员信息
-//	@Description	get string by ID
+//	@Summary		获取演员信息
 //	@Tags			actress
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"Actress ID"
+//	@Param			id	path		int	true	"演员ID"
 //	@Success		200	{object}	Success
 //	@Failure		400	{object}	Fail
 //	@Failure		404	{object}	NotFound
 //	@Failure		500	{object}	ServerError
-//	@Router			/actress/info/{id} [get]
-func ActressInfoApi(c *gin.Context) {
+//	@Router			/actress/getActressInfo/{id} [get]
+func GetActressInfoApi(c *gin.Context) {
 	id := c.Param("id")
 	aid, err := strconv.Atoi(id)
 	if err != nil {
@@ -194,46 +188,4 @@ func ActressInfoApi(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("演员信息", actress))
-}
-
-// OneAddInfoToActress godoc
-//
-//	@Summary		获取演员信息
-//	@Description	获取演员信息
-//	@Tags			actress
-//	@Accept			json
-//	@Produce		json
-//	@Param			actress	query		string	true	"actress"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/actress/oneAddInfo [get]
-func OneAddInfoToActress(c *gin.Context) {
-	var actress = c.Query("actress")
-	if err := service.OneAddInfoToActress(actress); err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
-}
-
-// AllAddInfoToActress godoc
-//
-//	@Summary		获取所有演员信息
-//	@Description	获取所有演员信息
-//	@Tags			actress
-//	@Accept			json
-//	@Produce		json
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/actress/allAddInfo [get]
-func AllAddInfoToActress(c *gin.Context) {
-	if err := service.AllAddInfoToActress(); err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
 }

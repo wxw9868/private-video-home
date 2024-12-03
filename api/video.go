@@ -75,7 +75,7 @@ type Video struct {
 	Sort      string `uri:"sort" form:"sort" json:"sort" example:"desc"`
 }
 
-// VideoListApi godoc
+// GetVideoListApi godoc
 //
 //	@Summary		视频列表
 //	@Description	视频列表
@@ -87,8 +87,8 @@ type Video struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/video/list [post]
-func VideoListApi(c *gin.Context) {
+//	@Router			/video/getVideoList [post]
+func GetVideoListApi(c *gin.Context) {
 	var bind Video
 	if err := c.BindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -116,7 +116,7 @@ func VideoListApi(c *gin.Context) {
 //	@Failure		400	{object}	Fail
 //	@Failure		404	{object}	NotFound
 //	@Failure		500	{object}	ServerError
-//	@Router			/video/play/{id} [get]
+//	@Router			/video/videoPlay/{id} [get]
 func VideoPlayApi(c *gin.Context) {
 	id := c.Param("id")
 	aid, err := strconv.Atoi(id)
@@ -186,7 +186,7 @@ type VideoCollect struct {
 	Collect int  `form:"collect" json:"collect" binding:"required,oneof=1 -1"`
 }
 
-// VideoCollectApi godoc
+// CollectVideoApi godoc
 //
 //	@Summary		视频收藏
 //	@Description	视频收藏
@@ -198,8 +198,8 @@ type VideoCollect struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/video/collect [post]
-func VideoCollectApi(c *gin.Context) {
+//	@Router			/video/collectVideo [post]
+func CollectVideoApi(c *gin.Context) {
 	var bind VideoCollect
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -220,21 +220,21 @@ func VideoCollectApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
-// VideoBrowseApi godoc
+// BrowseVideoApi godoc
 //
 //	@Summary		视频浏览记录
 //	@Description	get string by ID
 //	@Tags			video
 //	@Accept			json
 //	@Produce		json
-//	@Param			video_id		path		int	true	"Video ID"
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/video/browse/{video_id} [get]
-func VideoBrowseApi(c *gin.Context) {
-	id := c.Param("video_id")
+//	@Param			video_id	path		int	true	"Video ID"
+//	@Success		200			{object}	Success
+//	@Failure		400			{object}	Fail
+//	@Failure		404			{object}	NotFound
+//	@Failure		500			{object}	ServerError
+//	@Router			/video/browseVideo/{id} [get]
+func BrowseVideoApi(c *gin.Context) {
+	id := c.Param("id")
 	aid, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -272,7 +272,7 @@ type VideoComment struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/comment/comment [post]
+//	@Router			/comment/videoComment [post]
 func VideoCommentApi(c *gin.Context) {
 	var bind VideoComment
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -307,7 +307,7 @@ type VideoReply struct {
 	Content  string `form:"content" json:"content" binding:"required"`
 }
 
-// VideoReplyApi godoc
+// ReplyVideoCommentApi godoc
 //
 //	@Summary		视频评论回复
 //	@Description	视频评论回复
@@ -319,8 +319,8 @@ type VideoReply struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/comment/reply [post]
-func VideoReplyApi(c *gin.Context) {
+//	@Router			/comment/replyVideoComment [post]
+func ReplyVideoCommentApi(c *gin.Context) {
 	var bind VideoReply
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -349,21 +349,21 @@ func VideoReplyApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("回复成功", data))
 }
 
-// VideoCommentListApi godoc
+// GetVideoCommentListApi godoc
 //
 //	@Summary		视频弹幕列表
 //	@Description	视频弹幕列表
 //	@Tags			comment
 //	@Accept			json
 //	@Produce		json
-//	@Param			video_id		path		int	true	"Video ID"
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/comment/list/{video_id} [get]
-func VideoCommentListApi(c *gin.Context) {
-	id := c.Param("video_id")
+//	@Param			video_id	path		int	true	"Video ID"
+//	@Success		200			{object}	Success
+//	@Failure		400			{object}	Fail
+//	@Failure		404			{object}	NotFound
+//	@Failure		500			{object}	ServerError
+//	@Router			/comment/getVideoCommentList/{id} [get]
+func GetVideoCommentListApi(c *gin.Context) {
+	id := c.Param("id")
 	aid, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -388,7 +388,7 @@ type CommentZan struct {
 	Zan       int  `form:"zan" json:"zan" binding:"required,oneof=1 -1"`
 }
 
-// CommentZanApi godoc
+// LikeVideoCommentApi godoc
 //
 //	@Summary		视频评论回复赞
 //	@Description	视频评论回复赞
@@ -400,8 +400,8 @@ type CommentZan struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/comment/zan [post]
-func CommentZanApi(c *gin.Context) {
+//	@Router			/comment/likeVideoComment [post]
+func LikeVideoCommentApi(c *gin.Context) {
 	var bind CommentZan
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -427,7 +427,7 @@ type CommentCai struct {
 	Cai       int  `form:"cai" json:"cai" binding:"required,oneof=1 -1"`
 }
 
-// CommentCaiApi godoc
+// DislikeVideoCommentApi godoc
 //
 //	@Summary		视频评论回复踩
 //	@Description	视频评论回复踩
@@ -439,8 +439,8 @@ type CommentCai struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/comment/cai [post]
-func CommentCaiApi(c *gin.Context) {
+//	@Router			/comment/dislikeVideoComment [post]
+func DislikeVideoCommentApi(c *gin.Context) {
 	var bind CommentCai
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -461,21 +461,21 @@ func CommentCaiApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
-// DanmuListApi godoc
+// GetVideoBarrageListApi godoc
 //
-//	@Summary		视频弹幕列表
-//	@Description	get string by ID
+//	@Summary		获取视频弹幕列表
+//	@Description	获取视频弹幕列表
 //	@Tags			danmu
 //	@Accept			json
 //	@Produce		json
-//	@Param			video_id		path		int	true	"Video ID"
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/danmu/list/{video_id} [get]
-func DanmuListApi(c *gin.Context) {
-	id := c.Param("video_id")
+//	@Param			video_id	path		int	true	"Video ID"
+//	@Success		200			{object}	Success
+//	@Failure		400			{object}	Fail
+//	@Failure		404			{object}	NotFound
+//	@Failure		500			{object}	ServerError
+//	@Router			/danmu/getVideoBarrageList/{id} [get]
+func GetVideoBarrageListApi(c *gin.Context) {
+	id := c.Param("id")
 	aid, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -504,7 +504,7 @@ type DanmuSave struct {
 	Style   string  `form:"style" json:"style"`
 }
 
-// DanmuSaveApi godoc
+// SendVideoBarrageApi godoc
 //
 //	@Summary		视频弹幕
 //	@Description	视频弹幕
@@ -516,8 +516,8 @@ type DanmuSave struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/danmu/save [post]
-func DanmuSaveApi(c *gin.Context) {
+//	@Router			/danmu/sendVideoBarrage [post]
+func SendVideoBarrageApi(c *gin.Context) {
 	var bind DanmuSave
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -532,47 +532,30 @@ func DanmuSaveApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("发送成功", nil))
 }
 
-// VideoImportApi godoc
-//
-//	@Summary		视频导入
-//	@Description	get string by ID
-//	@Tags			video
-//	@Accept			json
-//	@Produce		json
-//	@Param			dir			query		string		true	"dir"
-//	@Param			actresss	query		string		true	"actresss"
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/video/import [get]
-func VideoImportApi(c *gin.Context) {
-	var videoDir = c.Query("dir")
-	var actresss = c.Query("actresss")
-	if err := service.VideoImport(videoDir, actresss); err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
+type ImportVideoData struct {
+	Dir       string `json:"dir" binding:"required"`
+	Actresses string `json:"actresses" binding:"required"`
 }
 
-// RepairVideoImportApi godoc
+// ImportVideoDataApi godoc
 //
-//	@Summary		修复视频导入
-//	@Description	get string by ID
+//	@Summary		导入视频数据
 //	@Tags			video
 //	@Accept			json
 //	@Produce		json
-//	@Param			actresss	query		string		true	"actresss"
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/video/repairImport [get]
-func RepairVideoImportApi(c *gin.Context) {
-	var actresss = c.Query("actresss")
-	if err := service.RepairVideoImport(strings.Split(actresss, ",")); err != nil {
+//	@Param			data	body		ImportVideoData	true	"视频数据"
+//	@Success		200			{object}	Success
+//	@Failure		400			{object}	Fail
+//	@Failure		404			{object}	NotFound
+//	@Failure		500			{object}	ServerError
+//	@Router			/video/importVideo [post]
+func ImportVideoDataApi(c *gin.Context) {
+	var bind ImportVideoData
+	if err := c.ShouldBindJSON(&bind); err != nil {
+		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
+		return
+	}
+	if err := videoService.ImportVideoData(bind.Dir, bind.Actresses); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -583,7 +566,6 @@ func RepairVideoImportApi(c *gin.Context) {
 // VideoWriteGoFound godoc
 //
 //	@Summary		视频导入GoFound
-//	@Description	视频导入GoFound
 //	@Tags			video
 //	@Accept			json
 //	@Produce		json
@@ -604,47 +586,6 @@ func VideoWriteGoFound(c *gin.Context) {
 func ResetTableApi(c *gin.Context) {
 	var table = c.Query("table")
 	if err := service.ResetTable(table); err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
-}
-
-type VideoPic struct {
-	Page int    `uri:"page" form:"page" json:"page"`
-	Size int    `uri:"size" form:"size" json:"size"`
-	Site string `uri:"site" form:"site" json:"site"`
-}
-
-func GetVideoPic(c *gin.Context) {
-	var bind VideoPic
-	if err := c.Bind(&bind); err != nil {
-		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
-		return
-	}
-
-	if err := service.AllVideoPic(bind.Page, bind.Size, bind.Site); err != nil {
-		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, util.Success("SUCCESS", nil))
-}
-
-type VideoPic1 struct {
-	Actress string `uri:"actress" form:"actress" json:"actress"`
-	Site    string `uri:"site" form:"site" json:"site"`
-}
-
-func OneVideoPic(c *gin.Context) {
-	var bind VideoPic1
-	if err := c.Bind(&bind); err != nil {
-		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
-		return
-	}
-
-	if err := service.OneVideoPic(bind.Actress, bind.Site); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}

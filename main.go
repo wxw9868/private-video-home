@@ -15,13 +15,16 @@ import (
 	"github.com/wxw9868/video/router"
 )
 
-// @title Video API
-// @version 1.0
-// @description This is a video server.
+//	@title			私人视频 API
+//	@version		1.0
+//	@description	This is a private video server.
 
-// @host 127.0.0.1:8080
-// @host 192.168.0.9:8080
-// @BasePath /
+//	@contact.name	API Support
+//	@contact.email	wxw9868gmail.com
+
+//	@host		192.168.0.9:8080
+//	@BasePath	/
+
 func main() {
 	// gin.SetMode(gin.ReleaseMode)
 
@@ -42,7 +45,6 @@ func main() {
 		})
 	})
 
-	// Set a lower memory limit for multipart forms (default is 32 MiB)
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.Static("/assets", "./assets")
 
@@ -59,8 +61,8 @@ func main() {
 	// actresss := "篠原なぎさ,朝比奈菜々子"
 	// err := service.VideoImport("D:/ta", actresss)
 	// fmt.Println(err)
-	//actresss := "目々澤めぐ,瀬戸レイカ"
-	//service.RepairVideoImport(strings.Split(actresss, ","))
+	// actresss := "目々澤めぐ,瀬戸レイカ"
+	// service.RepairVideoImport(strings.Split(actresss, ","))
 
 	if err := r.Run(fmt.Sprintf("%s:%d", conf.Host, conf.Port)); err != nil {
 		panic(err)

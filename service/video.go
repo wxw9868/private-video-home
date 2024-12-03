@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -559,4 +561,116 @@ func (vs *VideoService) DanmuSave(videoID, userID uint, text string, time float6
 		return err
 	}
 	return nil
+}
+
+func (vs *VideoService) ImportVideoData(dir string, actresses ...string) error {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+
+	videoSQL := generateVideoSQL(dir, files)
+	actressSQL := generateActressSQL(actresses)
+
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err = tx.Exec(videoSQL).Error; err != nil {
+			return err
+		}
+
+		if actressSQL != "" {
+			if err = tx.Exec(actressSQL).Error; err != nil {
+				return err
+			}
+		}
+
+		var videoActressSQL = "INSERT OR REPLACE INTO video_VideoActress (video_id, actress_id, CreatedAt, UpdatedAt) VALUES "
+		for _, v := range actresses {
+
+			var actress model.Actress
+			if err = tx.Where("actress = ?", v).First(&actress).Error; err != nil {
+				return err
+			}
+
+			var videos []model.Video
+			if err = tx.Where("title LIKE ?", "%"+v+"%").Find(&videos).Error; err != nil {
+				return err
+			}
+
+			for _, video := range videos {
+				var videoActress model.VideoActress
+				err = tx.Model(&model.VideoActress{}).Where("video_id = ? and actress_id = ?", video.ID, actress.ID).First(&videoActress).Error
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					videoActressSQL += fmt.Sprintf("(%d, %d, '%v', '%v'), ", video.ID, actress.ID, time.Now().Local(), time.Now().Local())
+				}
+			}
+		}
+
+		b := []byte(videoActressSQL)
+		if err = tx.Exec(string(b[:len(b)-2])).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err == nil {
+		if err = VideoWriteGoFound(); err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
+func generateVideoSQL(dir string, files []os.DirEntry) string {
+	var videoSQL = "INSERT OR REPLACE INTO video_Video (title, actress, size, duration, poster, width, height, codec_name, channel_layout, creation_time, CreatedAt, UpdatedAt) VALUES "
+	for _, file := range files {
+		filename := file.Name()
+		if filepath.Ext(filename) == ".mp4" {
+			title := strings.Split(filename, ".")[0]
+			array := strings.Split(title, "_")
+			actress := array[len(array)-1]
+			posterPath := "assets/image/poster/" + title + ".jpg"
+			videoPath := dir + "/" + filename
+			videoInfo, _ := utils.GetVideoInfo(videoPath)
+			size := videoInfo["size"].(int64)
+			duration := videoInfo["duration"].(float64)
+			width := videoInfo["width"].(int64)
+			height := videoInfo["height"].(int64)
+			codec := fmt.Sprintf("%s,%s", videoInfo["codec_name0"].(string), videoInfo["codec_name1"].(string))
+			channelLayout := videoInfo["channel_layout"].(string)
+			creationTime := videoInfo["creation_time"].(time.Time)
+			videoSQL += fmt.Sprintf("('%s', '%s', %d, %f, '%s', %d, %d, '%s', '%s', '%v', '%v', '%v'), ", title, actress, size, duration, posterPath, width, height, codec, channelLayout, creationTime, time.Now().Local(), time.Now().Local())
+		}
+	}
+	b := []byte(videoSQL)
+	return string(b[:len(b)-2])
+}
+
+func generateActressSQL(actresses []string) string {
+	if len(actresses) > 0 {
+		return ""
+	}
+	var actressSQL = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	startLen := len(actressSQL)
+	for _, actress := range actresses {
+		var data model.Actress
+		if errors.Is(db.Model(&model.Actress{}).Where("actress = ?", actress).First(&data).Error, gorm.ErrRecordNotFound) {
+			//_, err = os.Stat("assets/image/avatar/" + actress + ".jpg")
+			//if os.IsNotExist(err) {
+			//	nameSlice := []rune(actress)
+			//	if err := utils.GenerateAvatar(string(nameSlice[0]), avatarPath); err != nil {
+			//		return err
+			//	}
+			//}
+			avatarPath := "assets/image/avatar/defaultgirl.png"
+			actressSQL += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
+		}
+	}
+	endLen := len(actressSQL)
+	if endLen <= startLen {
+		return ""
+	}
+
+	b := []byte(actressSQL)
+	return string(b[:len(b)-2])
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/util/randomname"
 	"github.com/wxw9868/video/model"
@@ -129,18 +130,19 @@ func (us *UserService) Update(id uint, column string, value interface{}) error {
 
 func (us *UserService) Updates(id uint, updateUser model.User) error {
 	var user model.User
+	err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.First(&user, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
 
-	tx := db.Begin()
-	if err := tx.First(&user, id).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-	if err := tx.Model(&user).Updates(updateUser).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-	tx.Commit()
-	return nil
+		if err := tx.Model(&user).Updates(updateUser).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollectLog, error) {
@@ -152,7 +154,7 @@ func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollect
 	return &data, nil
 }
 
-func (us *UserService) CollectList(userID uint) ([]Video, error) {
+func (us *UserService) FavoriteList(userID uint) ([]Video, error) {
 	rows, err := db.Table("video_UserCollectLog as ucl").
 		Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
 		Joins("left join video_Video as v on v.id = ucl.video_id").

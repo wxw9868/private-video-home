@@ -149,10 +149,10 @@ func SearchQuery(c *gin.Context) {
 //	@Tags			search
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
 //	@Router			/search/api/status [get]
 func SearchStatus(c *gin.Context) {
 	Get(c, "/status")
@@ -166,10 +166,10 @@ func SearchStatus(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			database	query		string	true	"删除数据库"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
+//	@Success		200			{object}	Success
+//	@Failure		400			{object}	Fail
+//	@Failure		404			{object}	NotFound
+//	@Failure		500			{object}	ServerError
 //	@Router			/search/api/db/drop [get]
 func SearchDbDrop(c *gin.Context) {
 	Get(c, utils.Join("/db/drop", "?", "database=", c.Query("database")))
@@ -182,11 +182,11 @@ func SearchDbDrop(c *gin.Context) {
 //	@Tags			search
 //	@Accept			json
 //	@Produce		json
-//	@Param			q		query		string	true	"在线分词"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
+//	@Param			q	query		string	true	"在线分词"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
 //	@Router			/search/api/word/cut [get]
 func SearchWordCut(c *gin.Context) {
 	Get(c, utils.Join("/word/cut", "?", "q=", c.Query("q")))

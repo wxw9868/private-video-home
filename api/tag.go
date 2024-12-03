@@ -12,7 +12,7 @@ type TagAdd struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
-// TagAddApi godoc
+// CreateTagApi godoc
 //
 //	@Summary		Tag Add
 //	@Description	Tag Add
@@ -25,7 +25,7 @@ type TagAdd struct {
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
 //	@Router			/tag/add [post]
-func TagAddApi(c *gin.Context) {
+func CreateTagApi(c *gin.Context) {
 	var bind TagAdd
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -44,7 +44,7 @@ type TagEdit struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
-// TagEditApi godoc
+// UpdateTagApi godoc
 //
 //	@Summary		Tag Edit
 //	@Description	Tag Edit
@@ -56,8 +56,8 @@ type TagEdit struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/tag/edit [post]
-func TagEditApi(c *gin.Context) {
+//	@Router			/tag/updateTag [post]
+func UpdateTagApi(c *gin.Context) {
 	var bind TagEdit
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -71,20 +71,20 @@ func TagEditApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("修改成功", nil))
 }
 
-// TagDeleteApi godoc
+// DeleteTagApi godoc
 //
 //	@Summary		Tag Delete
 //	@Description	Tag Delete
 //	@Tags			tag
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int	true	"Tag Delete"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/tag/delete/{id} [get]
-func TagDeleteApi(c *gin.Context) {
+//	@Param			id	path		int	true	"Tag Delete"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/tag/deleteTag/{id} [get]
+func DeleteTagApi(c *gin.Context) {
 	id := c.Param("video_id")
 	aid, err := strconv.Atoi(id)
 	if err != nil {
@@ -110,7 +110,7 @@ type TagList struct {
 	Sort   string `uri:"sort" form:"sort" json:"sort"`
 }
 
-// TagListApi godoc
+// GetTagListApi godoc
 //
 //	@Summary		Tag List
 //	@Description	Tag List
@@ -122,8 +122,8 @@ type TagList struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/tag/list [post]
-func TagListApi(c *gin.Context) {
+//	@Router			/tag/getTagList [post]
+func GetTagListApi(c *gin.Context) {
 	var bind TagList
 	if err := c.Bind(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))

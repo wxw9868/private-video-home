@@ -14,6 +14,7 @@ var (
 	actressService = new(service.ActressService)
 	tagService     = new(service.TagService)
 	stockService   = new(service.StockService)
+	utilService    = new(service.UtilService)
 
 	client = gofoundClient.GofoundClient()
 

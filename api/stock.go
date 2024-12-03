@@ -20,16 +20,16 @@ type ImportFile struct {
 // ImportTradingRecordsApi godoc
 //
 //	@Summary		导入数据
-//	@Schemes        http https
+//	@Schemes		http https
 //	@Description	用于导入数据
 //	@Tags			stock
 //	@Accept			json
 //	@Produce		json
 //	@Param			file	formData	file	true	"文件"
 //	@Success		200		{object}	Message
-//	@Failure        400     {object}    Message
-//	@Failure        404     {object}    Message
-//	@Failure        500     {object}    Message
+//	@Failure		400		{object}	Message
+//	@Failure		404		{object}	Message
+//	@Failure		500		{object}	Message
 //	@Router			/stock/importExcel [post]
 func ImportTradingRecordsApi(c *gin.Context) {
 	var bindFile ImportFile
@@ -86,17 +86,17 @@ func ImportTradingRecordsApi(c *gin.Context) {
 // LiquidationApi godoc
 //
 //	@Summary		已清仓股票
-//	@Schemes        http https
+//	@Schemes		http https
 //	@Description	用于已清仓股票
 //	@Tags			stock
 //	@Accept			json
 //	@Produce		json
-//	@Param          page      query     string  false    "页码"
-//	@Param          page_size query     string  false   "每页条数"
-//	@Success		200		  {object}	Message
-//	@Failure        400       {object}  Message
-//	@Failure        404       {object}  Message
-//	@Failure        500       {object}  Message
+//	@Param			page		query		string	false	"页码"
+//	@Param			page_size	query		string	false	"每页条数"
+//	@Success		200			{object}	Message
+//	@Failure		400			{object}	Message
+//	@Failure		404			{object}	Message
+//	@Failure		500			{object}	Message
 //	@Router			/stock/liquidation [get]
 func LiquidationApi(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
@@ -138,17 +138,17 @@ type Paginate struct {
 // TradingRecordsApi godoc
 //
 //	@Summary		历史成交
-//	@Schemes        http https
+//	@Schemes		http https
 //	@Description	历史成交数据
 //	@Tags			stock
 //	@Accept			json
 //	@Produce		json
-//	@Param          page      query     string  false    "页码"
-//	@Param          page_size query     string  false    "每页条数"
-//	@Success		200		  {object}	Message
-//	@Failure        400       {object}  Message
-//	@Failure        404       {object}  Message
-//	@Failure        500       {object}  Message
+//	@Param			page		query		string	false	"页码"
+//	@Param			page_size	query		string	false	"每页条数"
+//	@Success		200			{object}	Message
+//	@Failure		400			{object}	Message
+//	@Failure		404			{object}	Message
+//	@Failure		500			{object}	Message
 //	@Router			/stock/tradingRecords [get]
 func TradingRecordsApi(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
