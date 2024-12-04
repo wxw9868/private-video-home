@@ -1,5 +1,7 @@
 FROM golang:1.22
 
+ENV GOPROXY=https://goproxy.cn
+
 WORKDIR /go/src/app
 
 COPY go.mod go.sum ./

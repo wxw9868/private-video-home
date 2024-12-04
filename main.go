@@ -58,11 +58,8 @@ func main() {
 		ginSwagger.DefaultModelsExpandDepth(-1)),
 	)
 
-	// actresss := "篠原なぎさ,朝比奈菜々子"
-	// err := service.VideoImport("D:/ta", actresss)
-	// fmt.Println(err)
-	// actresss := "目々澤めぐ,瀬戸レイカ"
-	// service.RepairVideoImport(strings.Split(actresss, ","))
+	//err := new(service.VideoService).ImportVideoData("D:/ta", "本真ゆり", "西内萌菜", "宮村恋", "田所三久", "栗原梢", "夏希アンジュ")
+	//fmt.Println(err)
 
 	if err := r.Run(fmt.Sprintf("%s:%d", conf.Host, conf.Port)); err != nil {
 		panic(err)
