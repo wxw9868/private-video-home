@@ -78,6 +78,15 @@ var _ = map[string]string{
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "041216_278 スカイエンジェル 196 パート2  #桃瀬るな",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "030816_258 スカイエンジェル 196 パート1  #桃瀬るな",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "081624_01 試着室でアパレル店員と生ハメセックス  #霧島あんな",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "100524_01 ハメられたモデル志願のスレンダー美女  #川口あかり",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
