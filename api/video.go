@@ -575,7 +575,7 @@ func ImportVideoDataApi(c *gin.Context) {
 //	@Failure		500	{object}	ServerError
 //	@Router			/video/writeGoFound [get]
 func VideoWriteGoFound(c *gin.Context) {
-	if err := service.VideoWriteGoFound(); err != nil {
+	if err := service.VideoWriteGoFound(""); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
