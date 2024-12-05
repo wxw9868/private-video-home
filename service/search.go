@@ -35,10 +35,14 @@ type Index struct {
 	Document interface{} `json:"document" binding:"required"`
 }
 
-func VideoWriteGoFound() error {
-	rows, err := db.Table("video_Video as v").
+func VideoWriteGoFound(query string) error {
+	vdb := db.Table("video_Video as v").
 		Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
-		Joins("left join video_VideoLog l on l.video_id = v.id").Rows()
+		Joins("left join video_VideoLog l on l.video_id = v.id")
+	if query != "" {
+		vdb = vdb.Where(query)
+	}
+	rows, err := vdb.Rows()
 	if err != nil {
 		return err
 	}

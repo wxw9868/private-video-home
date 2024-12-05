@@ -569,6 +569,9 @@ func (vs *VideoService) ImportVideoData(dir string, actresses ...string) error {
 		return err
 	}
 
+	var ids []uint
+	db.Model(&model.Video{}).Order("id desc").Limit(1).Pluck("id", &ids)
+
 	videoSQL := generateVideoSQL(dir, files)
 	actressSQL := generateActressSQL(actresses)
 
@@ -615,7 +618,10 @@ func (vs *VideoService) ImportVideoData(dir string, actresses ...string) error {
 	})
 
 	if err == nil {
-		if err = VideoWriteGoFound(); err != nil {
+		oldId := ids[0]
+		db.Model(&model.Video{}).Order("id desc").Limit(1).Pluck("id", &ids)
+		newId := ids[0]
+		if err = VideoWriteGoFound(fmt.Sprintf("v.id between %d and %d", oldId, newId)); err != nil {
 			return err
 		}
 	}
