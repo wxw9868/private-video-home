@@ -226,3 +226,18 @@ func (us *UserService) BrowseList(userID uint) ([]VideoBrowse, error) {
 	}
 	return data, nil
 }
+
+func (us *UserService) CreateUserLoginLog(m model.UserLoginLog) error {
+	if err := db.Create(&m).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (us *UserService) UserLoginLogList(id uint) ([]model.UserLoginLog, error) {
+	var data []model.UserLoginLog
+	if err := db.Model(&model.UserLoginLog{}).Where("user_id = ?", id).Find(&data).Error; err != nil {
+		return nil, err
+	}
+	return data, nil
+}
