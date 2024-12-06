@@ -132,7 +132,6 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		var videoInfo VideoInfo
 		db.ScanRows(rows, &videoInfo)
 
-		//f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
 		video := Video{
 			ID:       videoInfo.ID,
 			Title:    videoInfo.Title,
@@ -140,16 +139,6 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
 			Browse:   videoInfo.Browse,
 			Watch:    videoInfo.Watch,
-			//Actress:       videoInfo.Actress,
-			//Size:          f / 1024 / 1024,
-			//ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			//Width:         videoInfo.Width,
-			//Height:        videoInfo.Height,
-			//CodecName:     videoInfo.CodecName,
-			//ChannelLayout: videoInfo.ChannelLayout,
-			//Collect:       videoInfo.Collect,
-			//Zan:           videoInfo.Zan,
-			//Cai:           videoInfo.Cai,
 		}
 		videos = append(videos, video)
 		keys = append(keys, utils.Join("video_video_", strconv.Itoa(int(videoInfo.ID))))

@@ -62,11 +62,19 @@ func init() {
 
 	// 迁移 schema
 	if err := db.AutoMigrate(
-		&model.User{}, &model.UserCollectLog{},
-		&model.UserBrowseLog{}, &model.UserCommentLog{},
-		&model.Actress{}, &model.Tag{},
-		&model.Video{}, &model.VideoLog{}, &model.VideoComment{},
-		&model.VideoActress{}, &model.VideoTag{}, &model.VideoDanmu{},
+		&model.User{},
+		&model.UserLoginLog{},
+		&model.UserCollectLog{},
+		&model.UserBrowseLog{},
+		&model.UserCommentLog{},
+		&model.Actress{},
+		&model.Video{},
+		&model.VideoLog{},
+		&model.VideoComment{},
+		&model.VideoActress{},
+		&model.VideoTag{},
+		&model.VideoDanmu{},
+		&model.Tag{},
 		&model.Liquidation{}, &model.TradingRecords{},
 	); err != nil {
 		log.Fatalf("迁移 schema 失败: %s\n", err)

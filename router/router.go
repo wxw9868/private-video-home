@@ -26,6 +26,7 @@ func Router(r *gin.Engine) {
 	user.POST("changePassword", api.ChangePasswordApi)
 	user.GET("getUserFavoriteList", api.GetUserFavoriteListApi)
 	user.GET("getUserBrowseList", api.GetUserBrowseListApi)
+	user.GET("getUserLoginLogListApi", api.GetUserLoginLogListApi)
 
 	actress := auth.Group("actress")
 	actress.POST("addActress", api.AddActressApi)

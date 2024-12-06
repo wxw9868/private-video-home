@@ -5,11 +5,14 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/mssola/user_agent"
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/video/model"
+	"github.com/wxw9868/video/utils"
 )
 
 type Register struct {
@@ -76,10 +79,29 @@ func LoginApi(c *gin.Context) {
 	}
 
 	user, err := userService.Login(bind.Email, bind.Password)
+
+	ua := user_agent.New(c.Request.UserAgent())
+	browser, _ := ua.Browser()
+	userLoginLog := model.UserLoginLog{
+		LoginName:     bind.Email,
+		LoginIpaddr:   c.ClientIP(),
+		LoginLocation: utils.GetCityByIp(c.ClientIP()),
+		Browser:       browser,
+		Os:            ua.OS(),
+		LoginTime:     time.Now(),
+	}
+
 	if err != nil {
+		userLoginLog.UserID = 0
+		userLoginLog.Status = 1
+		userService.CreateUserLoginLog(userLoginLog)
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
+
+	userLoginLog.UserID = user.ID
+	userLoginLog.Status = 0
+	userService.CreateUserLoginLog(userLoginLog)
 
 	session := sessions.Default(c)
 	session.Set("user_id", user.ID)
@@ -355,4 +377,23 @@ func GetUserBrowseListApi(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("获取用户浏览记录", data))
+}
+
+// GetUserLoginLogListApi godoc
+//
+//	@Summary		获取用户登陆记录
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	Success
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/user/getUserLoginLogListApi [get]
+func GetUserLoginLogListApi(c *gin.Context) {
+	data, err := userService.UserLoginLogList(GetUserID(c))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, util.Success("获取用户登陆记录", data))
 }
