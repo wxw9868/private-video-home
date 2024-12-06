@@ -58,7 +58,7 @@ func main() {
 		ginSwagger.DefaultModelsExpandDepth(-1)),
 	)
 
-	//err := new(service.VideoService).ImportVideoData("D:/ta", "本真ゆり", "西内萌菜", "宮村恋", "田所三久", "栗原梢", "夏希アンジュ")
+	//err := new(service.VideoService).ImportVideoData("D:/ta", "桃瀬るな", "霧島あんな", "川口あかり", "白瀬ゆきほ", "大塚玲子", "白川りこ")
 	//fmt.Println(err)
 
 	if err := r.Run(fmt.Sprintf("%s:%d", conf.Host, conf.Port)); err != nil {

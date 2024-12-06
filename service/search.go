@@ -79,7 +79,7 @@ func VideoWriteGoFound(query string) error {
 		})
 	}
 
-	fmt.Printf("len %d  indexBatch: %+v\n", len(indexBatch), indexBatch)
+	//fmt.Printf("len %d  indexBatch: %+v\n", len(indexBatch), indexBatch)
 
 	b, err := json.Marshal(&indexBatch)
 	if err != nil {

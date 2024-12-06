@@ -78,32 +78,27 @@ var _ = map[string]string{
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "041216_278 スカイエンジェル 196 パート2  #桃瀬るな",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "030816_258 スカイエンジェル 196 パート1  #桃瀬るな",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "081624_01 試着室でアパレル店員と生ハメセックス  #霧島あんな",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "100524_01 ハメられたモデル志願のスレンダー美女  #川口あかり",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":     "012024_01_ オジサンのチンポが大好きなムチムチパパ活むすめ  #高杉洋子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)": "112523_01_ 豪華サービスで新規顧客獲得！メンズ専用エステティシャン  #高杉洋子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)": "060323_01_ SNSで知り合った個撮モデルを撮りまくって中出し！  #高杉洋子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)": "011624_01_ 献身的すぎるニート更生お姉さんの職権乱用レポ  #楓乃々花  #高橋明日香",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)": "042524_01_ ひざ枕イヤーエステ店のお姉さんとヤレるか検証  #楓乃々花  #高橋明日香",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)": "071324_01_ 体は正直！ハメ潮しちゃう女子大生  #梨本洋子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)": "Heyzo-3238 サービスが過剰すぎる出張メンズエステ嬢Vol.3  #梨本洋子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)": "010424_01_ 素人ＡＶ面接 〜勃起クリトリスを剥き出しにして控えめに喘ぐ桃尻娘〜  #梨本洋子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)": "123023_01_ すっぴん素人 ～オッパイもすっぴんもどっちも見せるのが恥ずかしいドM娘～  #綾野ゆう",
 	}
 	// #上原聡美  #さとみ
 	// #大月のの  #中津井加代
 	// 朝桐光    南野あかり
-	// 宮村恋  #歩
+	// 宮村恋    #歩
+	// 楓乃々花  #高橋明日香
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_", "_tg关注_@AVWUMAYUANPIAN",
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
-		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "歩", "#", " "}
-	var actressSlice = []string{"本真ゆり", "西内萌菜", "宮村恋", "田所三久", "栗原梢", "夏希アンジュ", "Heyzo-", "Vol.", "File.", "No."}
+		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "高橋明日香", "#", " "}
+	var actressSlice = []string{"桃瀬るな", "霧島あんな", "川口あかり", "白瀬ゆきほ", "大塚玲子", "白川りこ", "Heyzo-", "Vol.", "File.", "No.", "__"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}

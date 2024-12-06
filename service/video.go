@@ -575,8 +575,6 @@ func (vs *VideoService) ImportVideoData(dir string, actresses ...string) error {
 	videoSQL := generateVideoSQL(dir, files)
 	actressSQL := generateActressSQL(actresses)
 
-	fmt.Printf("actressSQL :%s\n", actressSQL)
-
 	err = db.Transaction(func(tx *gorm.DB) error {
 		if err = tx.Exec(videoSQL).Error; err != nil {
 			return err
