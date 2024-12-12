@@ -209,7 +209,7 @@ func (us *UserService) BrowseList(userID uint) ([]VideoBrowse, error) {
 	result := db.Table("video_UserBrowseLog as ubl").
 		Select("v.id,v.title,v.duration,v.poster").
 		Joins("left join video_Video as v on v.id = ubl.video_id").
-		Where("ubl.user_id = ? and ubl.UpdatedAt >= ?", userID, utils.GetTime("yesterday")).
+		Where("ubl.user_id = ? and ubl.UpdatedAt >= ?", userID, utils.NowTime().StringToTime("yesterday")).
 		Order("ubl.UpdatedAt desc").
 		Find(&videos)
 	if err := result.Error; err != nil {

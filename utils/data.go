@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gocolly/colly/v2"
 	"image/color"
 	"image/color/palette"
 	"io"
@@ -29,8 +30,39 @@ import (
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
-func NowTime() string {
-	return time.Now().Format("2006-01-02 15:04:05")
+type MyTime struct {
+	time.Time
+}
+
+func NowTime() *MyTime {
+	return &MyTime{time.Now()}
+}
+
+func (t *MyTime) FormatTime() string {
+	return t.Format("2006-01-02 15:04:05")
+}
+
+func (t *MyTime) StringToTime(tt string) (d time.Time) {
+	year, month, day := t.Date()
+
+	// 今日日期
+	today := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+	switch tt {
+	case "today":
+		d = today
+	case "yesterday":
+		// 昨日日期
+		d = today.AddDate(0, 0, -1)
+	case "weekStart":
+		// 本周起始日期（周一）
+		d = today.AddDate(0, 0, -int(today.Weekday())+1)
+	case "monthStart":
+		// 本月起始日期
+		d = time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
+	default:
+		d = t.Local()
+	}
+	return
 }
 
 // GenerateAvatar 生成头衔
@@ -371,6 +403,49 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 	return nil
 }
 
+func Pa() {
+	c := colly.NewCollector(
+		//colly.Debugger(&debug.LogDebugger{}), // 开启debugger模式
+		//colly.MaxDepth(1),
+		//colly.DetectCharset(),
+		//colly.Async(true),
+		//colly.AllowURLRevisit(), // 重复访问
+		//colly.AllowedDomains("www.baidu.com"),
+		//colly.AllowedDomains("www.google.com"),
+		colly.AllowedDomains("xslist.org"),
+	)
+	//c.SetRequestTimeout(120 * time.Second)
+
+	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
+		link := e.Attr("href")
+		fmt.Printf("Link found: %q -> %s\n", e.Text, link)
+		c.Visit(e.Request.AbsoluteURL(link))
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		r.Headers.Set("Accept", "text/html, */*; q=0.01")
+		r.Headers.Set("Accept-Encoding", "gzip, deflate, br, zstd")
+		r.Headers.Set("Accept-Language", "zh-CN,zh;q=0.9")
+		r.Headers.Set("Cookie", "_ga=GA1.1.2141611244.1733242380; userlg=zh; cf_clearance=iKWkQkqQx_Bd9P9U7HxmM6CV4WnYTM6ZirN7xWWbJ.k-1733764053-1.2.1.1-Inj6NuDFDjABgwChYAMXFnESGTrAYRo0L6yjFwfIA_tvvc3Yqv6pA2nPDOy8LvFwTQ4ldG1YWWigi.gwLaVclQXishJ0NQv_e.gYviCRNJIOa7V8pe2Dd.7ACiWaDJFG.MHlTCnSvgAJ02jsRKMWH2XOHWmynyhZXBp0jQKmhn1AvN5HrhF6GR6G1w2S2ioFSA.wZHekagiDoVUjl8PF9nIMgvDE_Wo7TB7QtuCqzux.XdpUADUq5ajhYnCw9jkBMJ1e5QOQhPPGJArM7SDlB9aJNOyLIbgJm9K1jSAGvGeiK4PZ6I2Ik6_sQ5UOK9TCqu02A5EbrWxOXG4k1oWNwzEm6wqnHjgxDWFSdJ3xhIyO8KIw2FkvpywFJ6v9jEzITc6TWn0a.6NY4dFVa.35cXthCqj9yx3Gu1T7jajtVWoONcKZqCQfagNCH3GLA8ol; _ga_V49SP7QGE6=GS1.1.1733761450.7.1.1733764090.0.0.0")
+		r.Headers.Set("Referer", "https://xslist.org")
+		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+		fmt.Println("Visiting", r.URL.String())
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
+	})
+
+	//c.Visit("https://www.google.com/")
+	c.Visit("https://xslist.org/")
+	//c.Visit("https://xslist.org/search?query=優希まこと&lg=zh")
+
+}
+
 func GeneteSQL() string {
 	var data = make(map[string]struct{})
 	err := ReadFileToMap("data.json", &data)
@@ -398,30 +473,6 @@ func GeneteSQL() string {
 	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
 
 	return actressSql
-}
-
-func GetTime(tt string) (d time.Time) {
-	now := time.Now()
-	year, month, day := now.Date()
-
-	// 今日日期
-	today := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
-	switch tt {
-	case "today":
-		d = today
-	case "yesterday":
-		// 昨日日期
-		d = today.AddDate(0, 0, -1)
-	case "weekStart":
-		// 本周起始日期（周一）
-		d = today.AddDate(0, 0, -int(today.Weekday())+1)
-	case "monthStart":
-		// 本月起始日期
-		d = time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
-	default:
-		d = now.Local()
-	}
-	return
 }
 
 func GetWebDocument(method, url string, body io.Reader) (*goquery.Document, error) {
