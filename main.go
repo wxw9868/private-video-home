@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/wxw9868/video/service"
 	"net/http"
 
 	"github.com/gin-contrib/pprof"
@@ -59,8 +58,10 @@ func main() {
 		ginSwagger.DefaultModelsExpandDepth(-1)),
 	)
 
-	err := new(service.VideoService).ImportVideoData("D:/ta", "真田春香", "大場ゆい", "成宮はるあ")
-	fmt.Println(err)
+	//err := new(service.VideoService).ImportVideoData("D:/ta", "江波りゅう", "北条麻妃", "松本まりな", "りおん")
+	//fmt.Println(err)
+	//err := new(service.ActressService).SaveActress()
+	//fmt.Println(err)
 
 	if err := r.Run(fmt.Sprintf("%s:%d", conf.Host, conf.Port)); err != nil {
 		panic(err)
