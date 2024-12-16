@@ -179,7 +179,7 @@ func (us *UserService) FavoriteList(userID uint) ([]Video, error) {
 			Poster:   videoInfo.Poster,
 			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
 			Browse:   videoInfo.Browse,
-			Watch:    videoInfo.Watch,
+			Collect:  videoInfo.Collect,
 			//Actress:       videoInfo.Actress,
 			//Size:          f / 1024 / 1024,
 			//ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),

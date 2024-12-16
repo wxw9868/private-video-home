@@ -40,12 +40,10 @@ var _ = map[string]string{
 
 var _ = []string{"", "", "", "", "", "", "", "", ""}
 
-var _ = []string{"", "", "", "", "", "", "", "", ""}
-
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "111423_01 憧れのAV女優と絡んだおチンポに大興奮！ちっちゃ可愛い桃尻娘！  #冬月涼子",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "042322_01 春は浴衣で初ごっきゅん  #冬月涼子",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
@@ -62,7 +60,7 @@ func TestVideoRename(t *testing.T) {
 		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
 		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
-	var actressSlice = []string{"輝月あんり", "冬月涼子", "松本まりな", "りおん", "Heyzo-", "Vol.", "File.", "No.", "__"}
+	var actressSlice = []string{"", "", "", "", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}

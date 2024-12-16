@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -45,7 +46,7 @@ type Video struct {
 	Poster   string `json:"poster"`
 	Duration string `json:"duration"`
 	Browse   uint   `json:"browse"`
-	Watch    uint   `json:"watch"`
+	Collect  uint   `json:"collect"`
 }
 
 func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort string) (data map[string]interface{}, err error) {
@@ -56,14 +57,14 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		for i, id := range ids {
 			result := rdb.HGetAll(ctx, utils.Join("video_video_", strconv.Itoa(int(id)))).Val()
 			browse, _ := strconv.Atoi(result["browse"])
-			watch, _ := strconv.Atoi(result["watch"])
+			collect, _ := strconv.Atoi(result["collect"])
 			videos[i] = Video{
 				ID:       id,
 				Title:    result["title"],
 				Poster:   result["poster"],
 				Duration: result["duration"],
 				Browse:   uint(browse),
-				Watch:    uint(watch),
+				Collect:  uint(collect),
 			}
 		}
 		data = map[string]interface{}{
@@ -115,7 +116,7 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		return nil, err
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
-	if strings.Compare(string(bts), result) == 0 && result != "" {
+	if strings.Compare(string(bts), result) == 0 {
 		return f(ids, int(count))
 	}
 
@@ -138,7 +139,7 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 			Poster:   videoInfo.Poster,
 			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
 			Browse:   videoInfo.Browse,
-			Watch:    videoInfo.Watch,
+			Collect:  videoInfo.Collect,
 		}
 		videos = append(videos, video)
 		keys = append(keys, utils.Join("video_video_", strconv.Itoa(int(videoInfo.ID))))
@@ -148,7 +149,7 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
 			pipe.HSet(ctx, key, "len", len(ids), "ids", string(bts))
 			for _, a := range videos {
-				pipe.HSet(ctx, utils.Join("video_video_", strconv.Itoa(int(a.ID))), "id", a.ID, "title", a.Title, "poster", a.Poster, "duration", a.Duration, "browse", a.Browse, "watch", a.Watch)
+				pipe.HSet(ctx, utils.Join("video_video_", strconv.Itoa(int(a.ID))), "id", a.ID, "title", a.Title, "poster", a.Poster, "duration", a.Duration, "browse", a.Browse, "collect", a.Collect)
 			}
 			return nil
 		})
@@ -157,19 +158,6 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	if err = rdb.Watch(ctx, txf, keys...); errors.Is(err, redis.TxFailedErr) {
 		return nil, err
 	}
-
-	//pages := pagination.NewPaginator(int(count), pageSize)
-	//pages.SetCurrentPage(page)
-	//data := map[string]interface{}{
-	//	"list": videos,
-	//	"page": map[string]interface{}{
-	//		"totalPage":   pages.TotalPage(),
-	//		"prePage":     pages.PrePage(),
-	//		"currentPage": pages.CurrentPage(),
-	//		"nextPage":    pages.NextPage(),
-	//		"pages":       pages.Pages(),
-	//	},
-	//}
 
 	data = map[string]interface{}{
 		"list":  videos,
@@ -222,34 +210,32 @@ func (vs *VideoService) Collect(videoID uint, collect int, userID uint) error {
 		return errors.New("视频不存在！")
 	}
 
-	tx := db.Begin()
-
-	var expr string
-	if collect == 1 {
-		// 增加1
-		expr = "collect + 1"
-
-		if err := tx.Create(&model.UserCollectLog{UserID: userID, VideoID: videoID}).Error; err != nil {
-			tx.Rollback()
-			return errors.New("创建失败！")
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var expr string
+		if collect == 1 {
+			// 增加1
+			expr = "collect + 1"
+			if err := tx.Create(&model.UserCollectLog{UserID: userID, VideoID: videoID}).Error; err != nil {
+				return errors.New("创建失败！")
+			}
+		} else {
+			// 减少1
+			expr = "collect - 1"
+			if err := tx.Where("user_id = ? and video_id = ?", userID, videoID).Delete(&model.UserCollectLog{}).Error; err != nil {
+				return errors.New("删除失败！")
+			}
 		}
-	} else {
-		// 减少1
-		expr = "collect - 1"
-
-		if err := tx.Where("user_id = ? and video_id = ?", userID, videoID).Delete(&model.UserCollectLog{}).Error; err != nil {
-			tx.Rollback()
-			return errors.New("删除失败！")
+		if err := tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("collect", gorm.Expr(expr)).Error; err != nil {
+			return errors.New("更新失败！")
 		}
-	}
-	if err := tx.Model(&model.VideoLog{}).Where("video_id = ?", videoID).Update("collect", gorm.Expr(expr)).Error; err != nil {
-		tx.Rollback()
-		return errors.New("更新失败！")
+
+		return nil
+	})
+	if err != nil {
+		return err
 	}
 
-	tx.Commit()
-
-	return nil
+	return vs.GofoundIndex(videoID)
 }
 
 func (vs *VideoService) Browse(videoID uint, userID uint) error {
@@ -258,29 +244,68 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 		return errors.New("视频不存在！")
 	}
 
-	tx := db.Begin()
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var userBrowseLog model.UserBrowseLog
+		if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).FirstOrInit(&userBrowseLog).Error; err != nil {
+			return err
+		}
 
-	var userBrowseLog model.UserBrowseLog
-	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).FirstOrInit(&userBrowseLog).Error; err != nil {
-		tx.Rollback()
+		if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).Assign(model.UserBrowseLog{Number: userBrowseLog.Number + 1}).FirstOrCreate(&model.UserBrowseLog{}).Error; err != nil {
+			return fmt.Errorf("创建失败: %s", err)
+		}
+
+		var videoLog model.VideoLog
+		if err := tx.Where(model.VideoLog{VideoID: videoID}).FirstOrInit(&videoLog).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where(model.VideoLog{VideoID: videoID}).Assign(model.VideoLog{Browse: videoLog.Browse + 1}).FirstOrCreate(&model.VideoLog{}).Error; err != nil {
+			return fmt.Errorf("创建失败: %s", err)
+		}
+
+		return nil
+	})
+	if err != nil {
 		return err
 	}
-	if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).Assign(model.UserBrowseLog{Number: userBrowseLog.Number + 1}).FirstOrCreate(&model.UserBrowseLog{}).Error; err != nil {
-		tx.Rollback()
-		return fmt.Errorf("创建失败: %s", err)
+
+	return vs.GofoundIndex(videoID)
+}
+
+func (vs *VideoService) GofoundIndex(videoID uint) error {
+	videoInfo, _ := vs.Info(videoID)
+
+	rdb.HSet(ctx, utils.Join("video_video_", strconv.Itoa(int(videoInfo.ID))), "id", videoInfo.ID, "title", videoInfo.Title, "poster", videoInfo.Poster, "duration", videoInfo.Duration, "browse", videoInfo.Browse, "collect", videoInfo.Collect)
+
+	f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
+	index := Index{
+		Id:   videoInfo.ID,
+		Text: videoInfo.Title,
+		Document: VideoData{
+			ID:            videoInfo.ID,
+			Title:         videoInfo.Title,
+			Poster:        videoInfo.Poster,
+			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
+			Size:          f / 1024 / 1024,
+			CreationTime:  videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
+			Width:         videoInfo.Width,
+			Height:        videoInfo.Height,
+			CodecName:     videoInfo.CodecName,
+			ChannelLayout: videoInfo.ChannelLayout,
+			CollectNum:    videoInfo.Collect,
+			BrowseNum:     videoInfo.Browse,
+			WatchNum:      videoInfo.Watch,
+			ZanNum:        videoInfo.Zan,
+			CaiNum:        videoInfo.Cai,
+		},
 	}
-	var videoLog model.VideoLog
-	if err := tx.Where(model.VideoLog{VideoID: videoID}).FirstOrInit(&videoLog).Error; err != nil {
-		tx.Rollback()
+	b, err := json.Marshal(&index)
+	if err != nil {
 		return err
 	}
-	if err := tx.Where(model.VideoLog{VideoID: videoID}).Assign(model.VideoLog{Browse: videoLog.Browse + 1}).FirstOrCreate(&model.VideoLog{}).Error; err != nil {
-		tx.Rollback()
-		return fmt.Errorf("创建失败: %s", err)
+	if err = Post(utils.Join("/index", "?", "database=", "private-video"), bytes.NewReader(b)); err != nil {
+		return err
 	}
-
-	tx.Commit()
-
 	return nil
 }
 

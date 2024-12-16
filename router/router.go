@@ -37,13 +37,13 @@ func Router(r *gin.Engine) {
 
 	video := auth.Group("video")
 	{
-		video.GET("searchVideo", api.VideoSearchApi)
 		video.POST("getVideoList", api.GetVideoListApi)
 		video.GET("videoPlay/:id", api.VideoPlayApi)
 		video.GET("browseVideo/:id", api.BrowseVideoApi)
 		video.POST("collectVideo", api.CollectVideoApi)
 		video.POST("importVideoData", api.ImportVideoDataApi)
 		video.GET("writeGoFound", api.VideoWriteGoFound)
+		video.GET("searchVideo", api.VideoSearchApi)
 
 		comment := video.Group("comment")
 		{

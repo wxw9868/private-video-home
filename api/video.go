@@ -246,7 +246,7 @@ func BrowseVideoApi(c *gin.Context) {
 	}
 
 	userID := GetUserID(c)
-	if err := videoService.Browse(uint(aid), userID); err != nil {
+	if err = videoService.Browse(uint(aid), userID); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
