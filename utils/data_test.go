@@ -41,12 +41,12 @@ var _ = map[string]string{
 var _ = []string{"", "", "", "", "", "", "", "", ""}
 
 var _ = map[string]string{
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "121424_100 スケベ椅子持参！～巨乳巨尻デリソープ嬢～  #細田さなえ",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "010124_962 人妻なでしこ調教 ～着物の似合う淫乱熟女を～  #細田さなえ",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-3270 喪服でAV撮影にやってきた未亡人  #細田さなえ",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "081123_893 スッピン熟女 ~細田さんの素顔~  #細田さなえ",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "072223-001 私のセックスを見てください！い～っぱい顔面射精してください！14   #細田さなえ",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "052723_856 二つの熟マンにブチ込み放題！  #細田さなえ  #松村菜央",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
@@ -70,7 +70,7 @@ func TestVideoRename(t *testing.T) {
 		"_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV",
 		"_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
-	var actressSlice = []string{"遥めぐみ", "柊麗奈", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
+	var actressSlice = []string{"遥めぐみ", "柊麗奈", "成宮祐希", "乙葉いおり", "細田さなえ", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
