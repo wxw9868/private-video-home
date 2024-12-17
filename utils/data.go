@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	browser "github.com/EDDYCJY/fake-useragent"
-	"github.com/gocolly/colly/v2"
 	"image/color"
 	"image/color/palette"
 	"io"
@@ -15,6 +13,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"regexp"
@@ -23,8 +22,10 @@ import (
 	"sync"
 	"time"
 
+	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
+	"github.com/gocolly/colly/v2"
 	"github.com/shiningrush/avatarbuilder"
 	"github.com/shiningrush/avatarbuilder/calc"
 	"github.com/tidwall/gjson"
@@ -406,22 +407,22 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 	return nil
 }
 
-func Pa() {
+func GetAvatar() {
 	c := colly.NewCollector(
-		//colly.Debugger(&debug.LogDebugger{}), // 开启debugger模式
-		colly.MaxDepth(1),
-		colly.DetectCharset(),
-		//colly.Async(true),
-		colly.AllowURLRevisit(), // 重复访问
 		colly.UserAgent(browser.Random()),
-		colly.AllowedDomains("xslist.org"),
+		colly.AllowedDomains("ggjav.com"),
 	)
-	c.SetRequestTimeout(120 * time.Second)
 
-	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		link := e.Attr("href")
-		fmt.Printf("Link found: %q -> %s\n", e.Text, link)
-		c.Visit(e.Request.AbsoluteURL(link))
+	c.OnHTML(".model", func(e *colly.HTMLElement) {
+		//fmt.Println(e.DOM.Html())
+		src, _ := e.DOM.Find("img").Attr("src")
+		name := e.DOM.Find(".model_name").Text()
+		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
+
+		savePath := "avatar"
+		saveFile := Join(name, path.Ext(src))
+		err := DownloadImage(src, savePath, saveFile)
+		fmt.Printf("error: %s\n", err)
 	})
 
 	c.OnRequest(func(r *colly.Request) {
@@ -436,9 +437,10 @@ func Pa() {
 		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
 	})
 
-	//c.Visit("https://xslist.org/")
-	c.Visit("https://xslist.org/search?query=優希まこと&lg=zh")
-
+	err := c.Visit(Join("https://ggjav.com/main/search?string=", url.QueryEscape("中田みなみ")))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func GeneteSQL() string {
@@ -483,11 +485,6 @@ func GetWebDocument(method, url string, body io.Reader) (*goquery.Document, erro
 	if method == "POST" {
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
-
-	//request.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-	//request.Header.Set("Accept-Encoding", "gzip, deflate, br, zstd")
-	//request.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
-	//request.Header.Set("Cookie", "")
 	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
 	resp, err := client.Do(request)
 	if err != nil {
@@ -509,15 +506,23 @@ func GetWebDocument(method, url string, body io.Reader) (*goquery.Document, erro
 
 func DownloadImage(url, savePath, saveFile string) error {
 	// 发起 GET 请求获取图片数据
-	res, err := http.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
-	defer res.Body.Close()
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("wrong http status code: %d", resp.StatusCode)
+	}
 
 	if saveFile == "" {
 		// 获取原文件名
-		_, saveFile = path.Split(res.Request.URL.Path)
+		_, saveFile = path.Split(resp.Request.URL.Path)
+	}
+
+	if err = os.MkdirAll(savePath, 0750); err != nil {
+		log.Fatal(err)
 	}
 
 	// 创建保存图片的文件
@@ -528,7 +533,7 @@ func DownloadImage(url, savePath, saveFile string) error {
 	defer file.Close()
 
 	// 将响应体的数据写入文件
-	_, err = io.Copy(file, res.Body)
+	_, err = io.Copy(file, resp.Body)
 	if err != nil {
 		return err
 	}

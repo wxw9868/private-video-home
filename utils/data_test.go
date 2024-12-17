@@ -56,32 +56,21 @@ var _ = map[string]string{
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
-	"": "081421_001 メンズ専用エステティシャン  #柊麗奈",
 }
 
-var _ = []string{"遥めぐみ", "", "", "", "", "", "", "", ""}
+var _ = []string{"", "", "", "", "", "", ""}
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "092318-759 極上泡姫物語 Vol.62  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "050618-658 僕の彼女が美咲愛だったら  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "030618-616 ファンと乱交撮影会  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "121617-557 チームのミスはチームリーダーの責任  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "111117_604 放課後のエッチな出来事  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "041517_512 ときめき〜憧れの君と温泉デート〜  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "Heyzo-1577 婚活よりも妊活！？～ドバーっと中に出しちゃって！～  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-1612 続々生中～快楽にのけぞるエロボデイ～  #美咲愛",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "090923_01 素人AV面接 ～Fカップ美巨乳で締まりの良い肉厚マンコの素人娘～  #当麻叶美",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+		"video_2024-12-17_21-10-02": "081421_001 メンズ専用エステティシャン  #柊麗奈",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_",
 		"无码频道_tg搜并关注_@AVWUMAYUANPIAN_每天更新_",
-		"_tg关注_@AVWUMAYUANPIAN",
-		"_一本道_无码AV_無碼AV", "_一本道_无码AV",
-		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV",
-		"_人妻paco_无码AV", "_天然素人_无码AV", "_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
-	var actressSlice = []string{"美咲愛", "笠木日向", "中田みなみ", "当麻叶美", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
+		"_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV",
+		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV",
+		"_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
+	var actressSlice = []string{"遥めぐみ", "柊麗奈", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
@@ -97,11 +86,34 @@ func TestVideoRename(t *testing.T) {
 	// りおん  Rion
 }
 
-func TestAcross(t *testing.T) {
+func TestActress(t *testing.T) {
+	_, err := os.Stat("D:/video/assets/image/pic/中田みなみ.jpg")
+	fmt.Println(err, os.IsExist(err), os.IsNotExist(err))
+
+	//files, err := os.ReadDir("D:/video/assets/image/pic")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//for _, file := range files {
+	//	filename := file.Name()
+	//	if filepath.Ext(filename) == ".jpg" {
+	//		fi, err := file.Info()
+	//		if err != nil {
+	//			log.Fatal(err)
+	//		}
+	//		if fi.Size() == 162 {
+	//			if err = os.Remove(path.Join("D:/video/assets/image/pic", filename)); err != nil {
+	//				log.Fatal(err)
+	//			}
+	//			log.Printf("name: %s, fi: %+v\n", filename, fi.Size())
+	//		}
+	//	}
+	//}
 }
 
-func TestPa(t *testing.T) {
-	Pa()
+func TestGetAvatar(t *testing.T) {
+	GetAvatar()
 }
 
 func TestNowTime(t *testing.T) {

@@ -3,13 +3,19 @@ package service
 import (
 	"encoding/json"
 	"errors"
-	"gorm.io/gorm"
+	"fmt"
+	"net/url"
+	"os"
+	"path"
 	"strconv"
 	"strings"
 
+	browser "github.com/EDDYCJY/fake-useragent"
+	"github.com/gocolly/colly/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
+	"gorm.io/gorm"
 )
 
 type ActressService struct{}
@@ -176,75 +182,15 @@ func (as *ActressService) Info(id uint) (*model.Actress, error) {
 // SaveActress 补充信息
 func (as *ActressService) SaveActress() error {
 	var strs = map[string]string{
-		"輝月あんり": `别名: Anri Kizuki, あんり（専門学生）, 天木ゆう, 輝月あんり
-出生: 1994年02月03日
-三围: B76 / W59 / H87
-罩杯: C Cup
-出道日期: n/a
-星座: Aquarius
-血型: A
-身高: 164cm
-国籍: 日本
-简介: 暂无关于輝月あんり(Anri Kizuki/30岁)的介绍。`,
-		"麻生希": `出生: 1988年12月19日
-三围: B88 / W58 / H89
-罩杯: E Cup
-出道日期: 2016年06月
-星座: Sagittarius
-血型: A
-身高: 170cm
-国籍: 日本
-简介: 暂无关于麻生希(Nozomi Aso)的介绍。`,
-		"京野ななか": `别名: Emiri Aizawa, Nana Koizumi, あやめさくら, かな（居酒屋）, 小泉奈々, 早坂かな, 相沢えみり
-出生: 1992年06月07日
-三围: B84 / W60 / H88
-罩杯: D Cup
-出道日期: n/a
-星座: Gemini
-血型: A
-身高: 158cm
-国籍: 日本
-简介: 暂无关于京野ななか(Nanaka Kyono/32岁)的介绍。`,
-		"あざみねね": `别名: 伊藤英玲奈, 吉澤留美, 春日もな, 立花えれな, 鈴木ワカ, 鈴木ワコ
-出生: 1990年10月10日
-三围: B91 / W58 / H85
-罩杯: J Cup
-出道日期: n/a
-星座: Libra
-血型: B
-身高: 153cm
-国籍: 日本
-简介: 暂无关于あざみねね(Nene Asami/34岁)的介绍。`,
-		"杏堂なつ": `别名: 安藤なつみ, 松山なつみ, 榊れいな
-出生: 1987年12月22日
-三围: B93 / W59 / H87
+		"美咲愛": `出生: n/a
+三围: n/a
 罩杯: n/a
-出道日期: 2006年12月
-星座: Capricorn
-血型: n/a
-身高: 163cm
-国籍: 日本
-简介: 暂无关于杏堂なつ(Natsu Ando)的介绍。`,
-		"七瀬ななみ": `别名: Nanami Nagase
-出生: 1981年08月27日
-三围: 83-60-87 (cm)
-罩杯: C-70 Cup
 出道日期: n/a
-星座: Virgo
-血型: A
-身高: 160 cm
-国籍: 日本
-简介: 暂无关于七瀬ななみ(Nanami Nanase)的介绍。`,
-		"雨音わかな": `别名: 奥野光香
-出生: n/a
-三围: B89 / W59 / H90
-罩杯: F Cup
-出道日期: 2016年06月
 星座: n/a
-血型: A
-身高: 166cm
+血型: n/a
+身高: n/a
 国籍: 日本
-简介: 暂无关于雨音わかな(Wakana Amane)的介绍。`,
+简介: 暂无关于美咲愛(Ai Misaki)的介绍。`,
 		//"": ``,
 	}
 	return db.Transaction(func(tx *gorm.DB) error {
@@ -282,6 +228,73 @@ func (as *ActressService) SaveActress() error {
 			// 根据 `struct` 更新属性，只会更新非零值的字段
 			if err := tx.Model(&model.Actress{}).Where("actress = ?", actress).Updates(m).Error; err != nil {
 				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (as *ActressService) DownAvatar() error {
+	c := colly.NewCollector(
+		colly.UserAgent(browser.Random()),
+		colly.AllowedDomains("ggjav.com"),
+	)
+
+	c.OnHTML(".model", func(e *colly.HTMLElement) {
+		src, _ := e.DOM.Find("img").Attr("src")
+		name := e.DOM.Find(".model_name").Text()
+		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
+
+		savePath := "assets/image/pic"
+		saveFile := utils.Join(name, path.Ext(src))
+		err := utils.DownloadImage(src, savePath, saveFile)
+		fmt.Printf("error: %s\n", err)
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL.String())
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
+	})
+
+	var actresses []string
+	if err := db.Model(&model.Actress{}).Pluck("actress", &actresses).Error; err != nil {
+		return err
+	}
+	for _, actress := range actresses {
+		err := c.Visit(utils.Join("https://ggjav.com/main/search?string=", url.QueryEscape(actress)))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (as *ActressService) CopyAvatar() error {
+	var actresses []string
+	if err := db.Model(&model.Actress{}).Where("avatar = ?", "assets/image/avatar/defaultgirl.png").Pluck("actress", &actresses).Error; err != nil {
+		return err
+	}
+
+	return db.Transaction(func(tx *gorm.DB) error {
+		for _, actress := range actresses {
+			_, err := os.Stat(path.Join("D:/video/assets/image/pic", utils.Join(actress, ".jpg")))
+			if err == nil {
+				m := model.Actress{}
+				m.Avatar = "assets/image/avatar/" + actress + ".jpg"
+				if err = tx.Model(&model.Actress{}).Where("actress = ?", actress).Updates(m).Error; err != nil {
+					return err
+				}
+				err = os.Rename(path.Join("D:/video/assets/image/pic", utils.Join(actress, ".jpg")), path.Join("D:/video/assets/image/na", utils.Join(actress, ".jpg")))
+				if err != nil {
+					return err
+				}
 			}
 		}
 		return nil
