@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// 视频基本信息
+// Video 视频基本信息
 type Video struct {
 	gorm.Model
 	CateID        uint      `gorm:"column:cate_id;type:uint;not null;default:0;comment:视频分类ID"`
@@ -23,7 +23,7 @@ type Video struct {
 	Introduction  string    `gorm:"column:introduction;type:text;comment:简介"`
 }
 
-// 视频剧集信息
+// VideoEpisodes 视频剧集信息
 type VideoEpisodes struct {
 	gorm.Model
 	VideoId       uint      `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
