@@ -15,8 +15,10 @@ import (
 	"testing"
 	"time"
 
+	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
+	"github.com/gocolly/colly/v2"
 	"golang.org/x/image/draw"
 )
 
@@ -37,32 +39,20 @@ var _ = map[string]string{
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
 	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
 }
-
-var _ = []string{"", "", "", "", "", "", "", "", ""}
-
-var _ = map[string]string{
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "121424_100 スケベ椅子持参！～巨乳巨尻デリソープ嬢～  #細田さなえ",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "010124_962 人妻なでしこ調教 ～着物の似合う淫乱熟女を～  #細田さなえ",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "Heyzo-3270 喪服でAV撮影にやってきた未亡人  #細田さなえ",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "081123_893 スッピン熟女 ~細田さんの素顔~  #細田さなえ",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "072223-001 私のセックスを見てください！い～っぱい顔面射精してください！14   #細田さなえ",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "052723_856 二つの熟マンにブチ込み放題！  #細田さなえ  #松村菜央",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
-}
-
 var _ = []string{"", "", "", "", "", "", ""}
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"video_2024-12-17_21-10-02": "081421_001 メンズ専用エステティシャン  #柊麗奈",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "092313-439 極上セレブ婦人 Vol.6  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "110413-471 濃厚な接吻  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "111914-739 ぶっかけ熟女 8 パート 1  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "Heyzo-3123  男の夢！ウハウハ逆3P！！Vol.10  #りおん  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "091424_001 肉便器育成所 ~ 肉食系の熟家畜 ~  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "102415_177 極射  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "010124_001 和服が似合う妖艶な女になった同級生と逆3Pハーレム同窓会  #江波りゅう  #りおん",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-0481  騙された着エロクイーン～ファンと禁断の拘束プレイ～  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "Heyzo-0439  美痴女～Sな女医の快楽治療～  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_",
@@ -70,20 +60,13 @@ func TestVideoRename(t *testing.T) {
 		"_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV",
 		"_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
-	var actressSlice = []string{"遥めぐみ", "柊麗奈", "成宮祐希", "乙葉いおり", "細田さなえ", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
+	var actressSlice = []string{"江波りゅう", "りおん", "篠原なぎさ", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("SUCCESS")
-	// #上原聡美  #さとみ
-	// #大月のの  #中津井加代
-	// 朝桐光    南野あかり
-	// 宮村恋    #歩
-	// 楓乃々花  #高橋明日香
-	// 上原志織  #上原結衣
-	// 京本かえで  #瞳ゆら  #中本みのり
-	// 成宮はるあ 陽咲希美
-	// りおん  Rion
+	// 細田さなえ 土井夏葉 樫田美喜
+	// 森本ひとみ 土井原佳奈子
 }
 
 func TestActress(t *testing.T) {
@@ -110,6 +93,48 @@ func TestActress(t *testing.T) {
 	//		}
 	//	}
 	//}
+}
+
+func TestBatchDownloadAvatars(t *testing.T) {
+	err := BatchDownloadAvatars()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func BatchDownloadAvatars() error {
+	c := colly.NewCollector(
+		colly.UserAgent(browser.Random()),
+		colly.AllowedDomains("javmenu.com"),
+	)
+
+	c.OnHTML(".video-list-item", func(e *colly.HTMLElement) {
+		src, _ := e.DOM.Find("img").Attr("data-src")
+		name := e.DOM.Find("h6").Text()
+		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
+
+		//savePath := "assets/image/pic"
+		//saveFile := utils.Join(name, path.Ext(src))
+		//err := utils.DownloadImage(src, savePath, saveFile)
+		//fmt.Printf("error: %s\n", err)
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL.String())
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
+	})
+
+	if err := c.Visit("https://javmenu.com/zh/uncensored/actress"); err != nil {
+		return err
+	}
+	return nil
 }
 
 func TestGetAvatar(t *testing.T) {

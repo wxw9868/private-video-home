@@ -182,15 +182,35 @@ func (as *ActressService) Info(id uint) (*model.Actress, error) {
 // SaveActress 补充信息
 func (as *ActressService) SaveActress() error {
 	var strs = map[string]string{
-		"美咲愛": `出生: n/a
+		"御坂恵衣": `出生: 2000年03月29日
 三围: n/a
-罩杯: n/a
-出道日期: n/a
-星座: n/a
+罩杯: G Cup
+出道日期: 2019年08月
+星座: Aries
 血型: n/a
 身高: n/a
 国籍: 日本
-简介: 暂无关于美咲愛(Ai Misaki)的介绍。`,
+简介: 暂无关于御坂恵衣(Mei Misaka/24岁)的介绍。`,
+		"前田陽菜": `别名: きゃさりんはらじゅく, 森川あみ, 森川亜美, 鈴木祐美, 雛丸
+出生: 1989年08月14日
+三围: B83 / W58 / H90
+罩杯: D Cup
+出道日期: n/a
+星座: Leo
+血型: n/a
+身高: 158cm
+国籍: 日本
+简介: 暂无关于前田陽菜(Hina Maeda/35岁)的介绍。`,
+		"七瀬ななみ": `别名: Nanami Nagase
+出生: 1981年08月27日
+三围: 83-60-87 (cm)
+罩杯: C-70 Cup
+出道日期: n/a
+星座: Virgo
+血型: A
+身高: 160 cm
+国籍: 日本
+简介: 暂无关于七瀬ななみ(Nanami Nanase)的介绍。`,
 		//"": ``,
 	}
 	return db.Transaction(func(tx *gorm.DB) error {
@@ -237,7 +257,7 @@ func (as *ActressService) SaveActress() error {
 func (as *ActressService) DownAvatar() error {
 	c := colly.NewCollector(
 		colly.UserAgent(browser.Random()),
-		colly.AllowedDomains("ggjav.com"),
+		colly.AllowedDomains("javmenu.com"),
 	)
 
 	c.OnHTML(".model", func(e *colly.HTMLElement) {
@@ -267,6 +287,7 @@ func (as *ActressService) DownAvatar() error {
 	if err := db.Model(&model.Actress{}).Pluck("actress", &actresses).Error; err != nil {
 		return err
 	}
+
 	for _, actress := range actresses {
 		err := c.Visit(utils.Join("https://ggjav.com/main/search?string=", url.QueryEscape(actress)))
 		if err != nil {

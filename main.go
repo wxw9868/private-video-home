@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/wxw9868/video/service"
-
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-colorable"
@@ -60,11 +58,11 @@ func main() {
 		ginSwagger.DefaultModelsExpandDepth(-1)),
 	)
 
-	//err := new(service.VideoService).ImportVideoData("D:/ta", "美咲愛", "笠木日向", "中田みなみ", "当麻叶美")
+	//err := new(service.VideoService).ImportVideoData("D:/ta", "浅川さおり", "向井瞳", "小島さとみ", "竹内柚葉", "森本ひとみ")
 	//err := new(service.ActressService).SaveActress()
 	//err := new(service.ActressService).DownAvatar()
-	err := new(service.ActressService).CopyAvatar()
-	fmt.Println(err)
+	//err := new(service.ActressService).CopyAvatar()
+	//fmt.Println(err)
 
 	if err := r.Run(fmt.Sprintf("%s:%d", conf.Host, conf.Port)); err != nil {
 		panic(err)
