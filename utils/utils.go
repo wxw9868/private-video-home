@@ -117,7 +117,7 @@ func getEncoding(charset string) encoding.Encoding {
 	}
 	enc, err := ianaindex.MIB.Encoding(charset)
 	if err != nil {
-		fmt.Errorf(`%+v`, err)
+		fmt.Printf(`%+v`, err)
 	}
 	return enc
 }
