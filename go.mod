@@ -5,6 +5,7 @@ go 1.22.0
 toolchain go1.22.1
 
 require (
+	github.com/EDDYCJY/fake-useragent v0.2.0
 	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/disintegration/imaging v1.6.2
 	github.com/fsnotify/fsnotify v1.7.0
@@ -29,7 +30,6 @@ require (
 )
 
 require (
-	github.com/EDDYCJY/fake-useragent v0.2.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/antchfx/htmlquery v1.2.3 // indirect
