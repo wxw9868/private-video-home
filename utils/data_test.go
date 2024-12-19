@@ -12,13 +12,12 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
-	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
-	"github.com/gocolly/colly/v2"
 	"golang.org/x/image/draw"
 )
 
@@ -95,46 +94,22 @@ func TestActress(t *testing.T) {
 	//}
 }
 
-func TestBatchDownloadAvatars(t *testing.T) {
-	err := BatchDownloadAvatars()
-	if err != nil {
-		log.Fatal(err)
+func TestBatchDownloadImages(t *testing.T) {
+	start := time.Now().Local()
+
+	var wg = new(sync.WaitGroup)
+	var urls = make(chan string)
+
+	for i := 0; i < runtime.NumCPU(); i++ {
+		wg.Add(1)
+		go Work(urls, wg)
 	}
-}
 
-func BatchDownloadAvatars() error {
-	c := colly.NewCollector(
-		colly.UserAgent(browser.Random()),
-		colly.AllowedDomains("javmenu.com"),
-	)
+	wg.Add(1)
+	go BatchDownloadImages(urls, wg)
 
-	c.OnHTML(".video-list-item", func(e *colly.HTMLElement) {
-		src, _ := e.DOM.Find("img").Attr("data-src")
-		name := e.DOM.Find("h6").Text()
-		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
-
-		//savePath := "assets/image/pic"
-		//saveFile := utils.Join(name, path.Ext(src))
-		//err := utils.DownloadImage(src, savePath, saveFile)
-		//fmt.Printf("error: %s\n", err)
-	})
-
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
-	})
-
-	c.OnResponse(func(r *colly.Response) {
-		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
-	})
-
-	c.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
-	})
-
-	if err := c.Visit("https://javmenu.com/zh/uncensored/actress"); err != nil {
-		return err
-	}
-	return nil
+	wg.Wait()
+	fmt.Printf("SUCCESS, elapsed: %v\n", time.Since(start))
 }
 
 func TestGetAvatar(t *testing.T) {

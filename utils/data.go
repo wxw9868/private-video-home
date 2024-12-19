@@ -17,20 +17,254 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
 	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly/v2/queue"
 	"github.com/shiningrush/avatarbuilder"
 	"github.com/shiningrush/avatarbuilder/calc"
 	"github.com/tidwall/gjson"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
+
+func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressSlice []string) error {
+	files, err := os.ReadDir(videoDir)
+	if err != nil {
+		return err
+	}
+	if len(files) == 0 {
+		return errors.New("no file")
+	}
+
+	for _, file := range files {
+		oldFilename := file.Name()
+		filename := oldFilename
+
+		oldName := strings.Split(filename, ".")[0]
+		newName, ok := nameMap[oldName]
+		if ok {
+			filename = strings.Replace(filename, oldName, newName, -1)
+		}
+		for _, v := range nameSlice {
+			filename = strings.Replace(filename, v, "", -1)
+		}
+		if len(filename) > 0 && filename[6:7] == "-" {
+			filename = strings.Replace(filename, filename[6:7], "_", -1)
+		}
+		if len(filename) > 0 && !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
+			newStr := ""
+			if !strings.Contains(filename, "Heyzo-") {
+				re := regexp.MustCompile(`\d+_\d+`)
+				newStr = re.FindString(filename[0:10])
+			} else {
+				newStr = filename[0:10]
+			}
+			filename = strings.Replace(filename, filename[0:10], newStr+"_", -1)
+		}
+		for _, v := range actressSlice {
+			if strings.Contains(filename, v) {
+				if v == "Vol." {
+					filename = strings.Replace(filename, v, "Vol_", -1)
+				} else if v == "Heyzo-" {
+					filename = strings.Replace(filename, v, "Heyzo_", -1)
+				} else if v == "Debut" {
+					filename = strings.Replace(filename, v, "Debut_", -1)
+				} else if v == "File." {
+					filename = strings.Replace(filename, v, "File_", -1)
+				} else if v == "No." {
+					filename = strings.Replace(filename, v, "No_", -1)
+				} else if v == "__" {
+					filename = strings.Replace(filename, v, "_", -1)
+				} else {
+					if !strings.Contains(filename, "_"+v) {
+						filename = strings.Replace(filename, v, "_"+v, -1)
+					}
+				}
+			}
+		}
+
+		oldPath := videoDir + "/" + oldFilename
+		newPath := videoDir + "/" + filename
+		if err = os.Rename(oldPath, newPath); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func Work(urls chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for url := range urls {
+		err := DownloadImage(url, "avatar", "")
+		if err != nil {
+			fmt.Printf("Image download failed: %s, error: %s\n", url, err)
+		}
+	}
+}
+
+func BatchDownloadImages(urls chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	var (
+		items    uint32
+		requests uint32
+		success  uint32
+		failure  uint32
+		results  uint32
+	)
+
+	c := colly.NewCollector(colly.UserAgent(browser.Random()), colly.AllowURLRevisit())
+
+	q, _ := queue.New(
+		runtime.NumCPU(),
+		&queue.InMemoryQueueStorage{MaxSize: 100000},
+	)
+
+	c.OnHTML(".sewhjer > img", func(e *colly.HTMLElement) {
+		link := strings.Join([]string{e.Request.URL.Scheme, "://", e.Request.URL.Host, e.Attr("data-src")}, "")
+
+		urls <- link
+		atomic.AddUint32(&results, 1)
+		// fmt.Printf("Link found: %s -> %s\n", link, filepath.Ext(dataSrc))
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		atomic.AddUint32(&requests, 1)
+	})
+	c.OnResponse(func(resp *colly.Response) {
+		if resp.StatusCode == http.StatusOK {
+			atomic.AddUint32(&success, 1)
+		} else {
+			atomic.AddUint32(&failure, 1)
+		}
+	})
+	c.OnError(func(resp *colly.Response, err error) {
+		atomic.AddUint32(&failure, 1)
+	})
+
+	var url string
+	for i := 1; i < 48; i++ {
+		if i > 2 {
+			url = fmt.Sprintf("https://www.gnmxjj.com/articlecolumn/starziliaoku_a%d.html", i)
+		} else {
+			url = "https://www.gnmxjj.com/articlecolumn/starziliaoku.html"
+		}
+		q.AddURL(url)
+		atomic.AddUint32(&items, 1)
+	}
+
+	if err := q.Run(c); err != nil {
+		log.Fatalf("Queue.Run() return an error: %v", err)
+	}
+
+	close(urls)
+	fmt.Printf("wrong Queue implementation: items = %d, requests = %d, success = %d, failure = %d, results = %d\n", items, requests, success, failure, results)
+}
+
+func GetAvatar() {
+	c := colly.NewCollector(
+		colly.UserAgent(browser.Random()),
+		colly.AllowedDomains("ggjav.com"),
+	)
+
+	c.OnHTML(".model", func(e *colly.HTMLElement) {
+		//fmt.Println(e.DOM.Html())
+		src, _ := e.DOM.Find("img").Attr("src")
+		name := e.DOM.Find(".model_name").Text()
+		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
+
+		savePath := "avatar"
+		saveFile := Join(name, path.Ext(src))
+		err := DownloadImage(src, savePath, saveFile)
+		fmt.Printf("error: %s\n", err)
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL.String())
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
+	})
+
+	err := c.Visit(Join("https://ggjav.com/main/search?string=", url.QueryEscape("中田みなみ")))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GeneteSQL() string {
+	var data = make(map[string]struct{})
+	err := ReadFileToMap("data.json", &data)
+	if err != nil {
+		return ""
+	}
+
+	var avatarDir = "./assets/image/avatar"
+	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
+	var root = "/Users/v_weixiongwei/go/src/video"
+	root = "D:/GoLang/video"
+	for actress := range data {
+		avatarPath := avatarDir + "/" + actress + ".png"
+		rootPath := root + "/assets/image/avatar" + "/" + actress + ".png"
+		_, err := os.Stat(rootPath)
+		if os.IsNotExist(err) {
+			nameSlice := []rune(actress)
+			if err := GenerateAvatar(string(nameSlice[0]), rootPath); err != nil {
+				log.Fatal(err)
+			}
+		}
+		actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
+	}
+	actressSqlBytes := []byte(actressSql)
+	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
+
+	return actressSql
+}
+
+func GetWebDocument(method, url string, body io.Reader) (*goquery.Document, error) {
+	// Request the HTML page.
+	client := http.Client{
+		Timeout: 50 * time.Second,
+	}
+	request, err := http.NewRequest(method, url, body)
+	if err != nil {
+		fmt.Printf("wrong http request: %s", err.Error())
+		return nil, fmt.Errorf("wrong http request: %s", err.Error())
+	}
+	if method == "POST" {
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Error status code:", resp.StatusCode)
+		return nil, fmt.Errorf("wrong http status code: %d", resp.StatusCode)
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return doc, nil
+}
 
 type MyTime struct {
 	time.Time
@@ -341,170 +575,11 @@ func WriteFile(name string, v any) error {
 	return nil
 }
 
-func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressSlice []string) error {
-	files, err := os.ReadDir(videoDir)
-	if err != nil {
-		return err
-	}
-	if len(files) == 0 {
-		return errors.New("no file")
-	}
-
-	for _, file := range files {
-		oldFilename := file.Name()
-		filename := oldFilename
-
-		oldName := strings.Split(filename, ".")[0]
-		newName, ok := nameMap[oldName]
-		if ok {
-			filename = strings.Replace(filename, oldName, newName, -1)
-		}
-		for _, v := range nameSlice {
-			filename = strings.Replace(filename, v, "", -1)
-		}
-		if len(filename) > 0 && filename[6:7] == "-" {
-			filename = strings.Replace(filename, filename[6:7], "_", -1)
-		}
-		if len(filename) > 0 && !strings.Contains(filename, filename[0:10]+"_") && strings.Contains(filename, filename[0:10]) {
-			newStr := ""
-			if !strings.Contains(filename, "Heyzo-") {
-				re := regexp.MustCompile(`\d+_\d+`)
-				newStr = re.FindString(filename[0:10])
-			} else {
-				newStr = filename[0:10]
-			}
-			filename = strings.Replace(filename, filename[0:10], newStr+"_", -1)
-		}
-		for _, v := range actressSlice {
-			if strings.Contains(filename, v) {
-				if v == "Vol." {
-					filename = strings.Replace(filename, v, "Vol_", -1)
-				} else if v == "Heyzo-" {
-					filename = strings.Replace(filename, v, "Heyzo_", -1)
-				} else if v == "Debut" {
-					filename = strings.Replace(filename, v, "Debut_", -1)
-				} else if v == "File." {
-					filename = strings.Replace(filename, v, "File_", -1)
-				} else if v == "No." {
-					filename = strings.Replace(filename, v, "No_", -1)
-				} else if v == "__" {
-					filename = strings.Replace(filename, v, "_", -1)
-				} else {
-					if !strings.Contains(filename, "_"+v) {
-						filename = strings.Replace(filename, v, "_"+v, -1)
-					}
-				}
-			}
-		}
-
-		oldPath := videoDir + "/" + oldFilename
-		newPath := videoDir + "/" + filename
-		if err = os.Rename(oldPath, newPath); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func GetAvatar() {
-	c := colly.NewCollector(
-		colly.UserAgent(browser.Random()),
-		colly.AllowedDomains("ggjav.com"),
-	)
-
-	c.OnHTML(".model", func(e *colly.HTMLElement) {
-		//fmt.Println(e.DOM.Html())
-		src, _ := e.DOM.Find("img").Attr("src")
-		name := e.DOM.Find(".model_name").Text()
-		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
-
-		savePath := "avatar"
-		saveFile := Join(name, path.Ext(src))
-		err := DownloadImage(src, savePath, saveFile)
-		fmt.Printf("error: %s\n", err)
-	})
-
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
-	})
-
-	c.OnResponse(func(r *colly.Response) {
-		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
-	})
-
-	c.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
-	})
-
-	err := c.Visit(Join("https://ggjav.com/main/search?string=", url.QueryEscape("中田みなみ")))
-	if err != nil {
+func DownloadImage(url, savePath, saveFile string) error {
+	if err := os.MkdirAll(savePath, 0750); err != nil {
 		log.Fatal(err)
 	}
-}
 
-func GeneteSQL() string {
-	var data = make(map[string]struct{})
-	err := ReadFileToMap("data.json", &data)
-	if err != nil {
-		return ""
-	}
-
-	var avatarDir = "./assets/image/avatar"
-	var actressSql = "INSERT OR REPLACE INTO video_Actress (actress, avatar, CreatedAt, UpdatedAt) VALUES "
-	var root = "/Users/v_weixiongwei/go/src/video"
-	root = "D:/GoLang/video"
-	for actress := range data {
-		avatarPath := avatarDir + "/" + actress + ".png"
-		rootPath := root + "/assets/image/avatar" + "/" + actress + ".png"
-		_, err := os.Stat(rootPath)
-		if os.IsNotExist(err) {
-			nameSlice := []rune(actress)
-			if err := GenerateAvatar(string(nameSlice[0]), rootPath); err != nil {
-				log.Fatal(err)
-			}
-		}
-		actressSql += fmt.Sprintf("('%s', '%s', '%v', '%v'), ", actress, avatarPath, time.Now().Local(), time.Now().Local())
-	}
-	actressSqlBytes := []byte(actressSql)
-	actressSql = string(actressSqlBytes[:len(actressSqlBytes)-2])
-
-	return actressSql
-}
-
-func GetWebDocument(method, url string, body io.Reader) (*goquery.Document, error) {
-	// Request the HTML page.
-	client := http.Client{
-		Timeout: 50 * time.Second,
-	}
-	request, err := http.NewRequest(method, url, body)
-	if err != nil {
-		fmt.Printf("wrong http request: %s", err.Error())
-		return nil, fmt.Errorf("wrong http request: %s", err.Error())
-	}
-	if method == "POST" {
-		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	}
-	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
-	resp, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Error status code:", resp.StatusCode)
-		return nil, fmt.Errorf("wrong http status code: %d", resp.StatusCode)
-	}
-
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return doc, nil
-}
-
-func DownloadImage(url, savePath, saveFile string) error {
 	// 发起 GET 请求获取图片数据
 	resp, err := http.Get(url)
 	if err != nil {
@@ -519,10 +594,6 @@ func DownloadImage(url, savePath, saveFile string) error {
 	if saveFile == "" {
 		// 获取原文件名
 		_, saveFile = path.Split(resp.Request.URL.Path)
-	}
-
-	if err = os.MkdirAll(savePath, 0750); err != nil {
-		log.Fatal(err)
 	}
 
 	// 创建保存图片的文件
