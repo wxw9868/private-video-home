@@ -3,7 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
+	metrics "github.com/bmc-toolbox/gin-go-metrics"
+	metricsMiddleware "github.com/bmc-toolbox/gin-go-metrics/middleware"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-colorable"
@@ -26,6 +30,21 @@ import (
 //	@BasePath	/
 
 func main() {
+	// Optional part to send metrics to Graphite,
+	// as alternative you can send metrics from
+	// rcrowley/go-metrics.DefaultRegistry yourself
+	err := metrics.Setup(
+		"graphite",  // clientType
+		"localhost", // graphite host
+		2003,        // graphite port
+		"server",    // metrics prefix
+		time.Minute, // graphite flushInterval
+	)
+	if err != nil {
+		fmt.Printf("Failed to set up monitoring: %s\n", err)
+		os.Exit(1)
+	}
+
 	// gin.SetMode(gin.ReleaseMode)
 
 	// 强制日志颜色化
@@ -33,6 +52,16 @@ func main() {
 	gin.DefaultWriter = colorable.NewColorableStdout()
 
 	r := gin.Default()
+
+	// argument to NewMetrics tells which variables need to be
+	// expanded in metrics, more on that by link:
+	// https://banzaicloud.com/blog/monitoring-gin-with-prometheus/
+	p := metricsMiddleware.NewMetrics([]string{"expanded_parameter"})
+	r.Use(p.HandlerFunc(
+		nil,
+		[]string{"/ping", "/api/ping"}, // ignore given URLs from stats
+		true,                           // replace "/" with "_" in URLs to prevent splitting Graphite namespace
+	))
 
 	//logger, _ := zap.NewProduction()
 	//r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
