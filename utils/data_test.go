@@ -16,6 +16,9 @@ import (
 	"testing"
 	"time"
 
+	browser "github.com/EDDYCJY/fake-useragent"
+	"github.com/gocolly/colly/v2"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
 	"golang.org/x/image/draw"
@@ -40,37 +43,23 @@ var _ = map[string]string{
 }
 var _ = []string{"", "", "", "", "", "", ""}
 
-var _ = map[string]string{
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "010618_204 おばさんぽ 〜江波りゅうの遠い記憶〜  #江波りゅう",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "022721_001 着物姿の江波りゅうを下品に調教！  #江波りゅう",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
-	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
-}
-var _ = []string{"", "", "", "", "", "", ""}
-
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "092313-439 極上セレブ婦人 Vol.6  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "110413-471 濃厚な接吻  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "111914-739 ぶっかけ熟女 8 パート 1  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "Heyzo-3123  男の夢！ウハウハ逆3P！！Vol.10  #りおん  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "091424_001 肉便器育成所 ~ 肉食系の熟家畜 ~  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "102415_177 極射  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "010124_001 和服が似合う妖艶な女になった同級生と逆3Pハーレム同窓会  #江波りゅう  #りおん",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-0481  騙された着エロクイーン～ファンと禁断の拘束プレイ～  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "Heyzo-0439  美痴女～Sな女医の快楽治療～  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "071313-381 Debut Vol.7  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "010618_204 おばさんぽ 〜江波りゅうの遠い記憶〜  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "022721_001 着物姿の江波りゅうを下品に調教！  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "030219_817 M痴女  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "080723-001 ネトラレ 〜盗撮されてハメられた兄嫁〜  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "081923_001 成績の上がるエッチな実践授業  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "122920_001 江波りゅう ～本音を赤裸々に告白～  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "123017-568 レズ不倫に仕組まれたスワップ乱交   #北条麻妃  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-1668  セックスレスな人妻と濃厚性交渉  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "Heyzo-2425  おしゃぶり大好き！痴熟女りゅう  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "Heyzo-2471  オナりまくってグチョグチョ！なドすけべ娘と絶頂性交Vol.14  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "Heyzo-2673  ネトラレちゃった美人女教師  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "Heyzo-2710  夫の借金の形にヤラれちゃう巨乳妻  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "Heyzo-2766  激烈ハードに3穴責め！！Vol.2  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "Heyzo-3169  どエロなお隣さんは寝取り大好きなセクシー女優  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "Heyzo-3282 娘のためなら咥えます！～悪徳教師に弄ばれる母親～  #江波りゅう",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_",
@@ -78,12 +67,12 @@ func TestVideoRename(t *testing.T) {
 		"_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV",
 		"_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
-	var actressSlice = []string{"江波りゅう", "りおん", "篠原なぎさ", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
+	var actressSlice = []string{"江波りゅう", "北条麻妃", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("SUCCESS")
-	// 細田さなえ 土井夏葉 樫田美喜
+	// 細田さなえ 土井夏葉樫田美喜,佐々野ひまり,細田さなえ,富沢浮江
 	// 森本ひとみ 土井原佳奈子
 }
 
@@ -117,22 +106,97 @@ func TestBatchDownloadImages(t *testing.T) {
 	start := time.Now().Local()
 
 	var wg = new(sync.WaitGroup)
-	var urls = make(chan string)
+	var actresses = make(chan Actress)
 
 	for i := 0; i < runtime.NumCPU(); i++ {
 		wg.Add(1)
-		go Work(urls, wg)
+		go Work(actresses, wg)
 	}
 
 	wg.Add(1)
-	go BatchDownloadImages(urls, wg)
+	go BatchDownloadImages(actresses, wg)
 
 	wg.Wait()
 	fmt.Printf("SUCCESS, elapsed: %v\n", time.Since(start))
 }
 
-func TestGetAvatar(t *testing.T) {
-	GetAvatar()
+func TestAvatar(t *testing.T) {
+	Avatar2()
+	Avatar1()
+}
+
+func Avatar2() {
+	c := colly.NewCollector(
+		colly.UserAgent(browser.Random()),
+		colly.AllowedDomains("ggjav.tv"),
+	)
+
+	c.OnHTML(".model", func(e *colly.HTMLElement) {
+		src, _ := e.DOM.Find("img").Attr("src")
+		name := e.DOM.Find(".model_name").Text()
+		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
+
+		savePath := "avatar"
+		saveFile := Join(name, path.Ext(src))
+		err := DownloadImage(src, savePath, saveFile)
+		if err != nil {
+			fmt.Printf("error: %s\n", err)
+		}
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL.String())
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
+	})
+
+	//err := c.Visit(Join("https://ggjav.com/main/search?string=", url.QueryEscape("中田みなみ")))
+	link := Join("https://ggjav.tv/main/all_uncensored_model?type=uncensored&page=", strconv.Itoa(22))
+	err := c.Visit(link)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func Avatar1() {
+	c := colly.NewCollector(
+		colly.UserAgent(browser.Random()),
+		colly.AllowedDomains("javmenu.com"),
+	)
+
+	c.OnHTML(".card", func(e *colly.HTMLElement) {
+		name := e.DOM.Find("h6").Text()
+		src, _ := e.DOM.Find("img").Attr("data-src")
+		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
+
+		savePath := "avatar"
+		saveFile := Join(name, path.Ext(src))
+		err := DownloadImage(strings.Replace(src, "http", "https", -1), savePath, saveFile)
+		fmt.Printf("error: %s\n", err)
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL.String())
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
+	})
+
+	err := c.Visit("https://javmenu.com/zh/uncensored/actress")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func TestNowTime(t *testing.T) {
@@ -216,7 +280,6 @@ func TestGetWebDocument(t *testing.T) {
 	//url := Join("https://ggjav.com/main/search?string", "杉浦花音")
 	//Nanako Asahina, まーちゃん, 今井花菜, 小池愛菜, 恋乃みくる, 朝比奈京子, 朝比奈恭子, 浅野麻衣, 野々村あいり, 陽菜子,上岡流留香,冴島みのり,ななこ,せりな・愛・ちひろ,モカ
 
-	//
 	var url1 = Join("https://nowav.tv/?s=", "亀井ひとみ")
 	doc, err := GetWebDocument("GET", url1, nil)
 	if err != nil {

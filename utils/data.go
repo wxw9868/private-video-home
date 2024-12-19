@@ -13,7 +13,6 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"regexp"
@@ -101,17 +100,22 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 	return nil
 }
 
-func Work(urls chan string, wg *sync.WaitGroup) {
+type Actress struct {
+	Filename string
+	Link     string
+}
+
+func Work(actresses chan Actress, wg *sync.WaitGroup) {
 	defer wg.Done()
-	for url := range urls {
-		err := DownloadImage(url, "avatar", "")
+	for v := range actresses {
+		err := DownloadImage(v.Link, "images", v.Filename)
 		if err != nil {
-			fmt.Printf("Image download failed: %s, error: %s\n", url, err)
+			fmt.Printf("Image download failed: %s, error: %s\n", v, err)
 		}
 	}
 }
 
-func BatchDownloadImages(urls chan string, wg *sync.WaitGroup) {
+func BatchDownloadImages(actresses chan Actress, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var (
 		items    uint32
@@ -128,14 +132,6 @@ func BatchDownloadImages(urls chan string, wg *sync.WaitGroup) {
 		&queue.InMemoryQueueStorage{MaxSize: 100000},
 	)
 
-	c.OnHTML(".sewhjer > img", func(e *colly.HTMLElement) {
-		link := strings.Join([]string{e.Request.URL.Scheme, "://", e.Request.URL.Host, e.Attr("data-src")}, "")
-
-		urls <- link
-		atomic.AddUint32(&results, 1)
-		// fmt.Printf("Link found: %s -> %s\n", link, filepath.Ext(dataSrc))
-	})
-
 	c.OnRequest(func(r *colly.Request) {
 		atomic.AddUint32(&requests, 1)
 	})
@@ -150,14 +146,33 @@ func BatchDownloadImages(urls chan string, wg *sync.WaitGroup) {
 		atomic.AddUint32(&failure, 1)
 	})
 
-	var url string
-	for i := 1; i < 48; i++ {
-		if i > 2 {
-			url = fmt.Sprintf("https://www.gnmxjj.com/articlecolumn/starziliaoku_a%d.html", i)
-		} else {
-			url = "https://www.gnmxjj.com/articlecolumn/starziliaoku.html"
+	//c.OnHTML(".card", func(e *colly.HTMLElement) {
+	//	name := e.DOM.Find("h6").Text()
+	//	src, _ := e.DOM.Find("img").Attr("data-src")
+	//
+	//	actresses <- Actress{
+	//		Filename: Join(name, path.Ext(src)),
+	//		Link:     strings.Replace(src, "http", "https", -1),
+	//	}
+	//	atomic.AddUint32(&results, 1)
+	//})
+	//for i := 1; i <= 22; i++ {
+	//	_ = q.AddURL(Join("https://javmenu.com/zh/uncensored/actress?page=", strconv.Itoa(i)))
+	//	atomic.AddUint32(&items, 1)
+	//}
+
+	c.OnHTML(".model", func(e *colly.HTMLElement) {
+		name := e.DOM.Find(".model_name").Text()
+		src, _ := e.DOM.Find("img").Attr("src")
+
+		actresses <- Actress{
+			Filename: Join(name, path.Ext(src)),
+			Link:     src,
 		}
-		q.AddURL(url)
+		atomic.AddUint32(&results, 1)
+	})
+	for i := 1; i <= 78; i++ {
+		_ = q.AddURL(Join("https://ggjav.tv/main/all_uncensored_model?type=uncensored&page=", strconv.Itoa(i)))
 		atomic.AddUint32(&items, 1)
 	}
 
@@ -165,44 +180,8 @@ func BatchDownloadImages(urls chan string, wg *sync.WaitGroup) {
 		log.Fatalf("Queue.Run() return an error: %v", err)
 	}
 
-	close(urls)
+	close(actresses)
 	fmt.Printf("wrong Queue implementation: items = %d, requests = %d, success = %d, failure = %d, results = %d\n", items, requests, success, failure, results)
-}
-
-func GetAvatar() {
-	c := colly.NewCollector(
-		colly.UserAgent(browser.Random()),
-		colly.AllowedDomains("ggjav.com"),
-	)
-
-	c.OnHTML(".model", func(e *colly.HTMLElement) {
-		//fmt.Println(e.DOM.Html())
-		src, _ := e.DOM.Find("img").Attr("src")
-		name := e.DOM.Find(".model_name").Text()
-		fmt.Printf("actress: %s, src:%s, ext:%s\n", name, src, path.Ext(src))
-
-		savePath := "avatar"
-		saveFile := Join(name, path.Ext(src))
-		err := DownloadImage(src, savePath, saveFile)
-		fmt.Printf("error: %s\n", err)
-	})
-
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
-	})
-
-	c.OnResponse(func(r *colly.Response) {
-		fmt.Printf("Response %s: %d bytes\n", r.Request.URL, len(r.Body))
-	})
-
-	c.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error %s: %v\n", r.Request.URL, err)
-	})
-
-	err := c.Visit(Join("https://ggjav.com/main/search?string=", url.QueryEscape("中田みなみ")))
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func GeneteSQL() string {
