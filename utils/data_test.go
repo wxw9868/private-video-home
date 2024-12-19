@@ -41,6 +41,25 @@ var _ = map[string]string{
 }
 var _ = []string{"", "", "", "", "", "", ""}
 
+var _ = map[string]string{
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "010618_204 おばさんぽ 〜江波りゅうの遠い記憶〜  #江波りゅう",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "022721_001 着物姿の江波りゅうを下品に調教！  #江波りゅう",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
+	"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
+}
+var _ = []string{"", "", "", "", "", "", ""}
+
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "092313-439 極上セレブ婦人 Vol.6  #江波りゅう",
@@ -52,7 +71,7 @@ func TestVideoRename(t *testing.T) {
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "010124_001 和服が似合う妖艶な女になった同級生と逆3Pハーレム同窓会  #江波りゅう  #りおん",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-0481  騙された着エロクイーン～ファンと禁断の拘束プレイ～  #江波りゅう",
 		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "Heyzo-0439  美痴女～Sな女医の快楽治療～  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "071313-381 Debut Vol.7  #江波りゅう",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_",
