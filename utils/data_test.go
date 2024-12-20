@@ -45,21 +45,21 @@ var _ = []string{"", "", "", "", "", "", ""}
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "010618_204 おばさんぽ 〜江波りゅうの遠い記憶〜  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "022721_001 着物姿の江波りゅうを下品に調教！  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "030219_817 M痴女  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "080723-001 ネトラレ 〜盗撮されてハメられた兄嫁〜  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "081923_001 成績の上がるエッチな実践授業  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "122920_001 江波りゅう ～本音を赤裸々に告白～  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "123017-568 レズ不倫に仕組まれたスワップ乱交   #北条麻妃  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "Heyzo-1668  セックスレスな人妻と濃厚性交渉  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "Heyzo-2425  おしゃぶり大好き！痴熟女りゅう  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "Heyzo-2471  オナりまくってグチョグチョ！なドすけべ娘と絶頂性交Vol.14  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "Heyzo-2673  ネトラレちゃった美人女教師  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "Heyzo-2710  夫の借金の形にヤラれちゃう巨乳妻  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "Heyzo-2766  激烈ハードに3穴責め！！Vol.2  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "Heyzo-3169  どエロなお隣さんは寝取り大好きなセクシー女優  #江波りゅう",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "Heyzo-3282 娘のためなら咥えます！～悪徳教師に弄ばれる母親～  #江波りゅう",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_",
@@ -67,13 +67,14 @@ func TestVideoRename(t *testing.T) {
 		"_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV",
 		"_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
-	var actressSlice = []string{"江波りゅう", "北条麻妃", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
+	var actressSlice = []string{"ももき希", "大橋由香", "", "", "", "", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("SUCCESS")
 	// 細田さなえ 土井夏葉樫田美喜,佐々野ひまり,細田さなえ,富沢浮江
 	// 森本ひとみ 土井原佳奈子
+	// tdl dl -u https://t.me/mczl07/3848 -d D:/down
 }
 
 func TestActress(t *testing.T) {

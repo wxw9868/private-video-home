@@ -7,6 +7,7 @@ toolchain go1.22.1
 require (
 	github.com/EDDYCJY/fake-useragent v0.2.0
 	github.com/PuerkitoBio/goquery v1.9.2
+	github.com/bmc-toolbox/gin-go-metrics v0.0.3
 	github.com/disintegration/imaging v1.6.2
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-contrib/pprof v1.5.0
@@ -35,7 +36,6 @@ require (
 	github.com/antchfx/htmlquery v1.2.3 // indirect
 	github.com/antchfx/xmlquery v1.2.4 // indirect
 	github.com/antchfx/xpath v1.1.8 // indirect
-	github.com/bmc-toolbox/gin-go-metrics v0.0.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

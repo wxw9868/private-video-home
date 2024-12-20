@@ -44,6 +44,9 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 	}
 
 	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
 		oldFilename := file.Name()
 		filename := oldFilename
 
