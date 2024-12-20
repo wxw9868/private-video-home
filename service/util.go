@@ -82,7 +82,7 @@ func (us *UtilService) OneAddInfoToActress(actress string) error {
 			m.BloodGroup = strings.Trim(strings.Split(bloodGroup, ":")[1], " ")
 			m.Stature = strings.Trim(strings.Split(stature, ":")[1], " ")
 			m.Nationality = strings.Trim(strings.Split(nationality, ":")[1], " ")
-			m.Introduction = strings.Trim(strings.Split(introduction, ":")[1], " ")
+			m.Intro = strings.Trim(strings.Split(introduction, ":")[1], " ")
 		}
 	})
 	//fmt.Printf("%+v\n", m)

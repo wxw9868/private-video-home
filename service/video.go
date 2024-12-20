@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/spf13/cast"
 	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
@@ -21,69 +22,67 @@ type VideoService struct{}
 
 type VideoInfo struct {
 	ID             uint      `json:"id"`
-	Title          string    `json:"title" gorm:"column:title;type:varchar(255);comment:标题"`
-	Actress        string    `json:"actress" gorm:"column:actress;type:varchar(100);comment:演员"`
-	Size           int64     `json:"size" gorm:"column:size;type:bigint;comment:大小"`
-	Duration       float64   `json:"duration" gorm:"column:duration;type:float;default:0;comment:时长"`
-	Poster         string    `json:"poster" gorm:"column:poster;type:varchar(255);comment:封面"`
-	Width          int       `json:"width" gorm:"column:width;type:int;default:0;comment:宽"`
-	Height         int       `json:"height" gorm:"column:height;type:int;default:0;comment:高"`
-	CodecName      string    `json:"codec_name" gorm:"column:codec_name;type:varchar(90);comment:编解码器"`
-	ChannelLayout  string    `json:"channel_layout" gorm:"column:channel_layout;type:varchar(90);comment:音频声道"`
-	CreationTime   time.Time `gorm:"column:creation_time;type:date;comment:时间"`
-	Collect        uint      `json:"collect" gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
-	Browse         uint      `json:"browse" gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
-	Zan            uint      `json:"zan" gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
-	Cai            uint      `json:"cai" gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
-	Watch          uint      `json:"watch" gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
-	ActressIds     string    `json:"actress_ids" gorm:"column:actress_ids;type:varchar(255);comment:演员ID"`
-	ActressNames   string    `json:"actress_names" gorm:"column:actress_names;type:varchar(255);comment:演员名称"`
-	ActressAvatars string    `json:"actress_avatars" gorm:"column:actress_avatars;type:varchar(2550);comment:演员头像"`
+	Title          string    `json:"title" gorm:"comment:标题"`
+	Actress        string    `json:"actress" gorm:"comment:演员"`
+	Size           int64     `json:"size" gorm:"comment:大小"`
+	Duration       float64   `json:"duration" gorm:"comment:时长"`
+	Poster         string    `json:"poster" gorm:"comment:封面"`
+	Width          int       `json:"width" gorm:"comment:宽"`
+	Height         int       `json:"height" gorm:"comment:高"`
+	CodecName      string    `json:"codecName" gorm:"comment:编解码器"`
+	ChannelLayout  string    `json:"channelLayout" gorm:"comment:音频声道"`
+	CreationTime   time.Time `json:"creationTime" gorm:"comment:时间"`
+	CollectNum     uint      `json:"collectNum" gorm:"comment:收藏"`
+	BrowseNum      uint      `json:"browseNum" gorm:"comment:浏览"`
+	LikeNum        uint      `json:"likeNum" gorm:"comment:赞"`
+	DisLikeNum     uint      `json:"disLikeNum" gorm:"comment:踩"`
+	WatchNum       uint      `json:"watchNum" gorm:"comment:观看"`
+	ActressIds     string    `json:"actressIds" gorm:"comment:演员ID"`
+	ActressNames   string    `json:"actressNames" gorm:"comment:演员名称"`
+	ActressAvatars string    `json:"actressAvatars" gorm:"comment:演员头像"`
 }
 type Video struct {
-	ID       uint   `json:"id"`
-	Title    string `json:"title"`
-	Poster   string `json:"poster"`
-	Duration string `json:"duration"`
-	Browse   uint   `json:"browse"`
-	Collect  uint   `json:"collect"`
+	ID         uint   `json:"id"`
+	Title      string `json:"title"`
+	Poster     string `json:"poster"`
+	Duration   string `json:"duration"`
+	BrowseNum  uint   `json:"browseNum"`
+	CollectNum uint   `json:"collectNum"`
 }
 
 func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort string) (data map[string]interface{}, err error) {
 	var ids []uint
 
-	f := func(ids []uint, count int) (map[string]interface{}, error) {
+	f := func(ids []uint, total int) (map[string]interface{}, error) {
 		videos := make([]Video, len(ids))
 		for i, id := range ids {
 			result := rdb.HGetAll(ctx, utils.Join("video_video_", strconv.Itoa(int(id)))).Val()
-			browse, _ := strconv.Atoi(result["browse"])
-			collect, _ := strconv.Atoi(result["collect"])
 			videos[i] = Video{
-				ID:       id,
-				Title:    result["title"],
-				Poster:   result["poster"],
-				Duration: result["duration"],
-				Browse:   uint(browse),
-				Collect:  uint(collect),
+				ID:         id,
+				Title:      result["title"],
+				Poster:     result["poster"],
+				Duration:   result["duration"],
+				BrowseNum:  cast.ToUint(result["browseNum"]),
+				CollectNum: cast.ToUint(result["collectNum"]),
 			}
 		}
 		data = map[string]interface{}{
 			"list":  videos,
-			"count": count,
+			"total": total,
 		}
 		return data, nil
 	}
 
 	if actressID != 0 {
 		var vadb = db.Model(&model.VideoActress{}).Where("actress_id = ?", actressID)
-		var count int64
-		if err = vadb.Count(&count).Error; err != nil {
+		var total int64
+		if err = vadb.Count(&total).Error; err != nil {
 			return nil, err
 		}
-		if err = vadb.Scopes(Paginate(page, pageSize, int(count))).Pluck("video_id", &ids).Error; err != nil {
+		if err = vadb.Scopes(Paginate(page, pageSize, int(total))).Pluck("video_id", &ids).Error; err != nil {
 			return nil, err
 		}
-		return f(ids, int(count))
+		return f(ids, int(total))
 	}
 
 	var key string
@@ -103,11 +102,11 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	if action != "" && sort != "" {
 		vdb = vdb.Order(utils.Join(action, " ", sort))
 	}
-	var count int64
-	if err = vdb.Count(&count).Error; err != nil {
+	var total int64
+	if err = vdb.Count(&total).Error; err != nil {
 		return nil, err
 	}
-	if err = db.Table("(?)", vdb).Scopes(Paginate(page, pageSize, int(count))).Pluck("id", &ids).Error; err != nil {
+	if err = db.Table("(?)", vdb).Scopes(Paginate(page, pageSize, int(total))).Pluck("id", &ids).Error; err != nil {
 		return nil, err
 	}
 
@@ -117,10 +116,10 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	}
 	result, _ := rdb.HGet(ctx, key, "ids").Result()
 	if strings.Compare(string(bts), result) == 0 {
-		return f(ids, int(count))
+		return f(ids, int(total))
 	}
 
-	rows, err := vdb.Scopes(Paginate(page, pageSize, int(count))).Rows()
+	rows, err := vdb.Scopes(Paginate(page, pageSize, int(total))).Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -134,12 +133,12 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 		db.ScanRows(rows, &videoInfo)
 
 		video := Video{
-			ID:       videoInfo.ID,
-			Title:    videoInfo.Title,
-			Poster:   videoInfo.Poster,
-			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
-			Browse:   videoInfo.Browse,
-			Collect:  videoInfo.Collect,
+			ID:         videoInfo.ID,
+			Title:      videoInfo.Title,
+			Poster:     videoInfo.Poster,
+			Duration:   utils.ResolveTime(uint32(videoInfo.Duration)),
+			BrowseNum:  videoInfo.BrowseNum,
+			CollectNum: videoInfo.CollectNum,
 		}
 		videos = append(videos, video)
 		keys = append(keys, utils.Join("video_video_", strconv.Itoa(int(videoInfo.ID))))
@@ -148,8 +147,8 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 	txf := func(tx *redis.Tx) error {
 		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
 			pipe.HSet(ctx, key, "len", len(ids), "ids", string(bts))
-			for _, a := range videos {
-				pipe.HSet(ctx, utils.Join("video_video_", strconv.Itoa(int(a.ID))), "id", a.ID, "title", a.Title, "poster", a.Poster, "duration", a.Duration, "browse", a.Browse, "collect", a.Collect)
+			for _, video := range videos {
+				pipe.HSet(ctx, utils.Join("video_video_", strconv.Itoa(int(video.ID))), "id", video.ID, "title", video.Title, "poster", video.Poster, "duration", video.Duration, "browseNum", video.BrowseNum, "collectNum", video.CollectNum)
 			}
 			return nil
 		})
@@ -161,7 +160,7 @@ func (vs *VideoService) Find(actressID int, page, pageSize int, action, sort str
 
 	data = map[string]interface{}{
 		"list":  videos,
-		"count": count,
+		"total": total,
 	}
 	return data, nil
 }
@@ -174,7 +173,7 @@ func (vs *VideoService) First(id string) (model.Video, error) {
 	return video, nil
 }
 
-func (vs *VideoService) Info(id uint) (VideoInfo, error) {
+func (vs *VideoService) Info(id, userId uint) (map[string]interface{}, error) {
 	var videoInfo VideoInfo
 	if err := db.Table("video_Video as v").
 		Select("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch, group_concat(a.id,',') as actress_ids, group_concat(a.actress,',') as actress_names, group_concat(a.avatar,',') as actress_avatars").
@@ -184,9 +183,50 @@ func (vs *VideoService) Info(id uint) (VideoInfo, error) {
 		Where("v.id = ?", id).
 		Group("v.id,v.title,v.duration,v.poster,v.size,v.width,v.height,v.codec_name,v.channel_layout,v.creation_time,l.collect, l.browse, l.zan, l.cai, l.watch").
 		Scan(&videoInfo).Error; err != nil {
-		return VideoInfo{}, err
+		return nil, err
 	}
-	return videoInfo, nil
+
+	type actress struct {
+		ID      string `json:"id"`
+		Actress string `json:"actress"`
+		Avatar  string `json:"avatar"`
+	}
+	idSlice := strings.Split(videoInfo.ActressIds, ",")
+	actressSlice := strings.Split(videoInfo.ActressNames, ",")
+	avatarSlice := strings.Split(videoInfo.ActressAvatars, ",")
+	actresses := make([]actress, len(idSlice))
+	for i := 0; i < len(idSlice); i++ {
+		actresses[i] = actress{ID: idSlice[i], Actress: actressSlice[i], Avatar: avatarSlice[i]}
+	}
+	var collectID uint = 0
+	var isCollect bool = false
+	userCollectLog, err := new(UserService).CollectLog(userId, videoInfo.ID)
+	if err == nil {
+		collectID = userCollectLog.ID
+		isCollect = true
+	}
+	data := map[string]interface{}{
+		"id":            videoInfo.ID,
+		"title":         videoInfo.Title,
+		"actresses":     actresses,
+		"poster":        videoInfo.Poster,
+		"link":          "assets/video/" + videoInfo.Title + ".mp4",
+		"duration":      utils.ResolveTime(uint32(videoInfo.Duration)),
+		"size":          float64(videoInfo.Size) / 1024 / 1024,
+		"width":         videoInfo.Width,
+		"height":        videoInfo.Height,
+		"codecName":     videoInfo.CodecName,
+		"channelLayout": videoInfo.ChannelLayout,
+		"modTime":       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
+		"collectNum":    videoInfo.CollectNum,
+		"browseNum":     videoInfo.BrowseNum,
+		"likeNum":       videoInfo.LikeNum,
+		"dislikeNum":    videoInfo.DisLikeNum,
+		"watchNum":      videoInfo.WatchNum,
+		"collectID":     collectID,
+		"isCollect":     isCollect,
+	}
+	return data, nil
 }
 
 func (vs *VideoService) List() ([]model.Video, error) {
@@ -273,30 +313,30 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 }
 
 func (vs *VideoService) GofoundIndex(videoID uint) error {
-	videoInfo, _ := vs.Info(videoID)
+	data, _ := vs.Info(videoID, 0)
+	id := data["id"].(uint)
+	title := data["title"].(string)
 
-	rdb.HSet(ctx, utils.Join("video_video_", strconv.Itoa(int(videoInfo.ID))), "id", videoInfo.ID, "title", videoInfo.Title, "poster", videoInfo.Poster, "duration", videoInfo.Duration, "browse", videoInfo.Browse, "collect", videoInfo.Collect)
-
-	f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
+	rdb.HSet(ctx, utils.Join("video_video_", strconv.FormatUint(uint64(id), 10)), "id", id, "title", title, "poster", data["poster"], "duration", data["duration"], "browseNum", data["browseNum"], "browseNum", data["browseNum"])
 	index := Index{
-		Id:   videoInfo.ID,
-		Text: videoInfo.Title,
+		Id:   id,
+		Text: title,
 		Document: VideoData{
-			ID:            videoInfo.ID,
-			Title:         videoInfo.Title,
-			Poster:        videoInfo.Poster,
-			Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
-			Size:          f / 1024 / 1024,
-			CreationTime:  videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			Width:         videoInfo.Width,
-			Height:        videoInfo.Height,
-			CodecName:     videoInfo.CodecName,
-			ChannelLayout: videoInfo.ChannelLayout,
-			CollectNum:    videoInfo.Collect,
-			BrowseNum:     videoInfo.Browse,
-			WatchNum:      videoInfo.Watch,
-			ZanNum:        videoInfo.Zan,
-			CaiNum:        videoInfo.Cai,
+			ID:            data["id"].(uint),
+			Title:         data["title"].(string),
+			Poster:        data["poster"].(string),
+			Duration:      data["duration"].(string),
+			Size:          data["size"].(float64),
+			CreationTime:  data["modTime"].(string),
+			Width:         data["width"].(int),
+			Height:        data["height"].(int),
+			CodecName:     data["codecName"].(string),
+			ChannelLayout: data["channelLayout"].(string),
+			CollectNum:    data["collectNum"].(uint),
+			BrowseNum:     data["browseNum"].(uint),
+			LikeNum:       data["likeNum"].(uint),
+			DisLikeNum:    data["dislikeNum"].(uint),
+			WatchNum:      data["watchNum"].(uint),
 		},
 	}
 	b, err := json.Marshal(&index)
@@ -372,9 +412,9 @@ func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userI
 
 type VideoComment struct {
 	model.VideoComment
-	LogUserID uint `gorm:"column:log_user_id;type:uint;not null;default:0;comment:用户ID"`
-	Zan       uint `gorm:"column:zan;type:uint;not null;default:0;comment:支持（赞）"`
-	Cai       uint `gorm:"column:cai;type:uint;not null;default:0;comment:反对（踩）"`
+	LogUserID uint `gorm:"comment:用户ID"`
+	Zan       uint `gorm:"comment:支持（赞）"`
+	Cai       uint `gorm:"comment:反对（踩）"`
 }
 
 func (vs *VideoService) CommentList(videoID, userID uint) ([]*CommentTree, error) {
@@ -544,12 +584,12 @@ func deleteArray(d []uint, e uint) []uint {
 // }
 
 type VideoDanmu struct {
-	Text   string  `json:"text" gorm:"column:text;type:text;not null;comment:弹幕文本"`
-	Time   float64 `json:"time" gorm:"column:time;type:double;not null;comment:弹幕时间, 默认为当前播放器时间"`
-	Mode   uint8   `json:"mode" gorm:"column:mode;type:uint;not null;default:0;comment:弹幕模式: 0: 滚动(默认)，1: 顶部，2: 底部"`
-	Color  string  `json:"color" gorm:"column:color;type:text;not null;comment:弹幕颜色，默认为白色"`
-	Border bool    `json:"border" gorm:"column:border;type:bool;not null;default:false;comment:弹幕是否有描边, 默认为 false"`
-	// Style  string `json:"style" gorm:"column:style;type:text;not null;comment:弹幕自定义样式, 默认为空对象"`
+	Text   string  `json:"text" gorm:"comment:弹幕文本"`
+	Time   float64 `json:"time" gorm:"comment:弹幕时间, 默认为当前播放器时间"`
+	Mode   uint8   `json:"mode" gorm:"comment:弹幕模式: 0: 滚动(默认) 1: 顶部 2: 底部"`
+	Color  string  `json:"color" gorm:"comment:弹幕颜色，默认为白色"`
+	Border bool    `json:"border" gorm:"comment:弹幕是否有描边, 默认为 false"`
+	// Style  string `json:"style" gorm:"comment:弹幕自定义样式, 默认为空对象"`
 }
 
 func (vs *VideoService) DanmuList(videoID uint) ([]VideoDanmu, error) {

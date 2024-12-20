@@ -242,7 +242,7 @@ func (as *ActressService) SaveActress() error {
 				case "国籍":
 					m.Nationality = value
 				case "简介":
-					m.Introduction = value
+					m.Intro = value
 				}
 			}
 			// 根据 `struct` 更新属性，只会更新非零值的字段

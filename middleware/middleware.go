@@ -22,7 +22,7 @@ func InitSession() gin.HandlerFunc {
 	return sessions.Sessions("stock_session", store)
 }
 
-func AuthSession() gin.HandlerFunc {
+func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		_, ok := session.Get("user_id").(uint)

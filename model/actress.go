@@ -2,6 +2,7 @@ package model
 
 import "gorm.io/gorm"
 
+// Actress 演员表
 type Actress struct {
 	gorm.Model
 	Actress      string `gorm:"column:actress;type:varchar(100);uniqueIndex;comment:演员名称"`
@@ -15,5 +16,5 @@ type Actress struct {
 	BloodGroup   string `gorm:"column:blood_group;type:varchar(5);comment:血型"`
 	Stature      string `gorm:"column:stature;type:varchar(5);comment:身高"`
 	Nationality  string `gorm:"column:nationality;type:varchar(255);comment:国籍"`
-	Introduction string `gorm:"column:introduction;type:text;comment:简介"`
+	Intro        string `gorm:"column:intro;type:text;comment:简介"`
 }

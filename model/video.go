@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Video 视频基本信息
+// Video 视频表
 type Video struct {
 	gorm.Model
 	CateID        uint      `gorm:"column:cate_id;type:uint;not null;default:0;comment:视频分类ID"`
@@ -23,7 +23,7 @@ type Video struct {
 	Introduction  string    `gorm:"column:introduction;type:text;comment:简介"`
 }
 
-// VideoEpisodes 视频剧集信息
+// VideoEpisodes 视频剧集信息表
 type VideoEpisodes struct {
 	gorm.Model
 	VideoId       uint      `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
@@ -37,17 +37,18 @@ type VideoEpisodes struct {
 	CreationTime  time.Time `gorm:"column:creation_time;type:date;comment:时间"`
 }
 
-// 视频日志信息
+// 视频日志信息表
 type VideoLog struct {
 	gorm.Model
 	VideoID uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
 	Collect uint `gorm:"column:collect;type:uint;not null;default:0;comment:收藏"`
 	Browse  uint `gorm:"column:browse;type:uint;not null;default:0;comment:浏览"`
-	Zan     uint `gorm:"column:zan;type:uint;not null;default:0;comment:赞"`
-	Cai     uint `gorm:"column:cai;type:uint;not null;default:0;comment:踩"`
+	Like    uint `gorm:"column:like;type:uint;not null;default:0;comment:赞"`
+	DisLike uint `gorm:"column:dis_like;type:uint;not null;default:0;comment:踩"`
 	Watch   uint `gorm:"column:watch;type:uint;not null;default:0;comment:观看"`
 }
 
+// VideoComment 视频评论表
 type VideoComment struct {
 	gorm.Model
 	ParentId    uint   `gorm:"column:parent_id;type:uint;not null;default:0;comment:父级评论的ID"`
@@ -68,18 +69,21 @@ type VideoComment struct {
 	// Status      string `gorm:"column:status;type:enum('VERIFYING','APPROVED','REJECT','DELETED');default:'VERIFYING';comment:评论的状态"`
 }
 
+// VideoActress 视频演员表
 type VideoActress struct {
 	gorm.Model
 	VideoId   uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
 	ActressId uint `gorm:"column:actress_id;type:uint;not null;default:0;comment:演员ID"`
 }
 
+// VideoTag 视频标签表
 type VideoTag struct {
 	gorm.Model
 	VideoId uint `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`
 	TagId   uint `gorm:"column:tag_id;type:uint;not null;default:0;comment:标签ID"`
 }
 
+// VideoDanmu 视频弹幕表
 type VideoDanmu struct {
 	gorm.Model
 	VideoId uint    `gorm:"column:video_id;type:uint;not null;default:0;comment:视频ID"`

@@ -26,7 +26,7 @@ type SendMail struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/user/sendMail [post]
+//	@Router			/verify/sendMail [post]
 func SendMailApi(c *gin.Context) {
 	var bind SendMail
 	if err := c.ShouldBind(&bind); err != nil {
@@ -68,7 +68,7 @@ type SendUrl struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/user/sendUrl [post]
+//	@Router			/verify/sendUrl [post]
 func SendUrlApi(c *gin.Context) {
 	var bind SendUrl
 	if err := c.ShouldBind(&bind); err != nil {
@@ -113,7 +113,7 @@ type Captcha struct {
 //	@Failure		400		{object}	Fail
 //	@Failure		404		{object}	NotFound
 //	@Failure		500		{object}	ServerError
-//	@Router			/user/captcha [post]
+//	@Router			/verify/captcha [post]
 func CaptchaApi(c *gin.Context) {
 	var bind Captcha
 	if err := c.ShouldBind(&bind); err != nil {
