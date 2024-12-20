@@ -2,6 +2,7 @@ package model
 
 import "gorm.io/gorm"
 
+// Category 分类表
 type Category struct {
 	gorm.Model
 	Name        string `gorm:"column:name;type:varchar(255);uniqueIndex;comment:分类名称"`

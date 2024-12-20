@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -104,6 +103,10 @@ func GetVideoListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("视频列表", data))
 }
 
+type Common struct {
+	ID uint `uri:"id" binding:"required"`
+}
+
 // VideoPlayApi godoc
 //
 //	@Summary		视频信息
@@ -118,65 +121,16 @@ func GetVideoListApi(c *gin.Context) {
 //	@Failure		500	{object}	ServerError
 //	@Router			/video/videoPlay/{id} [get]
 func VideoPlayApi(c *gin.Context) {
-	id := c.Param("id")
-	aid, err := strconv.Atoi(id)
-	if err != nil {
+	var bind Common
+	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
-	if aid == 0 {
-		c.JSON(http.StatusBadRequest, util.Fail("id must be greater than 0"))
-		return
-	}
 
-	vi, err := videoService.Info(cast.ToUint(aid))
+	data, err := videoService.Info(bind.ID, GetUserID(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
-	}
-
-	idsArr := strings.Split(vi.ActressIds, ",")
-	actressArr := strings.Split(vi.ActressNames, ",")
-	avatarArr := strings.Split(vi.ActressAvatars, ",")
-	type actress struct {
-		ID      string `json:"id"`
-		Actress string `json:"actress"`
-		Avatar  string `json:"avatar"`
-	}
-	actressSlice := make([]actress, len(actressArr))
-	for i := 0; i < len(actressArr); i++ {
-		actressSlice[i] = actress{ID: idsArr[i], Actress: actressArr[i], Avatar: avatarArr[i]}
-	}
-	var collectID uint = 0
-	var isCollect = false
-	usc, err := userService.CollectLog(GetUserID(c), vi.ID)
-	if err == nil {
-		collectID = usc.ID
-		isCollect = true
-	}
-
-	size, _ := strconv.ParseFloat(strconv.FormatInt(vi.Size, 10), 64)
-	data := gin.H{
-		"videoID":       vi.ID,
-		"videoTitle":    vi.Title,
-		"videoActress":  actressSlice,
-		"videoUrl":      "assets/video/" + vi.Title + ".mp4",
-		"Size":          size / 1024 / 1024,
-		"Duration":      utils.ResolveTime(uint32(vi.Duration)),
-		"ModTime":       vi.CreationTime.Format("2006-01-02 15:04:05"),
-		"Poster":        vi.Poster,
-		"Width":         vi.Width,
-		"Height":        vi.Height,
-		"CodecName":     vi.CodecName,
-		"ChannelLayout": vi.ChannelLayout,
-		"Collect":       vi.Collect,
-		"Browse":        vi.Browse,
-		"Zan":           vi.Zan,
-		"Cai":           vi.Cai,
-		"Watch":         vi.Watch,
-		"CollectID":     collectID,
-		"IsCollect":     isCollect,
-		"Avatar":        sessions.Default(c).Get("user_avatar").(string),
 	}
 	c.JSON(http.StatusOK, util.Success("视频信息", data))
 }

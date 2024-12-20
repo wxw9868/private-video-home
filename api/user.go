@@ -139,7 +139,7 @@ func LogoutApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("登出成功", nil))
 }
 
-// SessionApi godoc
+// GetSessionApi godoc
 //
 //	@Summary		用户信息
 //	@Tags			user
@@ -147,8 +147,8 @@ func LogoutApi(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	Success
 //	@Failure		404	{object}	NotFound
-//	@Router			/user/session [get]
-func SessionApi(c *gin.Context) {
+//	@Router			/user/getSession [get]
+func GetSessionApi(c *gin.Context) {
 	session := sessions.Default(c)
 	data := map[string]interface{}{
 		"id":          session.Get("user_id").(uint),
@@ -260,7 +260,7 @@ type UpdateUserInfo struct {
 	Mobile      string `form:"mobile" json:"mobile" binding:"required"`
 	Designation string `form:"designation" json:"designation"`
 	Address     string `form:"address" json:"address"`
-	Note        string `form:"note" json:"note"`
+	Intro       string `form:"intro" json:"intro"`
 }
 
 // UpdateUserInfoApi godoc
@@ -289,7 +289,7 @@ func UpdateUserInfoApi(c *gin.Context) {
 		Email:       bind.Email,
 		Designation: bind.Designation,
 		Address:     bind.Address,
-		Note:        bind.Note,
+		Intro:       bind.Intro,
 	}
 	err := userService.Updates(GetUserID(c), user)
 	if err != nil {

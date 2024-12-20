@@ -172,26 +172,14 @@ func (us *UserService) FavoriteList(userID uint) ([]Video, error) {
 		var videoInfo VideoInfo
 		db.ScanRows(rows, &videoInfo)
 
-		//f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
-		video := Video{
-			ID:       videoInfo.ID,
-			Title:    videoInfo.Title,
-			Poster:   videoInfo.Poster,
-			Duration: utils.ResolveTime(uint32(videoInfo.Duration)),
-			Browse:   videoInfo.Browse,
-			Collect:  videoInfo.Collect,
-			//Actress:       videoInfo.Actress,
-			//Size:          f / 1024 / 1024,
-			//ModTime:       videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
-			//Width:         videoInfo.Width,
-			//Height:        videoInfo.Height,
-			//CodecName:     videoInfo.CodecName,
-			//ChannelLayout: videoInfo.ChannelLayout,
-			//Collect:       videoInfo.Collect,
-			//Zan:           videoInfo.Zan,
-			//Cai:           videoInfo.Cai,
-		}
-		videos = append(videos, video)
+		videos = append(videos, Video{
+			ID:         videoInfo.ID,
+			Title:      videoInfo.Title,
+			Poster:     videoInfo.Poster,
+			Duration:   utils.ResolveTime(uint32(videoInfo.Duration)),
+			BrowseNum:  videoInfo.BrowseNum,
+			CollectNum: videoInfo.CollectNum,
+		})
 	}
 
 	return videos, nil

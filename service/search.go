@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strconv"
 
 	gofoundClient "github.com/wxw9868/video/initialize/gofound"
 	"github.com/wxw9868/video/utils"
@@ -13,20 +12,20 @@ import (
 
 type VideoData struct {
 	ID            uint    `json:"id"`
-	Title         string  `json:"title"`          // 视频标题
-	Poster        string  `json:"poster"`         // 视频封面
-	Duration      string  `json:"duration"`       // 视频时长
-	Size          float64 `json:"size"`           // 视频大小
-	CreationTime  string  `json:"creation_time"`  // 视频创建时间
-	Width         int     `json:"width"`          // 视频宽度
-	Height        int     `json:"height"`         // 视频长度
-	CodecName     string  `json:"codec_name"`     // 视频编解码器
-	ChannelLayout string  `json:"channel_layout"` // 视频音频声道
-	CollectNum    uint    `json:"collect_num"`    // 收藏次数
-	BrowseNum     uint    `json:"browse_num"`     // 浏览次数
-	WatchNum      uint    `json:"watch_num"`      // 观看次数
-	ZanNum        uint    `json:"zan_num"`        // 视频赞次数
-	CaiNum        uint    `json:"cai_num"`        // 视频踩次数
+	Title         string  `json:"title"`         // 视频标题
+	Poster        string  `json:"poster"`        // 视频封面
+	Duration      string  `json:"duration"`      // 视频时长
+	Size          float64 `json:"size"`          // 视频大小
+	CreationTime  string  `json:"creationTime"`  // 视频创建时间
+	Width         int     `json:"width"`         // 视频宽度
+	Height        int     `json:"height"`        // 视频长度
+	CodecName     string  `json:"codecName"`     // 视频编解码器
+	ChannelLayout string  `json:"channelLayout"` // 视频音频声道
+	CollectNum    uint    `json:"collectNum"`    // 收藏次数
+	BrowseNum     uint    `json:"browseNum"`     // 浏览次数
+	WatchNum      uint    `json:"watchNum"`      // 观看次数
+	LikeNum       uint    `json:"zanNum"`        // 视频赞次数
+	DisLikeNum    uint    `json:"dislikeNum"`    // 视频踩次数
 }
 
 type Index struct {
@@ -55,7 +54,6 @@ func VideoWriteGoFound(query string) error {
 			return err
 		}
 
-		f, _ := strconv.ParseFloat(strconv.FormatInt(videoInfo.Size, 10), 64)
 		indexBatch = append(indexBatch, Index{
 			Id:   videoInfo.ID,
 			Text: videoInfo.Title,
@@ -64,17 +62,17 @@ func VideoWriteGoFound(query string) error {
 				Title:         videoInfo.Title,
 				Poster:        videoInfo.Poster,
 				Duration:      utils.ResolveTime(uint32(videoInfo.Duration)),
-				Size:          f / 1024 / 1024,
+				Size:          float64(videoInfo.Size) / 1024 / 1024,
 				CreationTime:  videoInfo.CreationTime.Format("2006-01-02 15:04:05"),
 				Width:         videoInfo.Width,
 				Height:        videoInfo.Height,
 				CodecName:     videoInfo.CodecName,
 				ChannelLayout: videoInfo.ChannelLayout,
-				CollectNum:    videoInfo.Collect,
-				BrowseNum:     videoInfo.Browse,
-				WatchNum:      videoInfo.Watch,
-				ZanNum:        videoInfo.Zan,
-				CaiNum:        videoInfo.Cai,
+				CollectNum:    videoInfo.CollectNum,
+				BrowseNum:     videoInfo.BrowseNum,
+				WatchNum:      videoInfo.WatchNum,
+				LikeNum:       videoInfo.LikeNum,
+				DisLikeNum:    videoInfo.DisLikeNum,
 			},
 		})
 	}
