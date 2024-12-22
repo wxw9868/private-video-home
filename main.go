@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
-	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -56,13 +61,35 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL(ginSwaggerURL), ginSwagger.DefaultModelsExpandDepth(-1)))
 
-	//err := new(service.VideoService).ImportVideoData("D:/ta", "")
+	//err := new(service.VideoService).ImportVideoData("D:/ta/video", "知念真紀", "秋元若菜")
 	//err := new(service.ActressService).SaveActress()
 	//err := new(service.ActressService).DownAvatar()
 	//err := new(service.ActressService).CopyAvatar()
 	//fmt.Println(err)
 
-	if err := gracehttp.Serve(&http.Server{Addr: addr, Handler: r}); err != nil {
-		panic(err)
+	//if err := gracehttp.Serve(&http.Server{Addr: addr, Handler: r}); err != nil {
+	//	panic(err)
+	//}
+
+	srv := &http.Server{Addr: addr, Handler: r}
+
+	go func() {
+		// 服务连接
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	log.Println("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
 	}
+	log.Println("Server exiting")
 }

@@ -182,35 +182,59 @@ func (as *ActressService) Info(id uint) (*model.Actress, error) {
 // SaveActress 补充信息
 func (as *ActressService) SaveActress() error {
 	var strs = map[string]string{
-		"御坂恵衣": `出生: 2000年03月29日
-三围: n/a
-罩杯: G Cup
-出道日期: 2019年08月
-星座: Aries
-血型: n/a
-身高: n/a
-国籍: 日本
-简介: 暂无关于御坂恵衣(Mei Misaka/24岁)的介绍。`,
-		"前田陽菜": `别名: きゃさりんはらじゅく, 森川あみ, 森川亜美, 鈴木祐美, 雛丸
-出生: 1989年08月14日
-三围: B83 / W58 / H90
+		"望月しおん": `别名: 桜井ひなた,井坂由希恵
+三围: B80 / W55 / H82
+身高: 152cm`,
+		"橘ひなた": `别名: 小日向ひかり, 牧瀬美央, 高橋陽子
+出生: 1990年08月11日
+三围: B83 / W60 / H86
 罩杯: D Cup
 出道日期: n/a
 星座: Leo
-血型: n/a
-身高: 158cm
-国籍: 日本
-简介: 暂无关于前田陽菜(Hina Maeda/35岁)的介绍。`,
-		"七瀬ななみ": `别名: Nanami Nagase
-出生: 1981年08月27日
-三围: 83-60-87 (cm)
-罩杯: C-70 Cup
-出道日期: n/a
-星座: Virgo
 血型: A
-身高: 160 cm
+身高: 160cm
 国籍: 日本
-简介: 暂无关于七瀬ななみ(Nanami Nanase)的介绍。`,
+简介: 暂无关于橘ひなた(Hinata Tachibana/34岁)的介绍。`,
+		"中原あきな": `别名: あまねなのは
+出生: 1990年02月20日
+三围: B84 / W58 / H84
+罩杯: E Cup
+出道日期: 2008年09月
+星座: Pisces
+血型: n/a
+身高: n/a
+国籍: 日本
+简介: 暂无关于あまねなのは(Nanoha Amane/34岁)的介绍。`,
+		"小野麻里亜": `别名: Maria Ono, 中村真理亜, 小野まり, 小野まりあ, 小野麻理亜, 尾崎ゆりあ, 椎名綺更, 神代凛, 神代凜
+出生: 1989年03月16日
+三围: B86 / W60 / H87
+罩杯: E Cup
+出道日期: n/a
+星座: Pisces
+血型: B
+身高: 150cm
+国籍: 日本
+简介: 暂无关于小野麻里亜(Maria Ono/35岁)的介绍。`,
+		"渋谷まなか": `别名: 彩葉みおり, 豊田愛菜, 川村里穂, 大橋愛菜
+出生: 1995年05月11日
+三围: B95 / W60 / H87
+罩杯: H Cup
+出道日期: 2017年11月
+星座: Taurus
+血型: n/a
+身高: 168 cm
+国籍: 日本
+简介: 暂无关于豊田愛菜(Mana Toyota/29岁)的介绍。`,
+		//		"小野静香": `别名: 秋野早苗
+		//出生: 1995年07月31日
+		//三围: B80 / W60 / H87
+		//罩杯: E Cup
+		//出道日期: 2015年01月
+		//星座: Leo
+		//血型: n/a
+		//身高: 154
+		//国籍: 日本
+		//简介: 暂无关于秋野早苗(Sanae Akino/29岁)的介绍。`,
 		//"": ``,
 	}
 	return db.Transaction(func(tx *gorm.DB) error {
@@ -220,6 +244,7 @@ func (as *ActressService) SaveActress() error {
 			results := strings.Split(str, "\n")
 			for _, result := range results {
 				arr := strings.Split(result, ":")
+				fmt.Printf("actress: %s,arr: %+v\n", actress, arr)
 				column := strings.Trim(arr[0], " ")
 				value := strings.Replace(strings.Trim(arr[1], " "), "n/a", "", -1)
 				switch column {

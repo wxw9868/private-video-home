@@ -85,6 +85,8 @@ func VideoRename(videoDir string, nameMap map[string]string, nameSlice, actressS
 					filename = strings.Replace(filename, v, "No_", -1)
 				} else if v == "__" {
 					filename = strings.Replace(filename, v, "_", -1)
+				} else if v == "_～" {
+					filename = strings.Replace(filename, v, "～", -1)
 				} else {
 					if !strings.Contains(filename, "_"+v) {
 						filename = strings.Replace(filename, v, "_"+v, -1)

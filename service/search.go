@@ -24,7 +24,7 @@ type VideoData struct {
 	CollectNum    uint    `json:"collectNum"`    // 收藏次数
 	BrowseNum     uint    `json:"browseNum"`     // 浏览次数
 	WatchNum      uint    `json:"watchNum"`      // 观看次数
-	LikeNum       uint    `json:"zanNum"`        // 视频赞次数
+	LikeNum       uint    `json:"likeNum"`       // 视频赞次数
 	DisLikeNum    uint    `json:"dislikeNum"`    // 视频踩次数
 }
 
@@ -36,7 +36,7 @@ type Index struct {
 
 func VideoWriteGoFound(query string) error {
 	vdb := db.Table("video_Video as v").
-		Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
+		Select("v.*,l.collect, l.browse, l.like, l.dislike, l.watch").
 		Joins("left join video_VideoLog l on l.video_id = v.id")
 	if query != "" {
 		vdb = vdb.Where(query)
@@ -68,11 +68,11 @@ func VideoWriteGoFound(query string) error {
 				Height:        videoInfo.Height,
 				CodecName:     videoInfo.CodecName,
 				ChannelLayout: videoInfo.ChannelLayout,
-				CollectNum:    videoInfo.CollectNum,
-				BrowseNum:     videoInfo.BrowseNum,
-				WatchNum:      videoInfo.WatchNum,
-				LikeNum:       videoInfo.LikeNum,
-				DisLikeNum:    videoInfo.DisLikeNum,
+				CollectNum:    videoInfo.Collect,
+				BrowseNum:     videoInfo.Browse,
+				WatchNum:      videoInfo.Watch,
+				LikeNum:       videoInfo.Like,
+				DisLikeNum:    videoInfo.Dislike,
 			},
 		})
 	}

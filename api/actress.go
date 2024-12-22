@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
@@ -104,18 +103,13 @@ func UpdateActressApi(c *gin.Context) {
 //	@Failure		500	{object}	ServerError
 //	@Router			/actress/deleteActress/{id} [get]
 func DeleteActressApi(c *gin.Context) {
-	id := c.Param("id")
-	aid, err := strconv.Atoi(id)
-	if err != nil {
+	var bind Common
+	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
-	if aid == 0 {
-		c.JSON(http.StatusBadRequest, util.Fail("id must be greater than 0"))
-		return
-	}
 
-	if err := actressService.Delete(uint(aid)); err != nil {
+	if err := actressService.Delete(bind.ID); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -171,18 +165,13 @@ func GetActressListApi(c *gin.Context) {
 //	@Failure		500	{object}	ServerError
 //	@Router			/actress/getActressInfo/{id} [get]
 func GetActressInfoApi(c *gin.Context) {
-	id := c.Param("id")
-	aid, err := strconv.Atoi(id)
-	if err != nil {
+	var bind Common
+	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
-	if aid == 0 {
-		c.JSON(http.StatusBadRequest, util.Fail("id must be greater than 0"))
-		return
-	}
 
-	actress, err := actressService.Info(uint(aid))
+	actress, err := actressService.Info(bind.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

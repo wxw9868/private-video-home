@@ -173,12 +173,12 @@ func (us *UserService) FavoriteList(userID uint) ([]Video, error) {
 		db.ScanRows(rows, &videoInfo)
 
 		videos = append(videos, Video{
-			ID:         videoInfo.ID,
-			Title:      videoInfo.Title,
-			Poster:     videoInfo.Poster,
-			Duration:   utils.ResolveTime(uint32(videoInfo.Duration)),
-			BrowseNum:  videoInfo.BrowseNum,
-			CollectNum: videoInfo.CollectNum,
+			ID:       videoInfo.ID,
+			Title:    videoInfo.Title,
+			Poster:   videoInfo.Poster,
+			Duration: videoInfo.Duration,
+			Browse:   videoInfo.Browse,
+			Collect:  videoInfo.Collect,
 		})
 	}
 
@@ -194,11 +194,11 @@ type VideoBrowse struct {
 
 func (us *UserService) BrowseList(userID uint) ([]VideoBrowse, error) {
 	var videos []model.Video
-	result := db.Table("video_UserBrowseLog as ubl").
+	result := db.Table("video_UserBrowseLog as a").
 		Select("v.id,v.title,v.duration,v.poster").
-		Joins("left join video_Video as v on v.id = ubl.video_id").
-		Where("ubl.user_id = ? and ubl.UpdatedAt >= ?", userID, utils.NowTime().StringToTime("yesterday")).
-		Order("ubl.UpdatedAt desc").
+		Joins("left join video_Video as v on v.id = a.video_id").
+		Where("a.user_id = ? and a.UpdatedAt >= ?", userID, utils.NowTime().StringToTime("yesterday")).
+		Order("a.UpdatedAt desc").
 		Find(&videos)
 	if err := result.Error; err != nil {
 		return nil, err

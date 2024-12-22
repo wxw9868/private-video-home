@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/cast"
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/video/service"
 	"github.com/wxw9868/video/utils"
@@ -94,7 +92,7 @@ func GetVideoListApi(c *gin.Context) {
 		return
 	}
 
-	data, err := videoService.Find(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
+	data, err := videoService.List(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -188,19 +186,14 @@ func CollectVideoApi(c *gin.Context) {
 //	@Failure		500			{object}	ServerError
 //	@Router			/video/browseVideo/{id} [get]
 func BrowseVideoApi(c *gin.Context) {
-	id := c.Param("id")
-	aid, err := strconv.Atoi(id)
-	if err != nil {
+	var bind Common
+	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
-		return
-	}
-	if aid == 0 {
-		c.JSON(http.StatusBadRequest, util.Fail("video_id must be greater than 0"))
 		return
 	}
 
 	userID := GetUserID(c)
-	if err = videoService.Browse(uint(aid), userID); err != nil {
+	if err := videoService.Browse(bind.ID, userID); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -303,6 +296,10 @@ func ReplyVideoCommentApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("回复成功", data))
 }
 
+type Comment struct {
+	ID uint `uri:"id" binding:"required"`
+}
+
 // GetVideoCommentListApi godoc
 //
 //	@Summary		视频弹幕列表
@@ -317,19 +314,14 @@ func ReplyVideoCommentApi(c *gin.Context) {
 //	@Failure		500			{object}	ServerError
 //	@Router			/comment/getVideoCommentList/{id} [get]
 func GetVideoCommentListApi(c *gin.Context) {
-	id := c.Param("id")
-	aid, err := strconv.Atoi(id)
-	if err != nil {
+	var bind Comment
+	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
-		return
-	}
-	if aid == 0 {
-		c.JSON(http.StatusBadRequest, util.Fail("video_id must be greater than 0"))
 		return
 	}
 
 	userID := GetUserID(c)
-	list, err := videoService.CommentList(cast.ToUint(aid), userID)
+	list, err := videoService.CommentList(bind.ID, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -339,7 +331,7 @@ func GetVideoCommentListApi(c *gin.Context) {
 
 type CommentZan struct {
 	CommentID uint `form:"comment_id" json:"comment_id" binding:"required"`
-	Zan       int  `form:"zan" json:"zan" binding:"required,oneof=1 -1"`
+	Like      int  `form:"like" json:"like" binding:"required,oneof=1 -1"`
 }
 
 // LikeVideoCommentApi godoc
@@ -364,13 +356,13 @@ func LikeVideoCommentApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	if err := videoService.Zan(bind.CommentID, userID, bind.Zan); err != nil {
+	if err := videoService.Zan(bind.CommentID, userID, bind.Like); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
 	msg := "点赞成功"
-	if bind.Zan == -1 {
+	if bind.Like == -1 {
 		msg = "取消点赞"
 	}
 	c.JSON(http.StatusOK, util.Success(msg, nil))
@@ -378,7 +370,7 @@ func LikeVideoCommentApi(c *gin.Context) {
 
 type CommentCai struct {
 	CommentID uint `form:"comment_id" json:"comment_id" binding:"required"`
-	Cai       int  `form:"cai" json:"cai" binding:"required,oneof=1 -1"`
+	DisLike   int  `form:"dis_like" json:"dis_like" binding:"required,oneof=1 -1"`
 }
 
 // DislikeVideoCommentApi godoc
@@ -403,13 +395,13 @@ func DislikeVideoCommentApi(c *gin.Context) {
 
 	userID := GetUserID(c)
 
-	if err := videoService.Cai(bind.CommentID, userID, bind.Cai); err != nil {
+	if err := videoService.Cai(bind.CommentID, userID, bind.DisLike); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
 	msg := "点踩成功"
-	if bind.Cai == -1 {
+	if bind.DisLike == -1 {
 		msg = "取消踩"
 	}
 	c.JSON(http.StatusOK, util.Success(msg, nil))
@@ -429,18 +421,13 @@ func DislikeVideoCommentApi(c *gin.Context) {
 //	@Failure		500			{object}	ServerError
 //	@Router			/danmu/getVideoBarrageList/{id} [get]
 func GetVideoBarrageListApi(c *gin.Context) {
-	id := c.Param("id")
-	aid, err := strconv.Atoi(id)
-	if err != nil {
+	var bind Common
+	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
-	if aid == 0 {
-		c.JSON(http.StatusBadRequest, util.Fail("video_id must be greater than 0"))
-		return
-	}
 
-	list, err := videoService.DanmuList(cast.ToUint(aid))
+	list, err := videoService.DanmuList(bind.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

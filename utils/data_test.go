@@ -17,10 +17,9 @@ import (
 	"time"
 
 	browser "github.com/EDDYCJY/fake-useragent"
-	"github.com/gocolly/colly/v2"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/disintegration/imaging"
+	"github.com/gocolly/colly/v2"
 	"golang.org/x/image/draw"
 )
 
@@ -66,15 +65,15 @@ func TestVideoRename(t *testing.T) {
 		"无码频道_tg搜并关注_@AVWUMAYUANPIAN_每天更新_",
 		"_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV",
-		"_#Heyzo_无码AV", "_TG频道@TBBAD", "陽咲希美", "#", " "}
-	var actressSlice = []string{"ももき希", "大橋由香", "", "", "", "", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__"}
+		"_#Heyzo_无码AV", "_TG频道@TBBAD", "篠宮あおい", "#", " "}
+	var actressSlice = []string{"", "", "", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__", "_～"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("SUCCESS")
-	// 細田さなえ 土井夏葉樫田美喜,佐々野ひまり,細田さなえ,富沢浮江
+	// 細田さなえ 土井夏葉,樫田美喜,佐々野ひまり,細田さなえ,富沢浮江
 	// 森本ひとみ 土井原佳奈子
-	// tdl dl -u https://t.me/mczl07/3848 -d D:/down
+	// 知念真紀   篠宮あおい
 }
 
 func TestActress(t *testing.T) {
