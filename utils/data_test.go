@@ -44,21 +44,9 @@ var _ = []string{"", "", "", "", "", "", ""}
 
 func TestVideoRename(t *testing.T) {
 	var nameMap = map[string]string{
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":      "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (4)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (5)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (6)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (7)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (8)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (9)":  "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (10)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (11)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (12)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (13)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (14)": "",
-		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (15)": "",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新":     "Heyzo-0659 アフター6～お願い・・この体の火照り止めて～  #本澤朋美",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (2)": "070922_01 体操着を着るときはいつもノーパン、ノーブラだよ  #柳井瞳",
+		"无码频道-tg关注 @AVWUMAYUANPIAN  每天更新 (3)": "012524_01 性感帯は、Hカップのマシュマロおっぱいです  #柳井瞳",
 	}
 	var nameSlice = []string{
 		"无码频道_tg关注_@AVWUMAYUANPIAN_每天更新_",
@@ -66,7 +54,7 @@ func TestVideoRename(t *testing.T) {
 		"_tg关注_@AVWUMAYUANPIAN", "_一本道_无码AV_無碼AV", "_一本道_无码AV",
 		"_加勒比_无码AV_無碼AV", "_加勒比_无码AV", "_人妻paco_无码AV", "_天然素人_无码AV",
 		"_#Heyzo_无码AV", "_TG频道@TBBAD", "篠宮あおい", "#", " "}
-	var actressSlice = []string{"", "", "", "", "", "", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__", "_～"}
+	var actressSlice = []string{"本澤朋美", "柳井瞳", "梅宮あつこ", "ちはる", "Heyzo-", "Debut", "Vol.", "File.", "No.", "__", "_～"}
 	if err := VideoRename("D:/ta", nameMap, nameSlice, actressSlice); err != nil {
 		log.Fatal(err)
 	}
