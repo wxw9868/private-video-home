@@ -65,7 +65,7 @@ func init() {
 		&model.User{},
 		&model.UserLoginLog{},
 		&model.UserCollectLog{},
-		&model.UserBrowseLog{},
+		&model.UserPageViewsLog{},
 		&model.UserCommentLog{},
 		&model.Actress{},
 		&model.Video{},

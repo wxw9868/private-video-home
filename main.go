@@ -22,13 +22,13 @@ import (
 
 //	@title			私人视频 API
 //	@version		1.0
-//	@description    This is a private video server.
+//	@description	This is a private video server.
 
 //	@contact.name	API Support
 //	@contact.email	wxw9868gmail.com
 
-//	@host			192.168.0.9:8080
-//	@BasePath		/
+//	@host		192.168.0.9:8080
+//	@BasePath	/
 
 func main() {
 	// 禁用控制台颜色，将日志写入文件时不需要控制台颜色。

@@ -61,16 +61,16 @@ type Login struct {
 
 // LoginApi godoc
 //
-//	@Summary		用户登录
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Param			data	body		Login	true	"用户登录信息"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/user/login [post]
+//	@Summary	用户登录
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		Login	true	"用户登录信息"
+//	@Success	200		{object}	Success
+//	@Failure	400		{object}	Fail
+//	@Failure	404		{object}	NotFound
+//	@Failure	500		{object}	ServerError
+//	@Router		/user/login [post]
 func LoginApi(c *gin.Context) {
 	var bind Login
 	if err := c.ShouldBind(&bind); err != nil {
@@ -121,14 +121,14 @@ func LoginApi(c *gin.Context) {
 
 // LogoutApi godoc
 //
-//	@Summary		用户登出
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/user/session [get]
+//	@Summary	用户登出
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/user/session [get]
 func LogoutApi(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
@@ -141,13 +141,13 @@ func LogoutApi(c *gin.Context) {
 
 // GetSessionApi godoc
 //
-//	@Summary		用户信息
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		404	{object}	NotFound
-//	@Router			/user/getSession [get]
+//	@Summary	用户信息
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	404	{object}	NotFound
+//	@Router		/user/getSession [get]
 func GetSessionApi(c *gin.Context) {
 	session := sessions.Default(c)
 	data := map[string]interface{}{
@@ -164,14 +164,14 @@ func GetSessionApi(c *gin.Context) {
 
 // GetUserInfoApi godoc
 //
-//	@Summary		获取用户信息
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/user/getUserInfo [get]
+//	@Summary	获取用户信息
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/user/getUserInfo [get]
 func GetUserInfoApi(c *gin.Context) {
 	user, err := userService.Info(GetUserID(c))
 	if err != nil {
@@ -189,16 +189,16 @@ type ChangePassword struct {
 
 // ChangePasswordApi godoc
 //
-//	@Summary		修改密码
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Param			data	body		ChangePassword	true	"修改密码信息"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/user/changePassword [post]
+//	@Summary	修改密码
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		ChangePassword	true	"修改密码信息"
+//	@Success	200		{object}	Success
+//	@Failure	400		{object}	Fail
+//	@Failure	404		{object}	NotFound
+//	@Failure	500		{object}	ServerError
+//	@Router		/user/changePassword [post]
 func ChangePasswordApi(c *gin.Context) {
 	var bind ChangePassword
 	if err := c.ShouldBind(&bind); err != nil {
@@ -222,16 +222,16 @@ type ForgotPassword struct {
 
 // ForgotPasswordApi godoc
 //
-//	@Summary		忘记密码
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Param			data	body		ForgotPassword	true	"忘记密码信息"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/user/forgotPassword [post]
+//	@Summary	忘记密码
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		ForgotPassword	true	"忘记密码信息"
+//	@Success	200		{object}	Success
+//	@Failure	400		{object}	Fail
+//	@Failure	404		{object}	NotFound
+//	@Failure	500		{object}	ServerError
+//	@Router		/user/forgotPassword [post]
 func ForgotPasswordApi(c *gin.Context) {
 	var bind ForgotPassword
 	if err := c.ShouldBind(&bind); err != nil {
@@ -265,16 +265,16 @@ type UpdateUserInfo struct {
 
 // UpdateUserInfoApi godoc
 //
-//	@Summary		修改用户信息
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Param			data	body		UserUpdate	true	"修改用户信息"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/user/updateUserInfo [post]
+//	@Summary	修改用户信息
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		UpdateUserInfo	true	"修改用户信息"
+//	@Success	200		{object}	Success
+//	@Failure	400		{object}	Fail
+//	@Failure	404		{object}	NotFound
+//	@Failure	500		{object}	ServerError
+//	@Router		/user/updateUserInfo [post]
 func UpdateUserInfoApi(c *gin.Context) {
 	var bind UpdateUserInfo
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -343,14 +343,14 @@ func ChangeUserAvatarApi(c *gin.Context) {
 
 // GetUserFavoriteListApi godoc
 //
-//	@Summary		获取用户收藏记录
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/user/getUserFavoriteList [get]
+//	@Summary	获取用户收藏记录
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/user/getUserFavoriteList [get]
 func GetUserFavoriteListApi(c *gin.Context) {
 	data, err := userService.FavoriteList(GetUserID(c))
 	if err != nil {
@@ -362,14 +362,14 @@ func GetUserFavoriteListApi(c *gin.Context) {
 
 // GetUserBrowseListApi godoc
 //
-//	@Summary		获取用户浏览记录
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/user/getUserBrowseHistory [get]
+//	@Summary	获取用户浏览记录
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/user/getUserBrowseHistory [get]
 func GetUserBrowseListApi(c *gin.Context) {
 	data, err := userService.BrowseList(GetUserID(c))
 	if err != nil {
@@ -381,14 +381,14 @@ func GetUserBrowseListApi(c *gin.Context) {
 
 // GetUserLoginLogListApi godoc
 //
-//	@Summary		获取用户登陆记录
-//	@Tags			user
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/user/getUserLoginLogListApi [get]
+//	@Summary	获取用户登陆记录
+//	@Tags		user
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/user/getUserLoginLogListApi [get]
 func GetUserLoginLogListApi(c *gin.Context) {
 	data, err := userService.UserLoginLogList(GetUserID(c))
 	if err != nil {

@@ -65,11 +65,9 @@ func VideoSearchApi(c *gin.Context) {
 }
 
 type Video struct {
-	ActressID int    `uri:"actress_id" form:"actress_id" json:"actress_id"`
-	Page      int    `uri:"page" form:"page" json:"page"`
-	Size      int    `uri:"size" form:"size" json:"size"`
-	Action    string `uri:"action" form:"action" json:"action" example:"v.CreatedAt"`
-	Sort      string `uri:"sort" form:"sort" json:"sort" example:"desc"`
+	Paginate
+	OrderBy
+	ActressID int `uri:"actress_id" form:"actress_id" json:"actress_id"`
 }
 
 // GetVideoListApi godoc
@@ -77,14 +75,19 @@ type Video struct {
 //	@Summary		视频列表
 //	@Description	视频列表
 //	@Tags			video
-//	@Accept			json
+//	@Accept			application/x-www-form-urlencoded
 //	@Produce		json
-//	@Param			data	body		Video	true	"视频列表"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/video/getVideoList [post]
+//	@Produce		json
+//	@Param			page		query		int		false	"页码"	default(1)
+//	@Param			size		query		int		false	"条数"	default(10)
+//	@Param			column		query		string	false	"排序字段"
+//	@Param			order		query		string	false	"排序方式"	Enums(desc, asc)
+//	@Param			actress_id	query		int		false	"演员ID"
+//	@Success		200			{object}	Success
+//	@Failure		400			{object}	Fail
+//	@Failure		404			{object}	NotFound
+//	@Failure		500			{object}	ServerError
+//	@Router			/video/getVideoList [get]
 func GetVideoListApi(c *gin.Context) {
 	var bind Video
 	if err := c.BindJSON(&bind); err != nil {
@@ -92,7 +95,7 @@ func GetVideoListApi(c *gin.Context) {
 		return
 	}
 
-	data, err := videoService.List(bind.ActressID, bind.Page, bind.Size, bind.Action, bind.Sort)
+	data, err := videoService.List(bind.ActressID, bind.Page, bind.Size, bind.Column, bind.Order)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -101,24 +104,19 @@ func GetVideoListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("视频列表", data))
 }
 
-type Common struct {
-	ID uint `uri:"id" binding:"required"`
-}
-
-// VideoPlayApi godoc
+// GetVideoInfoApi godoc
 //
-//	@Summary		视频信息
-//	@Description	get string by ID
-//	@Tags			video
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path		int	true	"Video ID"
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/video/videoPlay/{id} [get]
-func VideoPlayApi(c *gin.Context) {
+//	@Summary	视频信息
+//	@Tags		video
+//	@Accept		application/x-www-form-urlencoded
+//	@Produce	json
+//	@Param		id	path		int	true	"Video ID"
+//	@Success	200	{object}	Success
+//	@Failure	400	{object}	Fail
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/video/getVideoInfo/{id} [get]
+func GetVideoInfoApi(c *gin.Context) {
 	var bind Common
 	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -172,7 +170,7 @@ func CollectVideoApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success(msg, nil))
 }
 
-// BrowseVideoApi godoc
+// RecordPageViewsApi godoc
 //
 //	@Summary		视频浏览记录
 //	@Description	get string by ID
@@ -185,7 +183,7 @@ func CollectVideoApi(c *gin.Context) {
 //	@Failure		404			{object}	NotFound
 //	@Failure		500			{object}	ServerError
 //	@Router			/video/browseVideo/{id} [get]
-func BrowseVideoApi(c *gin.Context) {
+func RecordPageViewsApi(c *gin.Context) {
 	var bind Common
 	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
@@ -480,16 +478,16 @@ type ImportVideoData struct {
 
 // ImportVideoDataApi godoc
 //
-//	@Summary		导入视频数据
-//	@Tags			video
-//	@Accept			json
-//	@Produce		json
-//	@Param			data	body		ImportVideoData	true	"视频数据"
-//	@Success		200			{object}	Success
-//	@Failure		400			{object}	Fail
-//	@Failure		404			{object}	NotFound
-//	@Failure		500			{object}	ServerError
-//	@Router			/video/importVideo [post]
+//	@Summary	导入视频数据
+//	@Tags		video
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		ImportVideoData	true	"视频数据"
+//	@Success	200		{object}	Success
+//	@Failure	400		{object}	Fail
+//	@Failure	404		{object}	NotFound
+//	@Failure	500		{object}	ServerError
+//	@Router		/video/importVideo [post]
 func ImportVideoDataApi(c *gin.Context) {
 	var bind ImportVideoData
 	if err := c.ShouldBindJSON(&bind); err != nil {
@@ -506,15 +504,15 @@ func ImportVideoDataApi(c *gin.Context) {
 
 // VideoWriteGoFound godoc
 //
-//	@Summary		视频导入GoFound
-//	@Tags			video
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/video/writeGoFound [get]
+//	@Summary	视频导入GoFound
+//	@Tags		video
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	400	{object}	Fail
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/video/writeGoFound [get]
 func VideoWriteGoFound(c *gin.Context) {
 	if err := service.VideoWriteGoFound(""); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
