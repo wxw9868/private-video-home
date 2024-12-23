@@ -72,7 +72,7 @@ type ActressList struct {
 //	@Router		/actress/getActressList [post]
 func GetActressListApi(c *gin.Context) {
 	var bind ActressList
-	if err := c.BindJSON(&bind); err != nil {
+	if err := c.ShouldBind(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}

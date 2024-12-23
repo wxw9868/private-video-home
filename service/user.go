@@ -106,12 +106,12 @@ type User struct {
 func (us *UserService) Info(id uint) (*User, error) {
 	var user User
 
-	ucl := db.Table("video_UserCollectLog as ucl").Select("ucl.user_id,count(ucl.video_id) as collect_num").Where("ucl.DeletedAt is null and ucl.user_id = ?", id).Group("ucl.user_id")
-	ubl := db.Table("video_UserBrowseLog as ubl").Select("ubl.user_id,sum(ubl.number) as browse_num").Where("ubl.DeletedAt is null and ubl.user_id = ?", id).Group("ubl.user_id")
+	a := db.Table("video_UserCollectLog as a").Select("a.user_id,count(a.video_id) as collect_num").Where("a.DeletedAt is null and a.user_id = ?", id).Group("a.user_id")
+	b := db.Table("video_UserPageViewsLog as b").Select("b.user_id,sum(b.page_views) as browse_num").Where("b.DeletedAt is null and b.user_id = ?", id).Group("b.user_id")
 	if err := db.Table("video_User as users").
 		Select("users.id,users.username,users.nickname,users.sex,users.mobile,users.email,users.qq,users.avatar,users.designation,users.realname,users.idcard,users.address,users.note,collect_num,browse_num").
-		Joins("left join (?) as ucl on ucl.user_id = users.id", ucl).
-		Joins("left join (?) as ubl on ubl.user_id = users.id", ubl).
+		Joins("left join (?) as a on a.user_id = users.id", a).
+		Joins("left join (?) as b on b.user_id = users.id", b).
 		Where("users.id = ?", id).
 		Group("users.id,users.username,users.nickname,users.sex,users.mobile,users.email,users.qq,users.avatar,users.designation,users.realname,users.idcard,users.address,users.note").
 		First(&user).Error; err != nil {
@@ -155,33 +155,16 @@ func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollect
 }
 
 func (us *UserService) FavoriteList(userID uint) ([]Video, error) {
-	rows, err := db.Table("video_UserCollectLog as ucl").
-		Select("v.*,l.collect, l.browse, l.zan, l.cai, l.watch").
-		Joins("left join video_Video as v on v.id = ucl.video_id").
-		Joins("left join video_VideoLog l on l.video_id = ucl.video_id").
-		Where("ucl.user_id = ? and ucl.DeletedAt is null", userID).
-		Order("ucl.id desc").
-		Rows()
+	var videos []Video
+	err := db.Table("video_UserCollectLog as a").
+		Select("v.id, v.title, v.poster, v.duration, l.collection_volume, l.page_views, l.likes_count, l.dislikes_count").
+		Joins("left join video_Video as v on v.id = a.video_id").
+		Joins("left join video_VideoLog l on l.video_id = a.video_id").
+		Where("a.user_id = ? and a.DeletedAt is null", userID).
+		Order("a.id desc").Scan(&videos).Error
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var videos []Video
-	for rows.Next() {
-		var videoInfo VideoInfo
-		db.ScanRows(rows, &videoInfo)
-
-		videos = append(videos, Video{
-			ID:       videoInfo.ID,
-			Title:    videoInfo.Title,
-			Poster:   videoInfo.Poster,
-			Duration: videoInfo.Duration,
-			Browse:   videoInfo.Browse,
-			Collect:  videoInfo.Collect,
-		})
-	}
-
 	return videos, nil
 }
 

@@ -36,7 +36,7 @@ type Index struct {
 
 func VideoWriteGoFound(query string) error {
 	vdb := db.Table("video_Video as v").
-		Select("v.*,l.collect, l.browse, l.like, l.dislike, l.watch").
+		Select("v.*,l.collection_volume, l.page_views, l.likes_count, l.dislikes_count, l.views_count").
 		Joins("left join video_VideoLog l on l.video_id = v.id")
 	if query != "" {
 		vdb = vdb.Where(query)
@@ -68,11 +68,11 @@ func VideoWriteGoFound(query string) error {
 				Height:        videoInfo.Height,
 				CodecName:     videoInfo.CodecName,
 				ChannelLayout: videoInfo.ChannelLayout,
-				CollectNum:    videoInfo.Collect,
-				BrowseNum:     videoInfo.Browse,
-				WatchNum:      videoInfo.Watch,
-				LikeNum:       videoInfo.Like,
-				DisLikeNum:    videoInfo.Dislike,
+				CollectNum:    videoInfo.CollectionVolume,
+				BrowseNum:     videoInfo.PageViews,
+				WatchNum:      videoInfo.ViewsCount,
+				LikeNum:       videoInfo.LikesCount,
+				DisLikeNum:    videoInfo.DislikesCount,
 			},
 		})
 	}

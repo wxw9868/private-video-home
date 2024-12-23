@@ -61,10 +61,11 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL(ginSwaggerURL), ginSwagger.DefaultModelsExpandDepth(-1)))
 
-	//err := new(service.VideoService).ImportVideoData("D:/ta/video", "知念真紀", "秋元若菜")
+	//err := new(service.VideoService).ImportVideoData("D:/ta/video", "本澤朋美", "柳井瞳", "梅宮あつこ", "ちはる")
 	//err := new(service.ActressService).SaveActress()
 	//err := new(service.ActressService).DownAvatar()
 	//err := new(service.ActressService).CopyAvatar()
+	//err := service.VideoWriteGoFound(fmt.Sprintf("v.id between %d and %d", 1963, 1979))
 	//fmt.Println(err)
 
 	//if err := gracehttp.Serve(&http.Server{Addr: addr, Handler: r}); err != nil {

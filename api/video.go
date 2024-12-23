@@ -90,7 +90,7 @@ type Video struct {
 //	@Router			/video/getVideoList [get]
 func GetVideoListApi(c *gin.Context) {
 	var bind Video
-	if err := c.BindJSON(&bind); err != nil {
+	if err := c.ShouldBind(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
@@ -133,7 +133,7 @@ func GetVideoInfoApi(c *gin.Context) {
 
 type VideoCollect struct {
 	VideoID uint `form:"video_id" json:"video_id" binding:"required"`
-	Collect int  `form:"collect" json:"collect" binding:"required,oneof=1 -1"`
+	Num     int  `form:"num" json:"num" binding:"required,oneof=1 -1"`
 }
 
 // CollectVideoApi godoc
@@ -156,15 +156,13 @@ func CollectVideoApi(c *gin.Context) {
 		return
 	}
 
-	userID := GetUserID(c)
-
-	if err := videoService.Collect(bind.VideoID, bind.Collect, userID); err != nil {
+	if err := videoService.Collect(bind.VideoID, GetUserID(c), bind.Num); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 
 	msg := "收藏成功"
-	if bind.Collect == -1 {
+	if bind.Num == -1 {
 		msg = "取消收藏"
 	}
 	c.JSON(http.StatusOK, util.Success(msg, nil))
@@ -173,16 +171,15 @@ func CollectVideoApi(c *gin.Context) {
 // RecordPageViewsApi godoc
 //
 //	@Summary		视频浏览记录
-//	@Description	get string by ID
 //	@Tags			video
 //	@Accept			json
 //	@Produce		json
-//	@Param			video_id	path		int	true	"Video ID"
-//	@Success		200			{object}	Success
-//	@Failure		400			{object}	Fail
-//	@Failure		404			{object}	NotFound
-//	@Failure		500			{object}	ServerError
-//	@Router			/video/browseVideo/{id} [get]
+//	@Param			id	path		int	true	"视频ID"
+//	@Success		200	{object}	Success
+//	@Failure		400	{object}	Fail
+//	@Failure		404	{object}	NotFound
+//	@Failure		500	{object}	ServerError
+//	@Router			/video/recordPageViews/{id} [get]
 func RecordPageViewsApi(c *gin.Context) {
 	var bind Common
 	if err := c.ShouldBindUri(&bind); err != nil {
@@ -190,8 +187,7 @@ func RecordPageViewsApi(c *gin.Context) {
 		return
 	}
 
-	userID := GetUserID(c)
-	if err := videoService.Browse(bind.ID, userID); err != nil {
+	if err := videoService.Browse(bind.ID, GetUserID(c)); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
