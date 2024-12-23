@@ -9,16 +9,16 @@ import (
 
 // OneAddInfoToActress godoc
 //
-//	@Summary		通过爬虫获取演员信息
-//	@Tags			util
-//	@Accept			json
-//	@Produce		json
-//	@Param			actress	query		string	true	"actress"
-//	@Success		200		{object}	Success
-//	@Failure		400		{object}	Fail
-//	@Failure		404		{object}	NotFound
-//	@Failure		500		{object}	ServerError
-//	@Router			/actress/oneAddInfo [get]
+//	@Summary	通过爬虫获取演员信息
+//	@Tags		util
+//	@Accept		json
+//	@Produce	json
+//	@Param		actress	query		string	true	"actress"
+//	@Success	200		{object}	Success
+//	@Failure	400		{object}	Fail
+//	@Failure	404		{object}	NotFound
+//	@Failure	500		{object}	ServerError
+//	@Router		/actress/oneAddInfo [get]
 func OneAddInfoToActress(c *gin.Context) {
 	var actress = c.Query("actress")
 	if err := utilService.OneAddInfoToActress(actress); err != nil {
@@ -30,15 +30,15 @@ func OneAddInfoToActress(c *gin.Context) {
 
 // AllAddInfoToActress godoc
 //
-//	@Summary		通过爬虫获取所有演员信息
-//	@Tags			util
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	Success
-//	@Failure		400	{object}	Fail
-//	@Failure		404	{object}	NotFound
-//	@Failure		500	{object}	ServerError
-//	@Router			/actress/allAddInfo [get]
+//	@Summary	通过爬虫获取所有演员信息
+//	@Tags		util
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	Success
+//	@Failure	400	{object}	Fail
+//	@Failure	404	{object}	NotFound
+//	@Failure	500	{object}	ServerError
+//	@Router		/actress/allAddInfo [get]
 func AllAddInfoToActress(c *gin.Context) {
 	if err := utilService.AllAddInfoToActress(); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))

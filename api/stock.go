@@ -130,11 +130,6 @@ func LiquidationApi(c *gin.Context) {
 	})
 }
 
-type Paginate struct {
-	Page     uint `form:"page" json:"page"`
-	PageSize uint `form:"page_size" json:"page_size"`
-}
-
 // TradingRecordsApi godoc
 //
 //	@Summary		历史成交

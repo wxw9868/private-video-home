@@ -20,7 +20,7 @@ import (
 
 type ActressService struct{}
 
-func (as *ActressService) Add(name string) error {
+func (as *ActressService) Create(name string) error {
 	result := db.Where(model.Actress{Actress: name}).FirstOrCreate(&model.Actress{Actress: name, Avatar: "assets/image/avatar/anonymous.png"})
 	if result.RowsAffected == 1 {
 		return nil

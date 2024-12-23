@@ -29,6 +29,21 @@ func GetUserID(c *gin.Context) uint {
 	return sessions.Default(c).Get("user_id").(uint)
 }
 
+type Common struct {
+	ID uint `uri:"id" binding:"required"`
+}
+
+type Paginate struct {
+	Page int `uri:"page" form:"page" json:"page"`
+	Size int `uri:"size" form:"size" json:"size"`
+	// PageSize uint `form:"page_size" json:"page_size"`
+}
+
+type OrderBy struct {
+	Column string `uri:"column" form:"column" json:"column"`
+	Order  string `uri:"order" form:"order" json:"order"`
+}
+
 type Message struct {
 	Code   int         `json:"code"`
 	Status bool        `json:"status"`

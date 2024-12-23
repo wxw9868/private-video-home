@@ -31,10 +31,10 @@ type Video struct {
 	Browse   uint    `gorm:"column:browse;type:uint;not null;default:0;comment:浏览" json:"browse"`
 }
 
-func (vs *VideoService) List(actressID int, page, pageSize int, action, sort string) (data map[string]interface{}, err error) {
+func (vs *VideoService) List(actressID int, page, pageSize int, column, order string) (data map[string]interface{}, err error) {
 	var ids []uint
 	var key string
-	switch action {
+	switch column {
 	case "v.CreatedAt":
 		key = "video_video_createdAt"
 	case "l.browse":
@@ -76,8 +76,8 @@ func (vs *VideoService) List(actressID int, page, pageSize int, action, sort str
 	vdb := db.Table("video_Video as v").
 		Select("v.id, v.title, v.duration, v.poster, l.collect, l.browse").
 		Joins("left join video_VideoLog l on l.video_id = v.id")
-	if action != "" && sort != "" {
-		vdb = vdb.Order(utils.Join(action, " ", sort))
+	if column != "" && order != "" {
+		vdb = vdb.Order(utils.Join(column, " ", order))
 	}
 	var total int64
 	if err = vdb.Count(&total).Error; err != nil {
@@ -250,12 +250,12 @@ func (vs *VideoService) Browse(videoID uint, userID uint) error {
 	}
 
 	err := db.Transaction(func(tx *gorm.DB) error {
-		var userBrowseLog model.UserBrowseLog
-		if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).FirstOrInit(&userBrowseLog).Error; err != nil {
+		var userBrowseLog model.UserPageViewsLog
+		if err := tx.Where(model.UserPageViewsLog{UserID: userID, VideoID: videoID}).FirstOrInit(&userBrowseLog).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Where(model.UserBrowseLog{UserID: userID, VideoID: videoID}).Assign(model.UserBrowseLog{Number: userBrowseLog.Number + 1}).FirstOrCreate(&model.UserBrowseLog{}).Error; err != nil {
+		if err := tx.Where(model.UserPageViewsLog{UserID: userID, VideoID: videoID}).Assign(model.UserPageViewsLog{PageViews: userBrowseLog.PageViews + 1}).FirstOrCreate(&model.UserPageViewsLog{}).Error; err != nil {
 			return fmt.Errorf("创建失败: %s", err)
 		}
 

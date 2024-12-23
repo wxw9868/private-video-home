@@ -35,18 +35,18 @@ func Router(r *gin.Engine) {
 
 	actress := private.Group("actress")
 	{
-		actress.POST("addActress", api.AddActressApi)
-		actress.POST("updateActress", api.UpdateActressApi)
-		actress.GET("deleteActress/:id", api.DeleteActressApi)
-		actress.POST("getActressList", api.GetActressListApi)
+		actress.POST("createActress", api.CreateActressApi)
+		actress.GET("getActressList", api.GetActressListApi)
 		actress.GET("getActressInfo/:id", api.GetActressInfoApi)
+		actress.POST("updateActress", api.UpdateActressApi)
+		actress.DELETE("deleteActress/:id", api.DeleteActressApi)
 	}
 
 	video := private.Group("video")
 	{
-		video.POST("getVideoList", api.GetVideoListApi)
-		video.GET("videoPlay/:id", api.VideoPlayApi)
-		video.GET("browseVideo/:id", api.BrowseVideoApi)
+		video.GET("getVideoList", api.GetVideoListApi)
+		video.GET("getVideoInfo/:id", api.GetVideoInfoApi)
+		video.GET("recordPageViews/:id", api.RecordPageViewsApi)
 		video.POST("collectVideo", api.CollectVideoApi)
 		video.POST("importVideoData", api.ImportVideoDataApi)
 		video.GET("writeGoFound", api.VideoWriteGoFound)

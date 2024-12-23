@@ -1,63 +1,47 @@
 basePath: /
 definitions:
-  api.ActressAdd:
+  api.Actress:
     properties:
       alias:
-        example: ""
         type: string
       avatar:
         example: assets/image/avatar/anonymous.png
         type: string
       birth:
-        example: ""
         type: string
       blood_group:
-        example: ""
         type: string
       cup_size:
-        example: ""
         type: string
       debut_date:
-        example: ""
         type: string
-      introduction:
-        example: ""
+      intro:
         type: string
       measurements:
-        example: ""
         type: string
       name:
-        example: ""
         type: string
       nationality:
-        example: ""
         type: string
       star_sign:
-        example: ""
         type: string
       stature:
-        example: ""
         type: string
     required:
     - name
     type: object
-  api.ActressEdit:
-    type: object
   api.ActressList:
     properties:
-      action:
-        example: a.CreatedAt
-        type: string
       actress:
-        example: ""
+        type: string
+      column:
+        type: string
+      order:
         type: string
       page:
         type: integer
       size:
         type: integer
-      sort:
-        example: desc
-        type: string
     type: object
   api.Captcha:
     properties:
@@ -84,29 +68,29 @@ definitions:
     type: object
   api.CommentCai:
     properties:
-      cai:
+      comment_id:
+        type: integer
+      dis_like:
         enum:
         - 1
         - -1
         type: integer
-      comment_id:
-        type: integer
     required:
-    - cai
     - comment_id
+    - dis_like
     type: object
   api.CommentZan:
     properties:
       comment_id:
         type: integer
-      zan:
+      like:
         enum:
         - 1
         - -1
         type: integer
     required:
     - comment_id
-    - zan
+    - like
     type: object
   api.DanmuSave:
     properties:
@@ -153,6 +137,16 @@ definitions:
     - confirm_password
     - password
     - reset_password_token
+    type: object
+  api.ImportVideoData:
+    properties:
+      actresses:
+        type: string
+      dir:
+        type: string
+    required:
+    - actresses
+    - dir
     type: object
   api.Index:
     properties:
@@ -299,7 +293,40 @@ definitions:
       sort:
         type: string
     type: object
-  api.UserUpdate:
+  api.UpdateActress:
+    properties:
+      alias:
+        type: string
+      avatar:
+        example: assets/image/avatar/anonymous.png
+        type: string
+      birth:
+        type: string
+      blood_group:
+        type: string
+      cup_size:
+        type: string
+      debut_date:
+        type: string
+      id:
+        type: integer
+      intro:
+        type: string
+      measurements:
+        type: string
+      name:
+        type: string
+      nationality:
+        type: string
+      star_sign:
+        type: string
+      stature:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  api.UpdateUserInfo:
     properties:
       address:
         type: string
@@ -307,11 +334,11 @@ definitions:
         type: string
       email:
         type: string
+      intro:
+        type: string
       mobile:
         type: string
       nickname:
-        type: string
-      note:
         type: string
       username:
         type: string
@@ -323,18 +350,16 @@ definitions:
     type: object
   api.Video:
     properties:
-      action:
-        example: v.CreatedAt
-        type: string
       actress_id:
         type: integer
+      column:
+        type: string
+      order:
+        type: string
       page:
         type: integer
       size:
         type: integer
-      sort:
-        example: desc
-        type: string
     type: object
   api.VideoCollect:
     properties:
@@ -372,25 +397,52 @@ definitions:
     - parent_id
     - video_id
     type: object
-host: 192.168.0.9:6000
+host: 192.168.0.9:8080
 info:
-  contact: {}
-  description: This is a video server.
-  title: Video API
+  contact:
+    email: wxw9868gmail.com
+    name: API Support
+  description: This is a private video server.
+  title: 私人视频 API
   version: "1.0"
 paths:
-  /actress/add:
+  /actress/allAddInfo:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 通过爬虫获取所有演员信息
+      tags:
+      - util
+  /actress/createActress:
     post:
       consumes:
       - application/json
-      description: 添加演员
       parameters:
-      - description: Actress Add
+      - description: 演员信息
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/api.ActressAdd'
+          $ref: '#/definitions/api.Actress'
       produces:
       - application/json
       responses:
@@ -413,40 +465,12 @@ paths:
       summary: 添加演员
       tags:
       - actress
-  /actress/allAddInfo:
+  /actress/deleteActress/{id}:
     get:
       consumes:
       - application/json
-      description: 获取所有演员信息
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 获取所有演员信息
-      tags:
-      - actress
-  /actress/delete/{id}:
-    get:
-      consumes:
-      - application/json
-      description: get string by ID
       parameters:
-      - description: Actress ID
+      - description: 演员ID
         in: path
         name: id
         required: true
@@ -473,47 +497,12 @@ paths:
       summary: 删除演员
       tags:
       - actress
-  /actress/edit:
-    post:
-      consumes:
-      - application/json
-      description: 编辑演员信息
-      parameters:
-      - description: Actress Edit
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.ActressEdit'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 编辑演员信息
-      tags:
-      - actress
-  /actress/info/{id}:
+  /actress/getActressInfo/{id}:
     get:
       consumes:
       - application/json
-      description: get string by ID
       parameters:
-      - description: Actress ID
+      - description: 演员ID
         in: path
         name: id
         required: true
@@ -537,14 +526,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ServerError'
-      summary: 演员信息
+      summary: 获取演员信息
       tags:
       - actress
-  /actress/list:
+  /actress/getActressList:
     post:
       consumes:
       - application/json
-      description: 演员列表
       parameters:
       - description: 演员列表
         in: body
@@ -552,6 +540,40 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/api.ActressList'
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 条数
+        in: query
+        name: size
+        type: integer
+      - description: string enums
+        enum:
+        - A
+        - B
+        - C
+        in: query
+        name: action
+        type: string
+      - description: string enums
+        enum:
+        - A
+        - B
+        - C
+        in: query
+        name: sort
+        type: string
+      - description: string enums
+        enum:
+        - A
+        - B
+        - C
+        in: query
+        name: actress
+        type: string
       produces:
       - application/json
       responses:
@@ -578,7 +600,6 @@ paths:
     get:
       consumes:
       - application/json
-      description: 获取演员信息
       parameters:
       - description: actress
         in: query
@@ -604,10 +625,43 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ServerError'
-      summary: 获取演员信息
+      summary: 通过爬虫获取演员信息
+      tags:
+      - util
+  /actress/updateActress:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 演员信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.UpdateActress'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 更新演员信息
       tags:
       - actress
-  /comment/cai:
+  /comment/dislikeVideoComment:
     post:
       consumes:
       - application/json
@@ -641,41 +695,7 @@ paths:
       summary: 视频评论回复踩
       tags:
       - comment
-  /comment/comment:
-    post:
-      consumes:
-      - application/json
-      description: 视频评论
-      parameters:
-      - description: 视频评论
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.VideoComment'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 视频评论
-      tags:
-      - comment
-  /comment/list/{video_id}:
+  /comment/getVideoCommentList/{id}:
     get:
       consumes:
       - application/json
@@ -708,41 +728,7 @@ paths:
       summary: 视频弹幕列表
       tags:
       - comment
-  /comment/reply:
-    post:
-      consumes:
-      - application/json
-      description: 视频评论回复
-      parameters:
-      - description: 视频评论回复
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.VideoReply'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 视频评论回复
-      tags:
-      - comment
-  /comment/zan:
+  /comment/likeVideoComment:
     post:
       consumes:
       - application/json
@@ -776,11 +762,79 @@ paths:
       summary: 视频评论回复赞
       tags:
       - comment
-  /danmu/list/{video_id}:
+  /comment/replyVideoComment:
+    post:
+      consumes:
+      - application/json
+      description: 视频评论回复
+      parameters:
+      - description: 视频评论回复
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.VideoReply'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频评论回复
+      tags:
+      - comment
+  /comment/videoComment:
+    post:
+      consumes:
+      - application/json
+      description: 视频评论
+      parameters:
+      - description: 视频评论
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.VideoComment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频评论
+      tags:
+      - comment
+  /danmu/getVideoBarrageList/{id}:
     get:
       consumes:
       - application/json
-      description: get string by ID
+      description: 获取视频弹幕列表
       parameters:
       - description: Video ID
         in: path
@@ -806,10 +860,10 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ServerError'
-      summary: 视频弹幕列表
+      summary: 获取视频弹幕列表
       tags:
       - danmu
-  /danmu/save:
+  /danmu/sendVideoBarrage:
     post:
       consumes:
       - application/json
@@ -1213,7 +1267,7 @@ paths:
       summary: Tag Add
       tags:
       - tag
-  /tag/delete/{id}:
+  /tag/deleteTag/{id}:
     get:
       consumes:
       - application/json
@@ -1246,41 +1300,7 @@ paths:
       summary: Tag Delete
       tags:
       - tag
-  /tag/edit:
-    post:
-      consumes:
-      - application/json
-      description: Tag Edit
-      parameters:
-      - description: Tag Edit
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.TagEdit'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: Tag Edit
-      tags:
-      - tag
-  /tag/list:
+  /tag/getTagList:
     post:
       consumes:
       - application/json
@@ -1314,13 +1334,80 @@ paths:
       summary: Tag List
       tags:
       - tag
-  /user/avatar:
+  /tag/updateTag:
+    post:
+      consumes:
+      - application/json
+      description: Tag Edit
+      parameters:
+      - description: Tag Edit
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.TagEdit'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: Tag Edit
+      tags:
+      - tag
+  /user/changePassword:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 修改密码信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 修改密码
+      tags:
+      - user
+  /user/changeUserAvatar:
     post:
       consumes:
       - multipart/form-data
-      description: Upload file
+      description: 上传头像文件
       parameters:
-      - description: account avatar
+      - description: 头像文件
         in: formData
         name: avatar
         required: true
@@ -1344,14 +1431,64 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ServerError'
-      summary: Upload account avatar
+      summary: 更换用户头像
       tags:
       - user
-  /user/browse:
+  /user/forgotPassword:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 忘记密码信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.ForgotPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 忘记密码
+      tags:
+      - user
+  /user/getSession:
     get:
       consumes:
       - application/json
-      description: 用户浏览记录
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+      summary: 用户信息
+      tags:
+      - user
+  /user/getUserBrowseHistory:
+    get:
+      consumes:
+      - application/json
       produces:
       - application/json
       responses:
@@ -1367,10 +1504,197 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ServerError'
-      summary: 用户浏览记录
+      summary: 获取用户浏览记录
       tags:
       - user
-  /user/captcha:
+  /user/getUserFavoriteList:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 获取用户收藏记录
+      tags:
+      - user
+  /user/getUserInfo:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 获取用户信息
+      tags:
+      - user
+  /user/getUserLoginLogListApi:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 获取用户登陆记录
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户登录信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 用户登录
+      tags:
+      - user
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户注册信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.Register'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 用户注册
+      tags:
+      - user
+  /user/session:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 用户登出
+      tags:
+      - user
+  /user/updateUserInfo:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 修改用户信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.UpdateUserInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 修改用户信息
+      tags:
+      - user
+  /verify/captcha:
     post:
       consumes:
       - application/json
@@ -1404,223 +1728,7 @@ paths:
       summary: 验证码
       tags:
       - user
-  /user/changePassword:
-    post:
-      consumes:
-      - application/json
-      description: 用户修改密码
-      parameters:
-      - description: 用户修改密码
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.ChangePassword'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 用户修改密码
-      tags:
-      - user
-  /user/collect:
-    get:
-      consumes:
-      - application/json
-      description: 用户收藏记录
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 用户收藏记录
-      tags:
-      - user
-  /user/forgotPassword:
-    post:
-      consumes:
-      - application/json
-      description: 用户忘记密码
-      parameters:
-      - description: 用户忘记密码
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.ForgotPassword'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 用户忘记密码
-      tags:
-      - user
-  /user/info:
-    get:
-      consumes:
-      - application/json
-      description: 用户信息
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 用户信息
-      tags:
-      - user
-  /user/login:
-    post:
-      consumes:
-      - application/json
-      description: 用户登录
-      parameters:
-      - description: 用户登录
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.Login'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 用户登录
-      tags:
-      - user
-  /user/register:
-    post:
-      consumes:
-      - application/json
-      description: 用户注册
-      parameters:
-      - description: 用户注册
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.Register'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 用户注册
-      tags:
-      - user
-  /user/save:
-    post:
-      consumes:
-      - application/json
-      description: 用户修改信息
-      parameters:
-      - description: 用户修改信息
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/api.UserUpdate'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 用户修改信息
-      tags:
-      - user
-  /user/sendMail:
+  /verify/sendMail:
     post:
       consumes:
       - application/json
@@ -1654,7 +1762,7 @@ paths:
       summary: 发送邮件
       tags:
       - user
-  /user/sendUrl:
+  /verify/sendUrl:
     post:
       consumes:
       - application/json
@@ -1688,26 +1796,7 @@ paths:
       summary: 发送URL
       tags:
       - user
-  /user/session:
-    get:
-      consumes:
-      - application/json
-      description: 用户信息
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-      summary: 用户信息
-      tags:
-      - user
-  /video/browse/{video_id}:
+  /video/browseVideo/{id}:
     get:
       consumes:
       - application/json
@@ -1740,7 +1829,7 @@ paths:
       summary: 视频浏览记录
       tags:
       - video
-  /video/collect:
+  /video/collectVideo:
     post:
       consumes:
       - application/json
@@ -1774,45 +1863,7 @@ paths:
       summary: 视频收藏
       tags:
       - video
-  /video/import:
-    get:
-      consumes:
-      - application/json
-      description: get string by ID
-      parameters:
-      - description: dir
-        in: query
-        name: dir
-        required: true
-        type: string
-      - description: actresss
-        in: query
-        name: actresss
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 视频导入
-      tags:
-      - video
-  /video/list:
+  /video/getVideoList:
     post:
       consumes:
       - application/json
@@ -1846,17 +1897,17 @@ paths:
       summary: 视频列表
       tags:
       - video
-  /video/play/{id}:
-    get:
+  /video/importVideo:
+    post:
       consumes:
       - application/json
-      description: get string by ID
       parameters:
-      - description: Video ID
-        in: path
-        name: id
+      - description: 视频数据
+        in: body
+        name: data
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/api.ImportVideoData'
       produces:
       - application/json
       responses:
@@ -1876,40 +1927,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ServerError'
-      summary: 视频信息
-      tags:
-      - video
-  /video/repairImport:
-    get:
-      consumes:
-      - application/json
-      description: get string by ID
-      parameters:
-      - description: actresss
-        in: query
-        name: actresss
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Success'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Fail'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ServerError'
-      summary: 修复视频导入
+      summary: 导入视频数据
       tags:
       - video
   /video/search:
@@ -1945,11 +1963,43 @@ paths:
       summary: 视频搜索
       tags:
       - video
+  /video/videoPlay/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Fail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ServerError'
+      summary: 视频信息
+      tags:
+      - video
   /video/writeGoFound:
     get:
       consumes:
       - application/json
-      description: 视频导入GoFound
       produces:
       - application/json
       responses:
