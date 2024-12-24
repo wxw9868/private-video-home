@@ -1,6 +1,5 @@
 *.exe
-assets/video
 *.DS_Store
-tmp
-bin
+assets/video
 database/sqlite
+bin
