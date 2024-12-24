@@ -77,7 +77,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.Actress"
+                            "$ref": "#/definitions/request.CreateActress"
                         }
                     }
                 ],
@@ -110,7 +110,7 @@ const docTemplate = `{
             }
         },
         "/actress/deleteActress/{id}": {
-            "get": {
+            "delete": {
                 "consumes": [
                     "application/json"
                 ],
@@ -210,7 +210,7 @@ const docTemplate = `{
         "/actress/getActressList": {
             "post": {
                 "consumes": [
-                    "application/json"
+                    "application/x-www-form-urlencoded"
                 ],
                 "produces": [
                     "application/json"
@@ -220,15 +220,6 @@ const docTemplate = `{
                 ],
                 "summary": "演员列表",
                 "parameters": [
-                    {
-                        "description": "演员列表",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.ActressList"
-                        }
-                    },
                     {
                         "type": "integer",
                         "default": 1,
@@ -244,35 +235,24 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "enum": [
-                            "A",
-                            "B",
-                            "C"
-                        ],
                         "type": "string",
-                        "description": "string enums",
-                        "name": "action",
+                        "description": "排序字段",
+                        "name": "column",
                         "in": "query"
                     },
                     {
                         "enum": [
-                            "A",
-                            "B",
-                            "C"
+                            "desc",
+                            "asc"
                         ],
                         "type": "string",
-                        "description": "string enums",
-                        "name": "sort",
+                        "description": "排序方式",
+                        "name": "order",
                         "in": "query"
                     },
                     {
-                        "enum": [
-                            "A",
-                            "B",
-                            "C"
-                        ],
                         "type": "string",
-                        "description": "string enums",
+                        "description": "演员名称",
                         "name": "actress",
                         "in": "query"
                     }
@@ -373,7 +353,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.UpdateActress"
+                            "$ref": "#/definitions/request.UpdateActress"
                         }
                     }
                 ],
@@ -407,7 +387,6 @@ const docTemplate = `{
         },
         "/comment/dislikeVideoComment": {
             "post": {
-                "description": "视频评论回复踩",
                 "consumes": [
                     "application/json"
                 ],
@@ -417,15 +396,15 @@ const docTemplate = `{
                 "tags": [
                     "comment"
                 ],
-                "summary": "视频评论回复踩",
+                "summary": "踩视频评论",
                 "parameters": [
                     {
-                        "description": "视频评论回复踩",
+                        "description": "踩视频评论",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.CommentCai"
+                            "$ref": "#/definitions/api.DislikeVideoComment"
                         }
                     }
                 ],
@@ -459,7 +438,6 @@ const docTemplate = `{
         },
         "/comment/getVideoCommentList/{id}": {
             "get": {
-                "description": "视频弹幕列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -469,7 +447,7 @@ const docTemplate = `{
                 "tags": [
                     "comment"
                 ],
-                "summary": "视频弹幕列表",
+                "summary": "获取视频评论列表",
                 "parameters": [
                     {
                         "type": "integer",
@@ -509,7 +487,6 @@ const docTemplate = `{
         },
         "/comment/likeVideoComment": {
             "post": {
-                "description": "视频评论回复赞",
                 "consumes": [
                     "application/json"
                 ],
@@ -519,15 +496,15 @@ const docTemplate = `{
                 "tags": [
                     "comment"
                 ],
-                "summary": "视频评论回复赞",
+                "summary": "赞视频评论",
                 "parameters": [
                     {
-                        "description": "视频评论回复赞",
+                        "description": "赞视频评论",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.CommentZan"
+                            "$ref": "#/definitions/api.LikeVideoComment"
                         }
                     }
                 ],
@@ -559,59 +536,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment/replyVideoComment": {
-            "post": {
-                "description": "视频评论回复",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "comment"
-                ],
-                "summary": "视频评论回复",
-                "parameters": [
-                    {
-                        "description": "视频评论回复",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.VideoReply"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.Success"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/api.Fail"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/api.NotFound"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/api.ServerError"
-                        }
-                    }
-                }
-            }
-        },
-        "/comment/videoComment": {
+        "/comment/postVideoComment": {
             "post": {
                 "description": "视频评论",
                 "consumes": [
@@ -663,9 +588,60 @@ const docTemplate = `{
                 }
             }
         },
-        "/danmu/getVideoBarrageList/{id}": {
+        "/comment/replyVideoComment": {
+            "post": {
+                "description": "视频评论回复",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "视频评论回复",
+                "parameters": [
+                    {
+                        "description": "视频评论回复",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ReplyVideoComment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/danmu/getVideoDanmuList/{id}": {
             "get": {
-                "description": "获取视频弹幕列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -679,8 +655,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Video ID",
-                        "name": "video_id",
+                        "description": "视频ID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -713,7 +689,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/danmu/sendVideoBarrage": {
+        "/danmu/postVideoDanmu": {
             "post": {
                 "description": "视频弹幕",
                 "consumes": [
@@ -733,7 +709,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.DanmuSave"
+                            "$ref": "#/definitions/request.CreateDanmu"
                         }
                     }
                 ],
@@ -1277,9 +1253,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/tag/add": {
+        "/tag/createTag": {
             "post": {
-                "description": "Tag Add",
                 "consumes": [
                     "application/json"
                 ],
@@ -1289,15 +1264,15 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "Tag Add",
+                "summary": "Create Tag",
                 "parameters": [
                     {
-                        "description": "Tag Add",
+                        "description": "Create Tag",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.TagAdd"
+                            "$ref": "#/definitions/api.CreateTag"
                         }
                     }
                 ],
@@ -1331,7 +1306,6 @@ const docTemplate = `{
         },
         "/tag/deleteTag/{id}": {
             "get": {
-                "description": "Tag Delete",
                 "consumes": [
                     "application/json"
                 ],
@@ -1341,11 +1315,60 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "Tag Delete",
+                "summary": "Delete Tag",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Tag Delete",
+                        "description": "Tag ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/getTagInfo/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Get Tag Info",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1381,7 +1404,6 @@ const docTemplate = `{
         },
         "/tag/getTagList": {
             "post": {
-                "description": "Tag List",
                 "consumes": [
                     "application/json"
                 ],
@@ -1391,7 +1413,7 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "Tag List",
+                "summary": "Get Tag List",
                 "parameters": [
                     {
                         "description": "Tag List",
@@ -1433,7 +1455,6 @@ const docTemplate = `{
         },
         "/tag/updateTag": {
             "post": {
-                "description": "Tag Edit",
                 "consumes": [
                     "application/json"
                 ],
@@ -1443,15 +1464,15 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "Tag Edit",
+                "summary": "Update Tag",
                 "parameters": [
                     {
-                        "description": "Tag Edit",
+                        "description": "Update Tag",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.TagEdit"
+                            "$ref": "#/definitions/api.UpdateTag"
                         }
                     }
                 ],
@@ -1646,7 +1667,7 @@ const docTemplate = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "用户信息",
+                "summary": "获取用户信息",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1658,74 +1679,6 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/api.NotFound"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/getUserBrowseHistory": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "获取用户浏览记录",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.Success"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/api.NotFound"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/api.ServerError"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/getUserFavoriteList": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "获取用户收藏记录",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.Success"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/api.NotFound"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/api.ServerError"
                         }
                     }
                 }
@@ -1799,6 +1752,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/getUserVideoCollectList": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "获取用户收藏记录",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/getUserVideoPageViewsList": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "获取用户视频浏览记录",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/user/login": {
             "post": {
                 "consumes": [
@@ -1833,6 +1854,40 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/logout": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "用户登出",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
                         }
                     },
                     "404": {
@@ -1901,40 +1956,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/session": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "用户登出",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.Success"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/api.NotFound"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/api.ServerError"
-                        }
-                    }
-                }
-            }
-        },
         "/user/updateUserInfo": {
             "post": {
                 "consumes": [
@@ -1954,7 +1975,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.UpdateUserInfo"
+                            "$ref": "#/definitions/request.UpdateUser"
                         }
                     }
                 ],
@@ -2142,9 +2163,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/video/browseVideo/{id}": {
-            "get": {
-                "description": "get string by ID",
+        "/video/collectVideo": {
+            "post": {
+                "description": "视频收藏",
                 "consumes": [
                     "application/json"
                 ],
@@ -2154,12 +2175,63 @@ const docTemplate = `{
                 "tags": [
                     "video"
                 ],
-                "summary": "视频浏览记录",
+                "summary": "视频收藏",
+                "parameters": [
+                    {
+                        "description": "视频收藏",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.CollectVideo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Fail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/video/getVideoInfo/{id}": {
+            "get": {
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "video"
+                ],
+                "summary": "视频信息",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "Video ID",
-                        "name": "video_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -2192,65 +2264,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/video/collectVideo": {
-            "post": {
-                "description": "视频收藏",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "video"
-                ],
-                "summary": "视频收藏",
-                "parameters": [
-                    {
-                        "description": "视频收藏",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.VideoCollect"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.Success"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/api.Fail"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/api.NotFound"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/api.ServerError"
-                        }
-                    }
-                }
-            }
-        },
         "/video/getVideoList": {
-            "post": {
+            "get": {
                 "description": "视频列表",
                 "consumes": [
-                    "application/json"
+                    "application/x-www-form-urlencoded"
                 ],
                 "produces": [
+                    "application/json",
                     "application/json"
                 ],
                 "tags": [
@@ -2259,13 +2280,40 @@ const docTemplate = `{
                 "summary": "视频列表",
                 "parameters": [
                     {
-                        "description": "视频列表",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.Video"
-                        }
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "条数",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "column",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "desc",
+                            "asc"
+                        ],
+                        "type": "string",
+                        "description": "排序方式",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "演员ID",
+                        "name": "actress_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2347,9 +2395,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/video/search": {
+        "/video/recordPageViews/{id}": {
             "get": {
-                "description": "get string by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -2359,13 +2406,13 @@ const docTemplate = `{
                 "tags": [
                     "video"
                 ],
-                "summary": "视频搜索",
+                "summary": "视频浏览记录",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "关键词",
-                        "name": "query",
-                        "in": "query",
+                        "type": "integer",
+                        "description": "视频ID",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -2397,7 +2444,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/video/videoPlay/{id}": {
+        "/video/search": {
             "get": {
                 "description": "get string by ID",
                 "consumes": [
@@ -2409,13 +2456,13 @@ const docTemplate = `{
                 "tags": [
                     "video"
                 ],
-                "summary": "视频信息",
+                "summary": "视频搜索",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Video ID",
-                        "name": "id",
-                        "in": "path",
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "query",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -2489,71 +2536,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.Actress": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "alias": {
-                    "type": "string"
-                },
-                "avatar": {
-                    "type": "string",
-                    "example": "assets/image/avatar/anonymous.png"
-                },
-                "birth": {
-                    "type": "string"
-                },
-                "blood_group": {
-                    "type": "string"
-                },
-                "cup_size": {
-                    "type": "string"
-                },
-                "debut_date": {
-                    "type": "string"
-                },
-                "intro": {
-                    "type": "string"
-                },
-                "measurements": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nationality": {
-                    "type": "string"
-                },
-                "star_sign": {
-                    "type": "string"
-                },
-                "stature": {
-                    "type": "string"
-                }
-            }
-        },
-        "api.ActressList": {
-            "type": "object",
-            "properties": {
-                "actress": {
-                    "type": "string"
-                },
-                "column": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "size": {
-                    "type": "integer"
-                }
-            }
-        },
         "api.Captcha": {
             "type": "object",
             "properties": {
@@ -2587,72 +2569,52 @@ const docTemplate = `{
                 }
             }
         },
-        "api.CommentCai": {
+        "api.CollectVideo": {
             "type": "object",
             "required": [
-                "comment_id",
-                "dis_like"
-            ],
-            "properties": {
-                "comment_id": {
-                    "type": "integer"
-                },
-                "dis_like": {
-                    "type": "integer",
-                    "enum": [
-                        1,
-                        -1
-                    ]
-                }
-            }
-        },
-        "api.CommentZan": {
-            "type": "object",
-            "required": [
-                "comment_id",
-                "like"
-            ],
-            "properties": {
-                "comment_id": {
-                    "type": "integer"
-                },
-                "like": {
-                    "type": "integer",
-                    "enum": [
-                        1,
-                        -1
-                    ]
-                }
-            }
-        },
-        "api.DanmuSave": {
-            "type": "object",
-            "required": [
-                "color",
-                "text",
+                "num",
                 "video_id"
             ],
             "properties": {
-                "border": {
-                    "type": "boolean"
-                },
-                "color": {
-                    "type": "string"
-                },
-                "mode": {
-                    "type": "integer"
-                },
-                "style": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "time": {
-                    "type": "number"
+                "num": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        -1
+                    ]
                 },
                 "video_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "api.CreateTag": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.DislikeVideoComment": {
+            "type": "object",
+            "required": [
+                "comment_id",
+                "dislike"
+            ],
+            "properties": {
+                "comment_id": {
+                    "type": "integer"
+                },
+                "dislike": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        -1
+                    ]
                 }
             }
         },
@@ -2700,7 +2662,10 @@ const docTemplate = `{
             ],
             "properties": {
                 "actresses": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "dir": {
                     "type": "string"
@@ -2732,6 +2697,25 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "api.LikeVideoComment": {
+            "type": "object",
+            "required": [
+                "comment_id",
+                "like"
+            ],
+            "properties": {
+                "comment_id": {
+                    "type": "integer"
+                },
+                "like": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        -1
+                    ]
                 }
             }
         },
@@ -2831,6 +2815,25 @@ const docTemplate = `{
                 }
             }
         },
+        "api.ReplyVideoComment": {
+            "type": "object",
+            "required": [
+                "content",
+                "parent_id",
+                "video_id"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "api.SendMail": {
             "type": "object",
             "required": [
@@ -2877,18 +2880,24 @@ const docTemplate = `{
                 }
             }
         },
-        "api.TagAdd": {
+        "api.TagList": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
-                "name": {
+                "column": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
                 }
             }
         },
-        "api.TagEdit": {
+        "api.UpdateTag": {
             "type": "object",
             "required": [
                 "id",
@@ -2903,24 +2912,94 @@ const docTemplate = `{
                 }
             }
         },
-        "api.TagList": {
+        "api.VideoComment": {
             "type": "object",
+            "required": [
+                "video_id"
+            ],
             "properties": {
-                "action": {
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.CreateActress": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "alias": {
                     "type": "string"
                 },
-                "page": {
-                    "type": "integer"
+                "avatar": {
+                    "type": "string",
+                    "example": "assets/image/avatar/anonymous.png"
                 },
-                "size": {
-                    "type": "integer"
+                "birth": {
+                    "type": "string"
                 },
-                "sort": {
+                "blood_group": {
+                    "type": "string"
+                },
+                "cup_size": {
+                    "type": "string"
+                },
+                "debut_date": {
+                    "type": "string"
+                },
+                "intro": {
+                    "type": "string"
+                },
+                "measurements": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nationality": {
+                    "type": "string"
+                },
+                "star_sign": {
+                    "type": "string"
+                },
+                "stature": {
                     "type": "string"
                 }
             }
         },
-        "api.UpdateActress": {
+        "request.CreateDanmu": {
+            "type": "object",
+            "required": [
+                "color",
+                "text",
+                "video_id"
+            ],
+            "properties": {
+                "border": {
+                    "type": "boolean"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "integer"
+                },
+                "style": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "number"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.UpdateActress": {
             "type": "object",
             "required": [
                 "id",
@@ -2969,7 +3048,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.UpdateUserInfo": {
+        "request.UpdateUser": {
             "type": "object",
             "required": [
                 "email",
@@ -2998,79 +3077,6 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "api.Video": {
-            "type": "object",
-            "properties": {
-                "actress_id": {
-                    "type": "integer"
-                },
-                "column": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "size": {
-                    "type": "integer"
-                }
-            }
-        },
-        "api.VideoCollect": {
-            "type": "object",
-            "required": [
-                "collect",
-                "video_id"
-            ],
-            "properties": {
-                "collect": {
-                    "type": "integer",
-                    "enum": [
-                        1,
-                        -1
-                    ]
-                },
-                "video_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "api.VideoComment": {
-            "type": "object",
-            "required": [
-                "content",
-                "video_id"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "video_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "api.VideoReply": {
-            "type": "object",
-            "required": [
-                "content",
-                "parent_id",
-                "video_id"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "parent_id": {
-                    "type": "integer"
-                },
-                "video_id": {
-                    "type": "integer"
                 }
             }
         }

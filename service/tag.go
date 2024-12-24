@@ -9,7 +9,7 @@ import (
 
 type TagService struct{}
 
-func (ts *TagService) Add(name string) error {
+func (ts *TagService) Create(name string) error {
 	result := db.Where(model.Tag{Name: name}).FirstOrCreate(&model.Tag{Name: name})
 	if result.RowsAffected == 1 {
 		return nil
@@ -17,10 +17,34 @@ func (ts *TagService) Add(name string) error {
 	return errors.New("标签已存在")
 }
 
-func (ts *TagService) Edit(id uint, name string) error {
+func (ts *TagService) List(page, pageSize int, column, order string) (map[string]interface{}, error) {
+	rdb := db.Model(&model.Tag{})
+	if column != "" && order != "" {
+		rdb = rdb.Order(utils.Join(column, " ", order))
+	}
+
+	var total int64
+	if err := rdb.Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	var tags []model.Tag
+	if err := rdb.Scopes(Paginate(page, pageSize, int(total))).Find(&tags).Error; err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{"list": tags, "total": total}, nil
+}
+
+func (ts *TagService) Info(id uint) (*model.Tag, error) {
 	var tag model.Tag
-	tag.ID = id
-	if err := db.Model(&tag).Updates(model.Tag{Name: name}).Error; err != nil {
+	if err := db.First(&tag, id).Error; err != nil {
+		return nil, err
+	}
+	return &tag, nil
+}
+
+func (ts *TagService) Update(id uint, name string) error {
+	if err := db.Model(&model.Tag{}).Where("id = ?", id).Updates(model.Tag{Name: name}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -31,29 +55,4 @@ func (ts *TagService) Delete(id uint) error {
 		return err
 	}
 	return nil
-}
-
-type Tags struct {
-	ID     uint   `json:"id"`
-	Name   string `gorm:"column:name" json:"name"`
-	Avatar string `gorm:"column:avatar" json:"avatar"`
-	Count  uint32 `gorm:"column:count" json:"count"`
-}
-
-func (ts *TagService) List(page, pageSize int, action, sort string) ([]Actress, error) {
-	var actresss []Actress
-	sql := "SELECT t.id, t.name, t.avatar, count(vt.video_id) as count FROM video_Tag t left join video_VideoTag vt on t.id = vt.tag_id group by 1,2,3"
-	if action != "" && sort != "" {
-		sql += utils.Join(" order by ", action, " ", sort)
-	}
-
-	var count int64
-	if err := db.Table("video_Tag t").Count(&count).Error; err != nil {
-		return nil, err
-	}
-
-	if err := db.Raw(sql).Scopes(Paginate(page, pageSize, int(count))).Scan(&actresss).Error; err != nil {
-		return nil, err
-	}
-	return actresss, nil
 }

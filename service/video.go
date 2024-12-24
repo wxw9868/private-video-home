@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/wxw9868/video/model"
+	"github.com/wxw9868/video/model/request"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
 )
@@ -31,10 +32,10 @@ type Video struct {
 	Browse   uint    `gorm:"column:page_views;type:uint;not null;default:0;comment:浏览" json:"browse"`
 }
 
-func (vs *VideoService) List(actressID int, page, pageSize int, column, order string) (data map[string]interface{}, err error) {
+func (vs *VideoService) List(req request.SearchVideo) (data map[string]interface{}, err error) {
 	var ids []uint
 	var key string
-	switch column {
+	switch req.Column {
 	case "v.CreatedAt":
 		key = "video_video_createdAt"
 	case "l.browse":
@@ -61,13 +62,13 @@ func (vs *VideoService) List(actressID int, page, pageSize int, column, order st
 		return map[string]interface{}{"list": videos, "total": total}, nil
 	}
 
-	if actressID != 0 {
-		var vadb = db.Model(&model.VideoActress{}).Where("actress_id = ?", actressID)
+	if req.ActressID != 0 {
+		var vadb = db.Model(&model.VideoActress{}).Where("actress_id = ?", req.ActressID)
 		var total int64
 		if err = vadb.Count(&total).Error; err != nil {
 			return nil, err
 		}
-		if err = vadb.Scopes(Paginate(page, pageSize, int(total))).Pluck("video_id", &ids).Error; err != nil {
+		if err = vadb.Scopes(Paginate(req.Page, req.Size, int(total))).Pluck("video_id", &ids).Error; err != nil {
 			return nil, err
 		}
 		return f(ids, int(total))
@@ -76,14 +77,14 @@ func (vs *VideoService) List(actressID int, page, pageSize int, column, order st
 	vdb := db.Table("video_Video as v").
 		Select("v.id, v.title, v.duration, v.poster, l.collection_volume, l.page_views").
 		Joins("left join video_VideoLog l on l.video_id = v.id")
-	if column != "" && order != "" {
-		vdb = vdb.Order(utils.Join(column, " ", order))
+	if req.Column != "" && req.Order != "" {
+		vdb = vdb.Order(utils.Join(req.Column, " ", req.Order))
 	}
 	var total int64
 	if err = vdb.Count(&total).Error; err != nil {
 		return nil, err
 	}
-	if err = db.Table("(?)", vdb).Scopes(Paginate(page, pageSize, int(total))).Pluck("id", &ids).Error; err != nil {
+	if err = db.Table("(?)", vdb).Scopes(Paginate(req.Page, req.Size, int(total))).Pluck("id", &ids).Error; err != nil {
 		return nil, err
 	}
 
@@ -97,7 +98,7 @@ func (vs *VideoService) List(actressID int, page, pageSize int, column, order st
 	}
 
 	var videos []Video
-	err = vdb.Scopes(Paginate(page, pageSize, int(total))).Scan(&videos).Error
+	err = vdb.Scopes(Paginate(req.Page, req.Size, int(total))).Scan(&videos).Error
 	if err != nil {
 		return nil, err
 	}
@@ -312,16 +313,11 @@ func (vs *VideoService) GofoundIndex(videoID uint) error {
 	return nil
 }
 
-func (vs *VideoService) Comment(videoID uint, content string, userID uint) (uint, error) {
-	var user model.User
-	if err := db.First(&user, userID).Error; err != nil {
-		return 0, err
-	}
-
+func (vs *VideoService) Comment(user *model.User, videoID uint, content string) (map[string]interface{}, error) {
 	comment := model.VideoComment{
 		ParentId:    0,
 		VideoId:     videoID,
-		UserId:      userID,
+		UserId:      user.ID,
 		Nickname:    user.Nickname,
 		Avatar:      user.Avatar,
 		Status:      "APPROVED",
@@ -329,25 +325,19 @@ func (vs *VideoService) Comment(videoID uint, content string, userID uint) (uint
 		Content:     content,
 		IsShow:      1,
 	}
-
-	result := db.Create(&comment)
-	if result.Error != nil {
-		return 0, result.Error
+	if err := db.Create(&comment).Error; err != nil {
+		return nil, err
 	}
 
-	return comment.ID, nil
+	data := map[string]interface{}{"commentID": comment.ID, "userAvatar": user.Avatar, "userNickname": user.Nickname, "content": content}
+	return data, nil
 }
 
-func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userID uint) (uint, error) {
-	var user model.User
-	if err := db.First(&user, userID).Error; err != nil {
-		return 0, err
-	}
-
+func (vs *VideoService) Reply(user *model.User, videoID, parentID uint, content string) (map[string]interface{}, error) {
 	comment := model.VideoComment{
 		ParentId:    parentID,
 		VideoId:     videoID,
-		UserId:      userID,
+		UserId:      user.ID,
 		Nickname:    user.Nickname,
 		Avatar:      user.Avatar,
 		Status:      "APPROVED",
@@ -356,21 +346,20 @@ func (vs *VideoService) Reply(videoID uint, parentID uint, content string, userI
 		IsShow:      1,
 	}
 
-	tx := db.Begin()
+	db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&comment).Error; err != nil {
+			return err
+		}
 
-	if err := tx.Create(&comment).Error; err != nil {
-		tx.Rollback()
-		return 0, err
-	}
+		if err := tx.Model(&model.VideoComment{}).Where("id = ?", parentID).Update("reply_num", gorm.Expr("reply_num + 1")).Error; err != nil {
+			return err
+		}
 
-	if err := tx.Model(&model.VideoComment{}).Where("id = ?", parentID).Update("reply_num", gorm.Expr("reply_num + 1")).Error; err != nil {
-		tx.Rollback()
-		return 0, err
-	}
+		return nil
+	})
 
-	tx.Commit()
-
-	return comment.ID, nil
+	data := map[string]interface{}{"commentID": comment.ID, "userAvatar": user.Avatar, "userNickname": user.Nickname, "content": content}
+	return data, nil
 }
 
 type VideoComment struct {
@@ -380,7 +369,7 @@ type VideoComment struct {
 	DisLIke   uint `gorm:"comment:反对（踩）"`
 }
 
-func (vs *VideoService) CommentList(videoID, userID uint) ([]*CommentTree, error) {
+func (vs *VideoService) CommentList(userID, videoID uint) ([]*CommentTree, error) {
 	var list []VideoComment
 	query := db.Model(&model.UserCommentLog{}).Where("video_id = ? and user_id = ?", videoID, userID)
 	if err := db.Table("video_VideoComment as c").
@@ -392,22 +381,17 @@ func (vs *VideoService) CommentList(videoID, userID uint) ([]*CommentTree, error
 	return tree(list), nil
 }
 
-func (vs *VideoService) Zan(commentID, userID uint, zan int) error {
+func (vs *VideoService) LikeVideoComment(userID, commentID uint, like int8) error {
 	var comment model.VideoComment
 	if errors.Is(db.First(&comment, commentID).Error, gorm.ErrRecordNotFound) {
 		return errors.New("评论不存在！")
 	}
 
-	var expr string
-	var like uint
-	if zan == 1 {
+	// 减少1
+	expr := "like - 1"
+	if like == 1 {
 		// 增加1
-		like = 1
 		expr = "like + 1"
-	} else {
-		// 减少1
-		like = 0
-		expr = "like - 1"
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
@@ -423,22 +407,17 @@ func (vs *VideoService) Zan(commentID, userID uint, zan int) error {
 	})
 }
 
-func (vs *VideoService) Cai(commentID, userID uint, cai int) error {
+func (vs *VideoService) DislikeVideoComment(userID, commentID uint, dislike int8) error {
 	var comment model.VideoComment
 	if errors.Is(db.First(&comment, commentID).Error, gorm.ErrRecordNotFound) {
 		return errors.New("评论不存在！")
 	}
 
-	var expr string
-	var dislike uint
-	if cai == 1 {
+	// 减少1
+	expr := "dislike - 1"
+	if dislike == 1 {
 		// 增加1
-		dislike = 1
 		expr = "dislike + 1"
-	} else {
-		// 减少1
-		dislike = 0
-		expr = "dislike - 1"
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
@@ -546,7 +525,7 @@ type VideoDanmu struct {
 	Mode   uint8   `json:"mode" gorm:"comment:弹幕模式: 0: 滚动(默认) 1: 顶部 2: 底部"`
 	Color  string  `json:"color" gorm:"comment:弹幕颜色，默认为白色"`
 	Border bool    `json:"border" gorm:"comment:弹幕是否有描边, 默认为 false"`
-	// Style  string `json:"style" gorm:"comment:弹幕自定义样式, 默认为空对象"`
+	Style  string  `json:"style" gorm:"comment:弹幕自定义样式, 默认为空对象"`
 }
 
 func (vs *VideoService) DanmuList(videoID uint) ([]VideoDanmu, error) {
@@ -557,16 +536,16 @@ func (vs *VideoService) DanmuList(videoID uint) ([]VideoDanmu, error) {
 	return list, nil
 }
 
-func (vs *VideoService) DanmuSave(videoID, userID uint, text string, time float64, mode uint8, color string, border bool, style string) error {
-	var danmu = model.VideoDanmu{
-		VideoId: videoID,
+func (vs *VideoService) Danmu(userID uint, req request.CreateDanmu) error {
+	danmu := model.VideoDanmu{
+		VideoId: req.VideoID,
+		Text:    req.Text,
+		Time:    req.Time,
+		Mode:    req.Mode,
+		Color:   req.Color,
+		Border:  req.Border,
+		Style:   req.Style,
 		UserId:  userID,
-		Text:    text,
-		Time:    time,
-		Mode:    mode,
-		Color:   color,
-		Border:  border,
-		Style:   style,
 	}
 	if err := db.Create(&danmu).Error; err != nil {
 		return err

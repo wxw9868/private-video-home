@@ -12,6 +12,7 @@ import (
 	"github.com/mssola/user_agent"
 	"github.com/wxw9868/util"
 	"github.com/wxw9868/video/model"
+	"github.com/wxw9868/video/model/request"
 	"github.com/wxw9868/video/utils"
 )
 
@@ -128,7 +129,7 @@ func LoginApi(c *gin.Context) {
 //	@Success	200	{object}	Success
 //	@Failure	404	{object}	NotFound
 //	@Failure	500	{object}	ServerError
-//	@Router		/user/session [get]
+//	@Router		/user/logout [get]
 func LogoutApi(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
@@ -141,7 +142,7 @@ func LogoutApi(c *gin.Context) {
 
 // GetSessionApi godoc
 //
-//	@Summary	用户信息
+//	@Summary	获取用户信息
 //	@Tags		user
 //	@Accept		json
 //	@Produce	json
@@ -149,17 +150,7 @@ func LogoutApi(c *gin.Context) {
 //	@Failure	404	{object}	NotFound
 //	@Router		/user/getSession [get]
 func GetSessionApi(c *gin.Context) {
-	session := sessions.Default(c)
-	data := map[string]interface{}{
-		"id":          session.Get("user_id").(uint),
-		"avatar":      session.Get("user_avatar").(string),
-		"username":    session.Get("user_username").(string),
-		"nickname":    session.Get("user_nickname").(string),
-		"email":       session.Get("user_email").(string),
-		"mobile":      session.Get("user_mobile").(string),
-		"designation": session.Get("user_designation").(string),
-	}
-	c.JSON(http.StatusOK, util.Success("获取成功", data))
+	c.JSON(http.StatusOK, util.Success("获取成功", GetUser(c)))
 }
 
 // GetUserInfoApi godoc
@@ -206,8 +197,7 @@ func ChangePasswordApi(c *gin.Context) {
 		return
 	}
 
-	userID := GetUserID(c)
-	if err := userService.ChangePassword(userID, bind.OldPassword, bind.NewPassword); err != nil {
+	if err := userService.ChangePassword(GetUserID(c), bind.OldPassword, bind.NewPassword); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
@@ -240,8 +230,8 @@ func ForgotPasswordApi(c *gin.Context) {
 	}
 
 	session := sessions.Default(c)
-	email := session.Get(bind.ResetPasswordToken).(string)
-	if email == "" {
+	email, ok := session.Get(bind.ResetPasswordToken).(string)
+	if email == "" || !ok {
 		c.JSON(http.StatusBadRequest, util.Fail("密码重置链接已失效，请重新获取"))
 		return
 	}
@@ -253,30 +243,20 @@ func ForgotPasswordApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("修改密码成功", nil))
 }
 
-type UpdateUserInfo struct {
-	Nickname    string `form:"nickname" json:"nickname" binding:"required"`
-	Username    string `form:"username" json:"username" binding:"required"`
-	Email       string `form:"email" json:"email" binding:"required,email"`
-	Mobile      string `form:"mobile" json:"mobile" binding:"required"`
-	Designation string `form:"designation" json:"designation"`
-	Address     string `form:"address" json:"address"`
-	Intro       string `form:"intro" json:"intro"`
-}
-
 // UpdateUserInfoApi godoc
 //
 //	@Summary	修改用户信息
 //	@Tags		user
 //	@Accept		json
 //	@Produce	json
-//	@Param		data	body		UpdateUserInfo	true	"修改用户信息"
+//	@Param		data	body		request.UpdateUser	true	"修改用户信息"
 //	@Success	200		{object}	Success
 //	@Failure	400		{object}	Fail
 //	@Failure	404		{object}	NotFound
 //	@Failure	500		{object}	ServerError
 //	@Router		/user/updateUserInfo [post]
 func UpdateUserInfoApi(c *gin.Context) {
-	var bind UpdateUserInfo
+	var bind request.UpdateUser
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
@@ -291,7 +271,8 @@ func UpdateUserInfoApi(c *gin.Context) {
 		Address:     bind.Address,
 		Intro:       bind.Intro,
 	}
-	err := userService.Updates(GetUserID(c), user)
+	user.ID = GetUserID(c)
+	err := userService.Updates(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -320,28 +301,29 @@ func ChangeUserAvatarApi(c *gin.Context) {
 		return
 	}
 
-	filename := filepath.Base(file.Filename)
-	avatarDir := "./assets/image/avatar/" + filename
-	if err := c.SaveUploadedFile(file, avatarDir); err != nil {
+	avatarPath := "assets/image/avatar/" + filepath.Base(file.Filename)
+	if err := c.SaveUploadedFile(file, avatarPath); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(fmt.Sprintf("upload file err: %s", err.Error())))
 		return
 	}
 
-	session := sessions.Default(c)
-	if err := userService.Update(session.Get("user_id").(uint), "avatar", avatarDir); err != nil {
+	user := GetUser(c)
+	if err := userService.Update(user.ID, "avatar", avatarPath); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
-	if session.Get("user_avatar").(string) != "./assets/image/avatar/avatar.png" {
-		os.Remove(session.Get("user_avatar").(string))
+	if user.Avatar != "./assets/image/avatar/avatar.png" {
+		os.Remove(user.Avatar)
 	}
-	session.Set("user_avatar", avatarDir)
+
+	session := sessions.Default(c)
+	session.Set("user_avatar", avatarPath)
 	session.Save()
 
-	c.JSON(http.StatusOK, util.Success("更换成功", avatarDir))
+	c.JSON(http.StatusOK, util.Success("更换成功", avatarPath))
 }
 
-// GetUserFavoriteListApi godoc
+// GetUserVideoCollectListApi godoc
 //
 //	@Summary	获取用户收藏记录
 //	@Tags		user
@@ -350,9 +332,9 @@ func ChangeUserAvatarApi(c *gin.Context) {
 //	@Success	200	{object}	Success
 //	@Failure	404	{object}	NotFound
 //	@Failure	500	{object}	ServerError
-//	@Router		/user/getUserFavoriteList [get]
-func GetUserFavoriteListApi(c *gin.Context) {
-	data, err := userService.FavoriteList(GetUserID(c))
+//	@Router		/user/getUserVideoCollectList [get]
+func GetUserVideoCollectListApi(c *gin.Context) {
+	data, err := userService.CollectList(GetUserID(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -360,18 +342,18 @@ func GetUserFavoriteListApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("获取用户收藏记录", data))
 }
 
-// GetUserBrowseListApi godoc
+// GetUserVideoPageViewsListApi godoc
 //
-//	@Summary	获取用户浏览记录
+//	@Summary	获取用户视频浏览记录
 //	@Tags		user
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{object}	Success
 //	@Failure	404	{object}	NotFound
 //	@Failure	500	{object}	ServerError
-//	@Router		/user/getUserBrowseHistory [get]
-func GetUserBrowseListApi(c *gin.Context) {
-	data, err := userService.BrowseList(GetUserID(c))
+//	@Router		/user/getUserVideoPageViewsList [get]
+func GetUserVideoPageViewsListApi(c *gin.Context) {
+	data, err := userService.VideoPageViewsList(GetUserID(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return

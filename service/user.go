@@ -55,19 +55,17 @@ func (us *UserService) Login(email, password string) (*model.User, error) {
 
 func (us *UserService) ChangePassword(id uint, oldPassword, newPassword string) error {
 	var user model.User
-	result := db.First(&user, id)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if err := db.First(&user, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("用户不存在！")
 	}
 
-	password, _ := util.DataEncryption(oldPassword)
-	if password != user.Password {
+	oldPassword, _ = util.DataEncryption(oldPassword)
+	if oldPassword != user.Password {
 		return errors.New("原密码输入错误！")
 	}
 
-	password, _ = util.DataEncryption(newPassword)
-	result = db.Model(&user).Updates(model.User{Password: password})
-	if result.Error != nil {
+	newPassword, _ = util.DataEncryption(newPassword)
+	if err := db.Model(&user).Updates(model.User{Password: newPassword}).Error; err != nil {
 		return errors.New("修改密码失败！")
 	}
 	return nil
@@ -77,44 +75,44 @@ func (us *UserService) ForgotPassword(email, newPassword string) error {
 	if errors.Is(db.Where("email = ?", email).First(&user).Error, gorm.ErrRecordNotFound) {
 		return errors.New("邮箱错误！")
 	}
-	password, _ := util.DataEncryption(newPassword)
-	result := db.Model(&user).Updates(model.User{Password: password})
-	if result.Error != nil {
+
+	newPassword, _ = util.DataEncryption(newPassword)
+	if err := db.Model(&user).Updates(model.User{Password: newPassword}).Error; err != nil {
 		return errors.New("修改密码失败！")
 	}
 	return nil
 }
 
 type User struct {
-	ID          uint
-	Username    string `gorm:"column:username;type:varchar(100);uniqueIndex;comment:账户名"`
-	Nickname    string `gorm:"column:nickname;type:varchar(30);comment:昵称"`
-	Sex         uint8  `gorm:"column:sex;type:uint;default:0;comment:性别 0保密 1男 2女"`
-	Mobile      string `gorm:"column:mobile;type:string;comment:手机号"`
-	Email       string `gorm:"column:email;type:string;comment:邮箱地址"`
-	QQ          string `gorm:"column:qq;type:varchar(20);comment:QQ"`
-	Avatar      string `gorm:"column:avatar;type:string;comment:用户头像地址"`
-	Designation string `gorm:"column:designation;type:string;comment:称号"`
-	Realname    string `gorm:"column:realname;type:varchar(50);comment:真实姓名"`
-	Idcard      string `gorm:"column:idcard;type:varchar(100);comment:身份证号"`
-	Address     string `gorm:"column:address;type:string;comment:地址"`
-	Note        string `gorm:"column:note;type:string;comment:备注"`
-	CollectNum  uint   `gorm:"column:collect_num;type:uint;default:0;comment:"`
-	BrowseNum   uint   `gorm:"column:browse_num;type:uint;default:0;comment:"`
+	ID          uint   `json:"id,omitempty"`
+	Username    string `gorm:"column:username;type:varchar(100);uniqueIndex;comment:账户名" json:"username,omitempty"`
+	Nickname    string `gorm:"column:nickname;type:varchar(30);comment:昵称" json:"nickname,omitempty"`
+	Sex         uint8  `gorm:"column:sex;type:uint;default:0;comment:性别 0保密 1男 2女" json:"sex,omitempty"`
+	Mobile      string `gorm:"column:mobile;type:string;comment:手机号" json:"mobile,omitempty"`
+	Email       string `gorm:"column:email;type:string;comment:邮箱地址" json:"email,omitempty"`
+	QQ          string `gorm:"column:qq;type:varchar(20);comment:QQ" json:"qq,omitempty"`
+	Avatar      string `gorm:"column:avatar;type:string;comment:用户头像地址" json:"avatar,omitempty"`
+	Designation string `gorm:"column:designation;type:string;comment:称号" json:"designation,omitempty"`
+	Realname    string `gorm:"column:realname;type:varchar(50);comment:真实姓名" json:"realname,omitempty"`
+	Idcard      string `gorm:"column:idcard;type:varchar(100);comment:身份证号" json:"idcard,omitempty"`
+	Address     string `gorm:"column:address;type:string;comment:地址" json:"address,omitempty"`
+	Note        string `gorm:"column:note;type:string;comment:备注" json:"note,omitempty"`
+	CollectNum  uint   `gorm:"column:collect_num;type:uint;default:0;comment:" json:"collect_num,omitempty"`
+	BrowseNum   uint   `gorm:"column:browse_num;type:uint;default:0;comment:" json:"browse_num,omitempty"`
 }
 
 func (us *UserService) Info(id uint) (*User, error) {
 	var user User
-
 	a := db.Table("video_UserCollectLog as a").Select("a.user_id,count(a.video_id) as collect_num").Where("a.DeletedAt is null and a.user_id = ?", id).Group("a.user_id")
 	b := db.Table("video_UserPageViewsLog as b").Select("b.user_id,sum(b.page_views) as browse_num").Where("b.DeletedAt is null and b.user_id = ?", id).Group("b.user_id")
-	if err := db.Table("video_User as users").
+	err := db.Table("video_User as users").
 		Select("users.id,users.username,users.nickname,users.sex,users.mobile,users.email,users.qq,users.avatar,users.designation,users.realname,users.idcard,users.address,users.note,collect_num,browse_num").
 		Joins("left join (?) as a on a.user_id = users.id", a).
 		Joins("left join (?) as b on b.user_id = users.id", b).
 		Where("users.id = ?", id).
 		Group("users.id,users.username,users.nickname,users.sex,users.mobile,users.email,users.qq,users.avatar,users.designation,users.realname,users.idcard,users.address,users.note").
-		First(&user).Error; err != nil {
+		First(&user).Error
+	if err != nil {
 		return nil, err
 	}
 
@@ -128,21 +126,11 @@ func (us *UserService) Update(id uint, column string, value interface{}) error {
 	return nil
 }
 
-func (us *UserService) Updates(id uint, updateUser model.User) error {
-	var user model.User
-	err := db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.First(&user, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-
-		if err := tx.Model(&user).Updates(updateUser).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	return err
+func (us *UserService) Updates(user model.User) error {
+	if err := db.Model(&user).Updates(user).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollectLog, error) {
@@ -154,7 +142,7 @@ func (us *UserService) CollectLog(userID uint, videoID uint) (*model.UserCollect
 	return &data, nil
 }
 
-func (us *UserService) FavoriteList(userID uint) ([]Video, error) {
+func (us *UserService) CollectList(userID uint) ([]Video, error) {
 	var videos []Video
 	err := db.Table("video_UserCollectLog as a").
 		Select("v.id, v.title, v.poster, v.duration, l.collection_volume, l.page_views, l.likes_count, l.dislikes_count").
@@ -168,32 +156,22 @@ func (us *UserService) FavoriteList(userID uint) ([]Video, error) {
 	return videos, nil
 }
 
-type VideoBrowse struct {
-	ID       uint   `json:"id"`
-	Title    string `json:"title"`
-	Duration string `json:"duration"`
-	Poster   string `json:"poster"`
+type VideoPageViews struct {
+	ID       uint    `json:"id"`
+	Title    string  `gorm:"column:title;type:varchar(255);uniqueIndex;comment:标题" json:"title"`
+	Duration float64 `gorm:"column:duration;type:float;default:0;comment:时长" json:"duration"`
+	Poster   string  `gorm:"column:poster;type:varchar(255);comment:封面" json:"poster"`
 }
 
-func (us *UserService) BrowseList(userID uint) ([]VideoBrowse, error) {
-	var videos []model.Video
-	result := db.Table("video_UserBrowseLog as a").
+func (us *UserService) VideoPageViewsList(userID uint) ([]VideoPageViews, error) {
+	var data []VideoPageViews
+	err := db.Table("video_UserPageViewsLog as a").
 		Select("v.id,v.title,v.duration,v.poster").
 		Joins("left join video_Video as v on v.id = a.video_id").
 		Where("a.user_id = ? and a.UpdatedAt >= ?", userID, utils.NowTime().StringToTime("yesterday")).
-		Order("a.UpdatedAt desc").
-		Find(&videos)
-	if err := result.Error; err != nil {
+		Order("a.UpdatedAt desc").Find(&data).Error
+	if err != nil {
 		return nil, err
-	}
-	data := make([]VideoBrowse, len(videos))
-	for k, video := range videos {
-		data[k] = VideoBrowse{
-			ID:       video.ID,
-			Title:    video.Title,
-			Duration: utils.ResolveTime(uint32(video.Duration)),
-			Poster:   video.Poster,
-		}
 	}
 	return data, nil
 }
