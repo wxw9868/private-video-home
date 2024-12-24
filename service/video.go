@@ -329,7 +329,7 @@ func (vs *VideoService) Comment(user *model.User, videoID uint, content string) 
 		return nil, err
 	}
 
-	data := map[string]interface{}{"commentID": comment.ID, "userAvatar": user.Avatar, "userNickname": user.Nickname, "content": content}
+	data := map[string]interface{}{"id": comment.ID, "avatar": user.Avatar, "nickname": user.Nickname, "content": content, "createdAt": comment.CreatedAt}
 	return data, nil
 }
 
@@ -363,19 +363,30 @@ func (vs *VideoService) Reply(user *model.User, videoID, parentID uint, content 
 }
 
 type VideoComment struct {
-	model.VideoComment
-	LogUserID uint `gorm:"comment:用户ID"`
-	Like      uint `gorm:"comment:支持（赞）"`
-	DisLIke   uint `gorm:"comment:反对（踩）"`
+	ID            uint      `json:"id"`
+	CreatedAt     time.Time `gorm:"comment:" json:"createdAt"`
+	ParentId      uint      `gorm:"column:parent_id;type:uint;not null;default:0;comment:父级评论的ID" json:"parentId"`
+	VideoId       uint      `gorm:"column:video_id;type:uint;not null;default:0;comment:被评论的视频ID" json:"videoId"`
+	UserId        uint      `gorm:"column:user_id;type:uint;not null;default:0;comment:评论人的ID" json:"userId"`
+	Nickname      string    `gorm:"column:nickname;type:varchar(13);null;comment:评论人的昵称" json:"nickname"`
+	Avatar        string    `gorm:"column:avatar;type:varchar(255);null;comment:评论人的头像地址" json:"avatar"`
+	Content       string    `gorm:"column:content;type:text;not null;comment:评论内容" json:"content"`
+	LikesCount    uint      `gorm:"column:likes_count;type:uint;not null;default:0;comment:点赞量" json:"likesCount"`
+	DislikesCount uint      `gorm:"column:dislikes_count;type:uint;not null;default:0;comment:点踩量" json:"dislikesCount"`
+	Like          int8      `gorm:"column:like;type:uint;not null;default:0;comment:支持（赞）" json:"like"`
+	Dislike       int8      `gorm:"column:dislike;type:uint;not null;default:0;comment:反对（踩）" json:"dislike"`
+	LogUserID     uint      `gorm:"column:log_user_id;comment:用户ID" json:"logUserId"`
 }
 
 func (vs *VideoService) CommentList(userID, videoID uint) ([]*CommentTree, error) {
 	var list []VideoComment
 	query := db.Model(&model.UserCommentLog{}).Where("video_id = ? and user_id = ?", videoID, userID)
-	if err := db.Table("video_VideoComment as c").
+	err := db.Table("video_VideoComment as c").
+		Select("c.id, c.CreatedAt, c.parent_id, c.video_id, c.user_id, c.nickname, c.avatar, c.content, c.likes_count, c.dislikes_count, l.like, l.dislike, l.user_id as log_user_id").
+		Joins("left join (?) l on l.comment_id = c.id", query).
 		Where("c.video_id = ?", videoID).
-		Select("c.*", "l.user_id as log_user_id", "l.like", "l.dislike").
-		Joins("left join (?) l on l.comment_id = c.id", query).Order("c.id desc").Find(&list).Error; err != nil {
+		Order("c.id desc").Find(&list).Error
+	if err != nil {
 		return nil, err
 	}
 	return tree(list), nil
@@ -388,10 +399,10 @@ func (vs *VideoService) LikeVideoComment(userID, commentID uint, like int8) erro
 	}
 
 	// 减少1
-	expr := "like - 1"
+	expr := "likes_count - 1"
 	if like == 1 {
 		// 增加1
-		expr = "like + 1"
+		expr = "likes_count + 1"
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
@@ -399,7 +410,7 @@ func (vs *VideoService) LikeVideoComment(userID, commentID uint, like int8) erro
 			return fmt.Errorf("创建失败: %s", err)
 		}
 
-		if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", commentID, comment.VideoId).Update("like", gorm.Expr(expr)).Error; err != nil {
+		if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", commentID, comment.VideoId).Update("likes_count", gorm.Expr(expr)).Error; err != nil {
 			return fmt.Errorf("更新失败: %s", err)
 		}
 
@@ -414,10 +425,10 @@ func (vs *VideoService) DislikeVideoComment(userID, commentID uint, dislike int8
 	}
 
 	// 减少1
-	expr := "dislike - 1"
+	expr := "dislikes_count - 1"
 	if dislike == 1 {
 		// 增加1
-		expr = "dislike + 1"
+		expr = "dislikes_count + 1"
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
@@ -425,7 +436,7 @@ func (vs *VideoService) DislikeVideoComment(userID, commentID uint, dislike int8
 			return fmt.Errorf("创建失败: %s", err)
 		}
 
-		if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", commentID, comment.VideoId).Update("oppose", gorm.Expr(expr)).Error; err != nil {
+		if err := tx.Model(&model.VideoComment{}).Where("id = ? and video_id = ?", commentID, comment.VideoId).Update("dislikes_count", gorm.Expr(expr)).Error; err != nil {
 			return fmt.Errorf("更新失败: %s", err)
 		}
 
@@ -435,12 +446,10 @@ func (vs *VideoService) DislikeVideoComment(userID, commentID uint, dislike int8
 
 type CommentTree struct {
 	VideoComment
-	// model.VideoComment
-	Childrens []CommentTree
+	Childrens []CommentTree `json:"childrens"`
 }
 
 func tree(list []VideoComment) []*CommentTree {
-	// func tree(list []model.VideoComment) []*CommentTree {
 	var data = make(map[uint]*CommentTree)
 	var childrens = make(map[uint][]CommentTree)
 	var dataSort []uint
@@ -463,7 +472,6 @@ func tree(list []VideoComment) []*CommentTree {
 	}
 
 	return result
-	// return recursive(data, childrens)
 }
 
 func recursiveSort(data map[uint]*CommentTree, childrens map[uint][]CommentTree, dataSort, childrensSort []uint) map[uint]*CommentTree {
@@ -499,25 +507,6 @@ func deleteArray(d []uint, e uint) []uint {
 	}
 	return r
 }
-
-// func recursive(data map[uint]*CommentTree, childrens map[uint][]CommentTree) map[uint]*CommentTree {
-// 	for _, v := range data {
-// 		videoComments, ok := childrens[v.ID]
-// 		if ok {
-// 			v.Childrens = videoComments
-// 			delete(childrens, v.ID)
-// 			if len(childrens) > 0 {
-// 				data := make(map[uint]*CommentTree, len(videoComments))
-// 				for _, v := range videoComments {
-// 					videoComment := v
-// 					data[v.ID] = &videoComment
-// 				}
-// 				recursive(data, childrens)
-// 			}
-// 		}
-// 	}
-// 	return data
-// }
 
 type VideoDanmu struct {
 	Text   string  `json:"text" gorm:"comment:弹幕文本"`
