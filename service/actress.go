@@ -14,24 +14,53 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/wxw9868/video/model"
+	"github.com/wxw9868/video/model/request"
 	"github.com/wxw9868/video/utils"
 	"gorm.io/gorm"
 )
 
 type ActressService struct{}
 
-func (as *ActressService) Create(name string) error {
-	result := db.Where(model.Actress{Actress: name}).FirstOrCreate(&model.Actress{Actress: name, Avatar: "assets/image/avatar/anonymous.png"})
+func (as *ActressService) Create(req request.CreateActress) error {
+	if req.Avatar == "" {
+		req.Avatar = "assets/image/avatar/anonymous.png"
+	}
+	result := db.Where(model.Actress{Actress: req.Name}).FirstOrCreate(&model.Actress{
+		Actress:      req.Name,
+		Alias:        req.Alias,
+		Avatar:       req.Avatar,
+		Birth:        req.Birth,
+		Measurements: req.Measurements,
+		CupSize:      req.CupSize,
+		DebutDate:    req.DebutDate,
+		StarSign:     req.StarSign,
+		BloodGroup:   req.BloodGroup,
+		Stature:      req.Stature,
+		Nationality:  req.Nationality,
+		Intro:        req.Intro,
+	})
 	if result.RowsAffected == 1 {
 		return nil
 	}
 	return errors.New("演员存在")
 }
 
-func (as *ActressService) Updates(id uint, name string) error {
-	var actress model.Actress
-	actress.ID = id
-	if err := db.Model(&actress).Updates(model.Actress{Actress: name}).Error; err != nil {
+func (as *ActressService) Updates(req request.UpdateActress) error {
+	actress := model.Actress{
+		Actress:      req.Name,
+		Alias:        req.Alias,
+		Avatar:       req.Avatar,
+		Birth:        req.Birth,
+		Measurements: req.Measurements,
+		CupSize:      req.CupSize,
+		DebutDate:    req.DebutDate,
+		StarSign:     req.StarSign,
+		BloodGroup:   req.BloodGroup,
+		Stature:      req.Stature,
+		Nationality:  req.Nationality,
+		Intro:        req.Intro,
+	}
+	if err := db.Model(&model.Actress{}).Where("id = ?", req.Id).Updates(actress).Error; err != nil {
 		return err
 	}
 	return nil
@@ -51,7 +80,7 @@ type Actress struct {
 	Count   uint32 `gorm:"column:count" json:"count"`
 }
 
-func (as *ActressService) List(page, pageSize int, action, sort, actress string) (data map[string]interface{}, err error) {
+func (as *ActressService) List(req request.SearchActress) (data map[string]interface{}, err error) {
 	var ids []uint
 
 	f := func(ids []uint, totalCount int) (map[string]interface{}, error) {
@@ -69,15 +98,11 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 				Count:   uint32(count),
 			}
 		}
-		data = map[string]interface{}{
-			"list":  actresss,
-			"count": totalCount,
-		}
-		return data, nil
+		return map[string]interface{}{"list": actresss, "total": totalCount}, nil
 	}
 
-	if actress != "" {
-		var adb = db.Model(&model.Actress{}).Where("actress like ?", "%"+actress+"%")
+	if req.Actress != "" {
+		var adb = db.Model(&model.Actress{}).Where("actress like ?", "%"+req.Actress+"%")
 		var count int64
 		if err = adb.Count(&count).Error; err != nil {
 			return nil, err
@@ -88,18 +113,18 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 
 	var key string
 	var sql = "SELECT a.id, a.actress, a.avatar, count(va.video_id) as count FROM video_Actress a left join video_VideoActress va on a.id = va.actress_id group by 1,2,3"
-	if action != "" && sort != "" {
-		sql += utils.Join(" order by ", action, " ", sort)
+	if req.Column != "" && req.Order != "" {
+		sql += utils.Join(" order by ", req.Column, " ", req.Order)
 	}
 
 	var totalCount int64
 	var adb = db.Model(&model.Actress{})
-	switch action {
+	switch req.Column {
 	case "a.CreatedAt":
-		adb = adb.Order(utils.Join("CreatedAt", " ", sort))
+		adb = adb.Order(utils.Join("CreatedAt", " ", req.Order))
 		key = "video_actress_createdAt"
 	case "a.actress":
-		adb = adb.Order(utils.Join("actress", " ", sort))
+		adb = adb.Order(utils.Join("actress", " ", req.Order))
 		key = "video_actress_actress"
 	case "count":
 		adb = db.Table("(?)", db.Raw(sql))
@@ -114,7 +139,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		key = "video_actress"
 	}
 
-	if action != "count" {
+	if req.Column != "count" {
 		if err = adb.Count(&totalCount).Error; err != nil {
 			return nil, err
 		}
@@ -139,7 +164,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 	}
 
 	var actresss []Actress
-	if err = db.Raw(sql).Scopes(Paginate(page, pageSize, int(count))).Scan(&actresss).Error; err != nil {
+	if err = db.Raw(sql).Scopes(Paginate(req.Page, req.Size, int(count))).Scan(&actresss).Error; err != nil {
 		return nil, err
 	}
 
@@ -163,12 +188,7 @@ func (as *ActressService) List(page, pageSize int, action, sort, actress string)
 		return nil, err
 	}
 
-	data = map[string]interface{}{
-		"list":  actresss,
-		"count": count,
-	}
-
-	return data, nil
+	return map[string]interface{}{"list": actresss, "total": count}, nil
 }
 
 func (as *ActressService) Info(id uint) (*model.Actress, error) {
@@ -182,49 +202,6 @@ func (as *ActressService) Info(id uint) (*model.Actress, error) {
 // SaveActress 补充信息
 func (as *ActressService) SaveActress() error {
 	var strs = map[string]string{
-		"望月しおん": `别名: 桜井ひなた,井坂由希恵
-三围: B80 / W55 / H82
-身高: 152cm`,
-		"橘ひなた": `别名: 小日向ひかり, 牧瀬美央, 高橋陽子
-出生: 1990年08月11日
-三围: B83 / W60 / H86
-罩杯: D Cup
-出道日期: n/a
-星座: Leo
-血型: A
-身高: 160cm
-国籍: 日本
-简介: 暂无关于橘ひなた(Hinata Tachibana/34岁)的介绍。`,
-		"中原あきな": `别名: あまねなのは
-出生: 1990年02月20日
-三围: B84 / W58 / H84
-罩杯: E Cup
-出道日期: 2008年09月
-星座: Pisces
-血型: n/a
-身高: n/a
-国籍: 日本
-简介: 暂无关于あまねなのは(Nanoha Amane/34岁)的介绍。`,
-		"小野麻里亜": `别名: Maria Ono, 中村真理亜, 小野まり, 小野まりあ, 小野麻理亜, 尾崎ゆりあ, 椎名綺更, 神代凛, 神代凜
-出生: 1989年03月16日
-三围: B86 / W60 / H87
-罩杯: E Cup
-出道日期: n/a
-星座: Pisces
-血型: B
-身高: 150cm
-国籍: 日本
-简介: 暂无关于小野麻里亜(Maria Ono/35岁)的介绍。`,
-		"渋谷まなか": `别名: 彩葉みおり, 豊田愛菜, 川村里穂, 大橋愛菜
-出生: 1995年05月11日
-三围: B95 / W60 / H87
-罩杯: H Cup
-出道日期: 2017年11月
-星座: Taurus
-血型: n/a
-身高: 168 cm
-国籍: 日本
-简介: 暂无关于豊田愛菜(Mana Toyota/29岁)的介绍。`,
 		//		"小野静香": `别名: 秋野早苗
 		//出生: 1995年07月31日
 		//三围: B80 / W60 / H87

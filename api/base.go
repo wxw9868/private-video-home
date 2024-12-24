@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	gofoundClient "github.com/wxw9868/video/initialize/gofound"
+	"github.com/wxw9868/video/model"
 	"github.com/wxw9868/video/service"
 )
 
@@ -25,23 +26,21 @@ var (
 	// actressListSort []string
 )
 
+func GetUser(c *gin.Context) *model.User {
+	session := sessions.Default(c)
+	user := new(model.User)
+	user.ID = session.Get("user_id").(uint)
+	user.Avatar = session.Get("user_avatar").(string)
+	user.Username = session.Get("user_username").(string)
+	user.Nickname = session.Get("user_nickname").(string)
+	user.Email = session.Get("user_email").(string)
+	user.Mobile = session.Get("user_mobile").(string)
+	user.Designation = session.Get("user_designation").(string)
+	return user
+}
+
 func GetUserID(c *gin.Context) uint {
-	return sessions.Default(c).Get("user_id").(uint)
-}
-
-type Common struct {
-	ID uint `uri:"id" binding:"required"`
-}
-
-type Paginate struct {
-	Page int `uri:"page" form:"page" json:"page"`
-	Size int `uri:"size" form:"size" json:"size"`
-	// PageSize uint `form:"page_size" json:"page_size"`
-}
-
-type OrderBy struct {
-	Column string `uri:"column" form:"column" json:"column"`
-	Order  string `uri:"order" form:"order" json:"order"`
+	return GetUser(c).ID
 }
 
 type Message struct {

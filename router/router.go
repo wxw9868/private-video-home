@@ -28,8 +28,8 @@ func Router(r *gin.Engine) {
 		user.POST("updateUserInfo", api.UpdateUserInfoApi)
 		user.POST("changeUserAvatar", api.ChangeUserAvatarApi)
 		user.POST("changePassword", api.ChangePasswordApi)
-		user.GET("getUserFavoriteList", api.GetUserFavoriteListApi)
-		user.GET("getUserBrowseList", api.GetUserBrowseListApi)
+		user.GET("getUserVideoCollectList", api.GetUserVideoCollectListApi)
+		user.GET("getUserVideoPageViewsList", api.GetUserVideoPageViewsListApi)
 		user.GET("getUserLoginLogListApi", api.GetUserLoginLogListApi)
 	}
 
@@ -50,20 +50,20 @@ func Router(r *gin.Engine) {
 		video.POST("collectVideo", api.CollectVideoApi)
 		video.POST("importVideoData", api.ImportVideoDataApi)
 		video.GET("writeGoFound", api.VideoWriteGoFound)
-		video.GET("searchVideo", api.VideoSearchApi)
+		video.GET("searchVideo", api.SearchVideoApi)
 
 		comment := video.Group("comment")
 		{
 			comment.GET("getVideoCommentList/:id", api.GetVideoCommentListApi)
-			comment.POST("videoComment", api.VideoCommentApi)
+			comment.POST("postVideoComment", api.PostVideoCommentApi)
 			comment.POST("replyVideoComment", api.ReplyVideoCommentApi)
 			comment.POST("likeVideoComment", api.LikeVideoCommentApi)
 			comment.POST("dislikeVideoComment", api.DislikeVideoCommentApi)
 		}
 		danmu := video.Group("danmu")
 		{
-			danmu.POST("sendVideoBarrage", api.SendVideoBarrageApi)
-			danmu.GET("getVideoBarrageList/:id", api.GetVideoBarrageListApi)
+			danmu.POST("postVideoDanmu", api.PostVideoDanmuApi)
+			danmu.GET("getVideoDanmuList/:id", api.GetVideoDanmuListApi)
 		}
 	}
 
@@ -79,10 +79,13 @@ func Router(r *gin.Engine) {
 	}
 
 	tag := private.Group("tag")
-	tag.POST("createTag", api.CreateTagApi)
-	tag.POST("updateTag", api.UpdateTagApi)
-	tag.POST("getTagList", api.GetTagListApi)
-	tag.GET("deleteTag/:id", api.DeleteTagApi)
+	{
+		tag.POST("createTag", api.CreateTagApi)
+		tag.POST("getTagList", api.GetTagListApi)
+		tag.GET("getTagInfo/:id", api.GetTagInfoApi)
+		tag.POST("updateTag", api.UpdateTagApi)
+		tag.GET("deleteTag/:id", api.DeleteTagApi)
+	}
 
 	stock := private.Group("stock")
 	stock.POST("importTradingRecords", api.ImportTradingRecordsApi)

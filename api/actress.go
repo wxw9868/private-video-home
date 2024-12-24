@@ -5,22 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wxw9868/util"
+	"github.com/wxw9868/video/model/request"
 )
-
-type Actress struct {
-	Name         string `form:"name" json:"name" binding:"required"`
-	Alias        string `form:"alias" json:"alias"`
-	Avatar       string `form:"avatar" json:"avatar" example:"assets/image/avatar/anonymous.png"`
-	Birth        string `form:"birth" json:"birth"`
-	Measurements string `form:"measurements" json:"measurements"`
-	CupSize      string `form:"cup_size" json:"cup_size"`
-	DebutDate    string `form:"debut_date" json:"debut_date"`
-	StarSign     string `form:"star_sign" json:"star_sign"`
-	BloodGroup   string `form:"blood_group" json:"blood_group"`
-	Stature      string `form:"stature" json:"stature"`
-	Nationality  string `form:"nationality" json:"nationality"`
-	Intro        string `form:"intro" json:"intro"`
-}
 
 // CreateActressApi godoc
 //
@@ -28,30 +14,24 @@ type Actress struct {
 //	@Tags		actress
 //	@Accept		json
 //	@Produce	json
-//	@Param		data	body		Actress	true	"演员信息"
+//	@Param		data	body		request.CreateActress	true	"演员信息"
 //	@Success	200		{object}	Success
 //	@Failure	400		{object}	Fail
 //	@Failure	404		{object}	NotFound
 //	@Failure	500		{object}	ServerError
 //	@Router		/actress/createActress [post]
 func CreateActressApi(c *gin.Context) {
-	var bind Actress
+	var bind request.CreateActress
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
 
-	if err := actressService.Create(bind.Name); err != nil {
+	if err := actressService.Create(bind); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, util.Success("添加成功", nil))
-}
-
-type ActressList struct {
-	Paginate
-	OrderBy
-	Actress string `uri:"actress"  form:"actress"  json:"actress"`
 }
 
 // GetActressListApi godoc
@@ -71,13 +51,13 @@ type ActressList struct {
 //	@Failure	500		{object}	ServerError
 //	@Router		/actress/getActressList [post]
 func GetActressListApi(c *gin.Context) {
-	var bind ActressList
+	var bind request.SearchActress
 	if err := c.ShouldBind(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
 
-	data, err := actressService.List(bind.Page, bind.Size, bind.Column, bind.Order, bind.Actress)
+	data, err := actressService.List(bind)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
@@ -99,7 +79,7 @@ func GetActressListApi(c *gin.Context) {
 //	@Failure	500	{object}	ServerError
 //	@Router		/actress/getActressInfo/{id} [get]
 func GetActressInfoApi(c *gin.Context) {
-	var bind Common
+	var bind request.Common
 	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
@@ -126,7 +106,7 @@ func GetActressInfoApi(c *gin.Context) {
 //	@Failure	500	{object}	ServerError
 //	@Router		/actress/deleteActress/{id} [delete]
 func DeleteActressApi(c *gin.Context) {
-	var bind Common
+	var bind request.Common
 	if err := c.ShouldBindUri(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
@@ -139,31 +119,26 @@ func DeleteActressApi(c *gin.Context) {
 	c.JSON(http.StatusOK, util.Success("删除成功", nil))
 }
 
-type UpdateActress struct {
-	Id uint `json:"id" binding:"required" `
-	Actress
-}
-
 // UpdateActressApi godoc
 //
 //	@Summary	更新演员信息
 //	@Tags		actress
 //	@Accept		json
 //	@Produce	json
-//	@Param		data	body		UpdateActress	true	"演员信息"
+//	@Param		data	body		request.UpdateActress	true	"演员信息"
 //	@Success	200		{object}	Success
 //	@Failure	400		{object}	Fail
 //	@Failure	404		{object}	NotFound
 //	@Failure	500		{object}	ServerError
 //	@Router		/actress/updateActress [post]
 func UpdateActressApi(c *gin.Context) {
-	var bind UpdateActress
+	var bind request.UpdateActress
 	if err := c.ShouldBindJSON(&bind); err != nil {
 		c.JSON(http.StatusBadRequest, util.Fail(err.Error()))
 		return
 	}
 
-	if err := actressService.Updates(bind.Id, bind.Name); err != nil {
+	if err := actressService.Updates(bind); err != nil {
 		c.JSON(http.StatusInternalServerError, util.Fail(err.Error()))
 		return
 	}
